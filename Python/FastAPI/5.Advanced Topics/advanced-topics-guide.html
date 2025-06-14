@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastAPI Advanced Topics Guide</title>
+    <style>        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: #2c3e50;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background: #34495e;
+            border-bottom: 1px solid #455a75;
+        }
+
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 1.3em;
+            color: #ecf0f1;
+            border: none;
+            padding: 0;
+        }
+
+        .sidebar-nav {
+            padding: 0;
+        }
+
+        .sidebar-section {
+            border-bottom: 1px solid #455a75;
+        }
+
+        .sidebar-section-title {
+            background: #34495e;
+            color: #ecf0f1;
+            padding: 15px 20px;
+            margin: 0;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-section-title:hover {
+            background: #455a75;
+        }
+
+        .sidebar-links {
+            background: #2c3e50;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .sidebar-section.active .sidebar-links {
+            max-height: 500px;
+        }
+
+        .sidebar-links a {
+            display: block;
+            color: #bdc3c7;
+            text-decoration: none;
+            padding: 12px 25px;
+            border-bottom: 1px solid #34495e;
+            transition: background 0.2s ease;
+        }
+
+        .sidebar-links a:hover {
+            background: #34495e;
+            color: #ecf0f1;
+        }
+
+        .sidebar-links a.current {
+            background: #3498db;
+            color: white;
+            font-weight: 600;
+        }
+
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .sidebar-toggle {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            font-size: 2.8em;
+            background: linear-gradient(45deg, #3498db, #9b59b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        h2 {
+            color: #2c3e50;
+            border-left: 5px solid #3498db;
+            padding-left: 15px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        
+        h3 {
+            color: #34495e;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+        
+        .topic-section {
+            margin: 30px 0;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+            background-color: #f8f9fa;
+        }
+        
+        .advanced-note {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .advanced-note h4 {
+            color: white;
+            margin-top: 0;
+            font-size: 1.2em;
+        }
+        
+        .code-container {
+            position: relative;
+            margin: 15px 0;
+        }
+        
+        .code-block {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            border: 1px solid #3c3c3c;
+            position: relative;
+        }
+        
+        .copy-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            opacity: 0.8;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .copy-button:hover {
+            opacity: 1;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+        }
+        
+        .copy-button:active {
+            background-color: #27ae60;
+            transform: translateY(0);
+        }
+        
+        ul, ol {
+            padding-left: 20px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        .toc {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border: 1px solid #bdc3c7;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .toc h3 {
+            margin-top: 0;
+            color: #2c3e50;
+            text-align: center;
+            font-size: 1.6em;
+        }
+        
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 10px;
+        }
+        
+        .toc li {
+            margin-bottom: 8px;
+        }
+        
+        .toc a {
+            color: #3498db;
+            text-decoration: none;
+            padding: 8px 12px;
+            display: block;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .toc a:hover {
+            background-color: #3498db;
+            color: white;
+            transform: translateX(5px);
+        }
+        
+        .performance-tips {
+            background-color: #e8f5e8;
+            border: 1px solid #27ae60;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid #27ae60;
+        }
+        
+        .performance-tips h4 {
+            color: #27ae60;
+            margin-top: 0;
+        }
+        
+        .deployment-section {
+            background-color: #fff3e0;
+            border: 1px solid #ff9800;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid #ff9800;
+        }
+        
+        .deployment-section h3 {
+            color: #f57c00;
+            margin-top: 0;
+        }
+        
+        .file-structure {
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            margin: 15px 0;
+            line-height: 1.4;
+        }
+        
+        .keyword {
+            background-color: #3498db;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+        
+        .string {
+            color: #ce9178;
+        }
+        
+        .comment {
+            color: #6a9955;
+            font-style: italic;
+        }
+        
+        .function {
+            color: #dcdcaa;
+        }
+        
+        .variable {
+            color: #9cdcfe;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+            
+            .code-block {
+                font-size: 12px;
+                padding: 15px;
+            }
+            
+            .toc ul {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2.2em;
+            }
+            
+            h2 {
+                font-size: 1.5em;
+            }
+        }
+        
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Highlight target section */
+        :target {
+            background-color: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: -15px;
+            animation: highlight 2s ease-in-out;
+        }
+        
+        @keyframes highlight {
+            0% { background-color: #3498db; }
+            100% { background-color: #fff3cd; }
+        }
+        
+        /* Enhanced visual effects */
+        .code-container:hover .copy-button {
+            opacity: 1;
+        }
+        
+        .topic-section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+      <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2>� Python Guides</h2>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    🤖 Agentic AI <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../../Agentic AI/agentic-ai-guide.html">AI Agents Guide</a>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    ⚡ Async Programming <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../../Async Programming/async-programming-guide.html">Asyncio & Concurrency</a>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    🎨 Decorators <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../../Decorators/decorators-guide.html">Python Decorators</a>
+                </div>
+            </div>
+            <div class="sidebar-section active">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    🚀 FastAPI <span>▼</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../fastapi-guide.html">FastAPI Overview</a>
+                    <a href="../1.Basic/fastapi-basics-complete.html">FastAPI Fundamentals</a>
+                    <a href="../2.API Development/api-development-guide.html">API Development</a>
+                    <a href="../3.Security/security-guide.html">Security & Authentication</a>
+                    <a href="../4.Testing/testing-guide.html">Testing Strategies</a>
+                    <a href="../5.Advanced Topics/advanced-topics-guide.html" class="current">Advanced Topics</a>
+                    <a href="../6.Miscellanous/miscellaneous-guide.html">Tips & Best Practices</a>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    🦜 LangChain <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../../LangChain/langchain-documentation.html">LangChain Framework</a>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    � LangGraph <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../../LangGraph/langgraph-guide.html">Graph-based AI</a>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="container">
+        <h1>⚡ FastAPI Advanced Topics</h1>
+        
+        <div class="toc">
+            <h3>📚 Advanced Topics Overview</h3>
+            <ul>
+                <li><a href="#middleware">🔧 Middleware</a></li>
+                <li><a href="#background-tasks">⚙️ Background Tasks</a></li>
+                <li><a href="#database-connections">🗄️ Database Connections</a></li>
+                <li><a href="#sqlalchemy">📊 SQLAlchemy Integration</a></li>
+                <li><a href="#dependency-injection">💉 Dependency Injection</a></li>
+                <li><a href="#exception-handling">⚠️ Exception Handling</a></li>
+                <li><a href="#application-structure">🏗️ Application Structure</a></li>
+                <li><a href="#deployment">🚀 Deployment</a></li>
+                <li><a href="#performance">⚡ Performance</a></li>
+            </ul>
+        </div>
+
+        <div class="advanced-note">
+            <h4>🎯 About Advanced Topics</h4>
+            <p>This guide covers advanced FastAPI concepts that will help you build production-ready, scalable applications. These topics assume familiarity with basic FastAPI concepts and focus on enterprise-level features and best practices.</p>
+        </div>
+
+        <div id="middleware" class="topic-section">
+            <h2>🔧 Middleware in FastAPI</h2>
+            <p>Middleware in FastAPI allows you to process requests and responses globally before they reach your endpoints or after they leave them. Middleware is implemented as a function or class that takes a request, performs some operations (e.g., logging, authentication, or modifying headers), and passes it to the next middleware or endpoint.</p>
+            
+            <div class="code-container">
+                <button class="copy-button" onclick="copyCode(this)">Copy</button>
+                <div class="code-block">from fastapi import FastAPI
+from starlette.middleware.base import BaseHTTPMiddleware
+
+app = FastAPI()
+
+class CustomMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        response = await call_next(request)
+        response.headers['X-Custom-Header'] = 'Custom Value'
+        return response
+
+app.add_middleware(CustomMiddleware)</div>
+            </div>
+        </div>
+
+        <div id="background-tasks" class="topic-section">
+            <h2>⚙️ Background Tasks in FastAPI</h2>
+            <p>Background tasks allow you to execute operations asynchronously after sending a response to the client. This is useful for tasks like sending emails, processing data, or logging.</p>
+            
+            <div class="code-container">
+                <button class="copy-button" onclick="copyCode(this)">Copy</button>
+                <div class="code-block">from fastapi import FastAPI, BackgroundTasks
+
+app = FastAPI()
+
+def write_log(message: str):
+    with open("log.txt", "a") as log_file:
+        log_file.write(message + "\n")
+
+@app.post("/send-message/")
+async def send_message(background_tasks: BackgroundTasks, message: str):
+    background_tasks.add_task(write_log, message)
+    return {"message": "Message sent"}</div>
+            </div>
+        </div>
+
+        <div id="database-connections" class="topic-section">
+            <h2>🗄️ Managing Database Connections in FastAPI</h2>
+            <p>Database connections in FastAPI can be managed using connection pools or libraries like <code>databases</code> or <code>SQLAlchemy</code>. You can use dependency injection to ensure proper connection handling.</p>
+            
+            <div class="code-container">
+                <button class="copy-button" onclick="copyCode(this)">Copy</button>
+                <div class="code-block">from fastapi import FastAPI, Depends
+from sqlalchemy.orm import Session
+from .database import get_db
+
+app = FastAPI()
+
+@app.get("/items/")
+async def read_items(db: Session = Depends(get_db)):
+    return db.query(Item).all()</div>
+            </div>
+        </div>
+
+        <div id="sqlalchemy" class="topic-section">
+            <h2>📊 Integrating SQLAlchemy with FastAPI</h2>
+            <p>SQLAlchemy can be integrated with FastAPI for ORM-based database operations. You need to set up a database engine, session, and models.</p>
+            
+            <div class="code-container">
+                <button class="copy-button" onclick="copyCode(this)">Copy</button>
+                <div class="code-block">from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+
+DATABASE_URL = "sqlite:///./test.db"
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
+
+class Item(Base):
+    __tablename__ = "items"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, index=True)
+
+Base.metadata.create_all(bind=engine)</div>
+            </div>
+        </div>
+
+        <div id="dependency-injection" class="topic-section">
+            <h2>💉 Dependency Injection in FastAPI</h2>
+            <p>Dependency Injection in FastAPI allows you to manage shared resources, configurations, or services efficiently. It is implemented using the <code>Depends</code> function.</p>
+            
+            <div class="code-container">
+                <button class="copy-button" onclick="copyCode(this)">Copy</button>
+                <div class="code-block">from fastapi import Depends
+
+def get_config():
+    return {"key": "value"}
+
+@app.get("/config/")
+async def read_config(config: dict = Depends(get_config)):
+    return config</div>
+            </div>
+        </div>
+
+        <div id="exception-handling" class="topic-section">
+            <h2>⚠️ Exception Handling in FastAPI</h2>
+            <p>FastAPI provides a way to handle exceptions globally using custom exception handlers. You can define handlers for specific exceptions or use middleware for broader error handling.</p>
+            
+            <div class="code-container">
+                <button class="copy-button" onclick="copyCode(this)">Copy</button>
+                <div class="code-block">from fastapi import FastAPI, HTTPException
+from fastapi.responses import JSONResponse
+
+app = FastAPI()
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request, exc):
+    return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})</div>
+            </div>
+        </div>
+
+        <div id="application-structure" class="topic-section">
+            <h2>🏗️ Structuring Large FastAPI Applications</h2>
+            <p>Large FastAPI applications can be structured using modules, routers, and dependency injection. You can organize your code into separate files for models, routers, services, and configurations.</p>
+            
+            <div class="file-structure">project/
+├── app/
+│   ├── main.py
+│   ├── routers/
+│   │   ├── items.py
+│   │   ├── users.py
+│   ├── models/
+│   │   ├── item.py
+│   │   ├── user.py
+│   ├── services/
+│   │   ├── database.py
+│   │   ├── auth.py</div>
+        </div>
+
+        <div id="deployment" class="topic-section">
+            <h2>🚀 Deploying FastAPI Applications</h2>
+            <p>FastAPI applications can be deployed using Docker, Kubernetes, or cloud platforms like AWS, Azure, and Google Cloud.</p>
+            
+            <div class="deployment-section">
+                <h3>🐳 Docker Deployment</h3>
+                <p>Create a <code>Dockerfile</code>:</p>
+                <div class="code-container">
+                    <button class="copy-button" onclick="copyCode(this)">Copy</button>
+                    <div class="code-block">FROM python:3.9
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY . .
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]</div>
+                </div>
+            </div>
+            
+            <div class="deployment-section">
+                <h3>☸️ Kubernetes Deployment</h3>
+                <p>Create a <code>deployment.yaml</code>:</p>
+                <div class="code-container">
+                    <button class="copy-button" onclick="copyCode(this)">Copy</button>
+                    <div class="code-block">apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastapi-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: fastapi-app
+  template:
+    metadata:
+      labels:
+        app: fastapi-app
+    spec:
+      containers:
+      - name: fastapi-app
+        image: fastapi:latest
+        ports:
+        - containerPort: 8000</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="performance" class="topic-section">
+            <h2>⚡ Performance Improvements in FastAPI</h2>
+            
+            <div class="performance-tips">
+                <h4>🚀 Performance Optimization Tips</h4>
+                <ul>
+                    <li><strong>Use async functions</strong> for I/O-bound operations</li>
+                    <li><strong>Enable caching</strong> with tools like Redis</li>
+                    <li><strong>Use a reverse proxy</strong> like Nginx</li>
+                    <li><strong>Optimize database queries</strong> and use connection pooling</li>
+                    <li><strong>Use middleware</strong> for logging and monitoring</li>
+                    <li><strong>Profile and benchmark</strong> your application using tools like Locust or Apache Benchmark</li>
+                    <li><strong>Implement proper error handling</strong> to avoid resource leaks</li>
+                    <li><strong>Use streaming responses</strong> for large data transfers</li>
+                    <li><strong>Minimize dependencies</strong> and use lazy loading</li>
+                    <li><strong>Enable compression</strong> for API responses</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="advanced-note">
+            <h4>🎓 Next Steps</h4>
+            <p>These advanced topics provide the foundation for building enterprise-level FastAPI applications. Consider exploring additional areas like:</p>
+            <ul>
+                <li><strong>Microservices Architecture</strong> with FastAPI</li>
+                <li><strong>Event-driven systems</strong> using message queues</li>
+                <li><strong>Advanced security patterns</strong> and OAuth2 flows</li>
+                <li><strong>Monitoring and observability</strong> with Prometheus and Grafana</li>
+                <li><strong>API Gateway integration</strong> and service mesh</li>
+                <li><strong>Advanced testing strategies</strong> for complex systems</li>
+            </ul>
+        </div>
+
+    </div>
+
+    <script>
+        function copyCode(button) {
+            const codeBlock = button.nextElementSibling;
+            const text = codeBlock.textContent;
+            
+            navigator.clipboard.writeText(text).then(function() {
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.style.backgroundColor = '#27ae60';
+                
+                setTimeout(function() {
+                    button.textContent = originalText;
+                    button.style.backgroundColor = '#3498db';
+                }, 2000);
+            }).catch(function(err) {
+                console.error('Could not copy text: ', err);
+                
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.style.backgroundColor = '#27ae60';
+                
+                setTimeout(function() {
+                    button.textContent = originalText;
+                    button.style.backgroundColor = '#3498db';
+                }, 2000);
+            });
+        }
+
+        // Add smooth scrolling to all links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add intersection observer for highlighting current section
+        const sections = document.querySelectorAll('.topic-section');
+        const tocLinks = document.querySelectorAll('.toc a');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocLinks.forEach(link => {
+                        link.style.backgroundColor = '';
+                        link.style.color = '#3498db';
+                        if (link.getAttribute('href') === `#${id}`) {
+                            link.style.backgroundColor = '#3498db';
+                            link.style.color = 'white';                        }
+                    });
+                }
+            });
+        }, { threshold: 0.3 });
+
+        sections.forEach(section => {
+            observer.observe(section);
+        });
+
+        // Sidebar functionality
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        function toggleSection(element) {
+            const section = element.parentElement;
+            const isActive = section.classList.contains('active');
+            
+            // Close all sections
+            document.querySelectorAll('.sidebar-section').forEach(sec => {
+                sec.classList.remove('active');
+                const arrow = sec.querySelector('.sidebar-section-title span');
+                if (arrow) arrow.textContent = '▶';
+            });
+            
+            // Open clicked section if it wasn't active
+            if (!isActive) {
+                section.classList.add('active');
+                const arrow = element.querySelector('span');
+                if (arrow) arrow.textContent = '▼';
+            }
+        }
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.querySelector('.sidebar-toggle');
+            
+            if (window.innerWidth <= 768 && 
+                !sidebar.contains(event.target) && 
+                !sidebarToggle.contains(event.target)) {
+                sidebar.classList.remove('active');
+            }
+        });
+    </script>
+    </div> <!-- End main-content -->
+</body>
+</html>

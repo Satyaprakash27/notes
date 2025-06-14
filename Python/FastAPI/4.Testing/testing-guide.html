@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastAPI Testing Guide</title>
+    <style>        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: #2c3e50;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background: #34495e;
+            border-bottom: 1px solid #455a75;
+        }
+
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 1.3em;
+            color: #ecf0f1;
+            border: none;
+            padding: 0;
+        }
+
+        .sidebar-nav {
+            padding: 0;
+        }
+
+        .sidebar-section {
+            border-bottom: 1px solid #455a75;
+        }
+
+        .sidebar-section-title {
+            background: #34495e;
+            color: #ecf0f1;
+            padding: 15px 20px;
+            margin: 0;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-section-title:hover {
+            background: #455a75;
+        }
+
+        .sidebar-links {
+            background: #2c3e50;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .sidebar-section.active .sidebar-links {
+            max-height: 500px;
+        }
+
+        .sidebar-links a {
+            display: block;
+            color: #bdc3c7;
+            text-decoration: none;
+            padding: 12px 25px;
+            border-bottom: 1px solid #34495e;
+            transition: background 0.2s ease;
+        }
+
+        .sidebar-links a:hover {
+            background: #34495e;
+            color: #ecf0f1;
+        }
+
+        .sidebar-links a.current {
+            background: #3498db;
+            color: white;
+            font-weight: 600;
+        }
+
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .sidebar-toggle {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            border-bottom: 3px solid #9b59b6;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        
+        h2 {
+            color: #34495e;
+            border-left: 4px solid #9b59b6;
+            padding-left: 15px;
+            margin-top: 30px;
+            margin-bottom: 20px;
+        }
+        
+        h3 {
+            color: #2c3e50;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+        
+        h4 {
+            color: #8e44ad;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        
+        .question {
+            background-color: #f4f1f8;
+            border-left: 4px solid #9b59b6;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .question h2 {
+            margin-top: 0;
+            color: #8e44ad;
+            border: none;
+            padding: 0;
+        }
+        
+        .overview {
+            background-color: #e8f4fd;
+            border: 1px solid #b3d9ff;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .overview h2 {
+            color: #2980b9;
+            margin-top: 0;
+            border: none;
+            padding: 0;
+        }
+        
+        .testing-note {
+            background-color: #f0f8e8;
+            border: 1px solid #c3e6c3;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #27ae60;
+        }
+        
+        .testing-note h4 {
+            color: #27ae60;
+            margin-top: 0;
+        }
+        
+        .code-container {
+            position: relative;
+            margin: 15px 0;
+        }
+        
+        .code-block {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            border: 1px solid #3c3c3c;
+        }
+        
+        .copy-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #9b59b6;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+        
+        .copy-button:hover {
+            opacity: 1;
+        }
+        
+        .copy-button:active {
+            background-color: #27ae60;
+        }
+        
+        ul, ol {
+            padding-left: 20px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        .features {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .features h4 {
+            color: #495057;
+            margin-top: 0;
+        }
+        
+        .toc {
+            background-color: #f4f1f8;
+            border: 1px solid #d2b4de;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .toc h3 {
+            margin-top: 0;
+            color: #8e44ad;
+        }
+        
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        .toc li {
+            margin-bottom: 5px;
+        }
+        
+        .toc a {
+            color: #9b59b6;
+            text-decoration: none;
+            padding: 5px 0;
+            display: block;
+        }
+        
+        .toc a:hover {
+            text-decoration: underline;
+        }
+        
+        .best-practices {
+            background-color: #fff9e6;
+            border: 1px solid #ffe066;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #f39c12;
+        }
+        
+        .best-practices h2 {
+            color: #e67e22;
+            margin-top: 0;
+            border: none;
+            padding: 0;
+        }
+        
+        .keyword {
+            background-color: #9b59b6;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+        
+        .string {
+            color: #ce9178;
+        }
+        
+        .comment {
+            color: #6a9955;
+            font-style: italic;
+        }
+        
+        .function {
+            color: #dcdcaa;
+        }
+        
+        .variable {
+            color: #9cdcfe;
+        }
+        
+        .bash-command {
+            background-color: #2d3748;
+            color: #68d391;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            margin: 10px 0;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            .code-block {
+                font-size: 12px;
+                padding: 15px;
+            }
+        }
+        
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Highlight target section */
+        :target {
+            background-color: #fff3cd;
+            padding: 10px;
+            border-radius: 5px;
+            margin: -10px;
+        }
+    </style>
+</head>
+<body>
+    <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+      <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2>� Python Guides</h2>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    🤖 Agentic AI <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../../Agentic AI/agentic-ai-guide.html">AI Agents Guide</a>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    ⚡ Async Programming <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../../Async Programming/async-programming-guide.html">Asyncio & Concurrency</a>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    🎨 Decorators <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../../Decorators/decorators-guide.html">Python Decorators</a>
+                </div>
+            </div>
+            <div class="sidebar-section active">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    🚀 FastAPI <span>▼</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../fastapi-guide.html">FastAPI Overview</a>
+                    <a href="../1.Basic/fastapi-basics-complete.html">FastAPI Fundamentals</a>
+                    <a href="../2.API Development/api-development-guide.html">API Development</a>
+                    <a href="../3.Security/security-guide.html">Security & Authentication</a>
+                    <a href="../4.Testing/testing-guide.html" class="current">Testing Strategies</a>
+                    <a href="../5.Advanced Topics/advanced-topics-guide.html">Advanced Topics</a>
+                    <a href="../6.Miscellanous/miscellaneous-guide.html">Tips & Best Practices</a>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    🦜 LangChain <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../../LangChain/langchain-documentation.html">LangChain Framework</a>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    � LangGraph <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../../LangGraph/langgraph-guide.html">Graph-based AI</a>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="container">
+        <h1>🧪 FastAPI Testing Guide</h1>
+        
+        <div class="overview">
+            <h2>📋 Overview</h2>
+            <p>Testing is a crucial part of building robust FastAPI applications. FastAPI provides excellent testing capabilities through its integration with popular testing frameworks and its built-in <strong>TestClient</strong> class.</p>
+        </div>
+        
+        <div class="toc">
+            <h3>📚 Table of Contents</h3>
+            <ul>
+                <li><a href="#testing-fastapi">How to Test FastAPI Applications</a></li>
+                <li><a href="#testclient-role">Role of TestClient in FastAPI</a></li>
+                <li><a href="#mocking-dependencies">Mocking Dependencies</a></li>
+                <li><a href="#testing-frameworks">Testing Frameworks</a></li>
+                <li><a href="#best-practices">Best Practices</a></li>
+            </ul>
+        </div>
+
+        <div id="testing-fastapi" class="question">
+            <h2>✅ How do you test FastAPI applications?</h2>
+            <p>FastAPI applications can be tested using several approaches:</p>
+        </div>
+
+        <h3>1. Unit Testing with TestClient</h3>
+        <div class="code-container">
+            <button class="copy-button" onclick="copyCode(this)">Copy</button>
+            <div class="code-block">from fastapi import FastAPI
+from fastapi.testclient import TestClient
+
+app = FastAPI()
+
+@app.get("/")
+def read_root():
+    return {"Hello": "World"}
+
+@app.get("/items/{item_id}")
+def read_item(item_id: int, q: str = None):
+    return {"item_id": item_id, "q": q}
+
+# Create test client
+client = TestClient(app)
+
+def test_read_root():
+    response = client.get("/")
+    assert response.status_code == 200
+    assert response.json() == {"Hello": "World"}
+
+def test_read_item():
+    response = client.get("/items/42?q=test")
+    assert response.status_code == 200
+    assert response.json() == {"item_id": 42, "q": "test"}</div>
+        </div>
+
+        <h3>2. Testing with Pytest</h3>
+        <div class="code-container">
+            <button class="copy-button" onclick="copyCode(this)">Copy</button>
+            <div class="code-block">import pytest
+from fastapi.testclient import TestClient
+from main import app
+
+client = TestClient(app)
+
+@pytest.fixture
+def test_client():
+    """Create a test client fixture"""
+    return TestClient(app)
+
+def test_create_item(test_client):
+    response = test_client.post(
+        "/items/",
+        json={"name": "Test Item", "price": 10.5, "is_offer": True}
+    )
+    assert response.status_code == 200
+    assert response.json()["name"] == "Test Item"
+
+def test_read_items(test_client):
+    response = test_client.get("/items/")
+    assert response.status_code == 200
+    assert isinstance(response.json(), list)</div>
+        </div>
+
+        <h3>3. Testing Authentication Endpoints</h3>
+        <div class="code-container">
+            <button class="copy-button" onclick="copyCode(this)">Copy</button>
+            <div class="code-block">def test_login():
+    response = client.post(
+        "/login",
+        data={"username": "testuser", "password": "testpass"}
+    )
+    assert response.status_code == 200
+    token = response.json()["access_token"]
+    
+    # Test protected endpoint
+    headers = {"Authorization": f"Bearer {token}"}
+    response = client.get("/protected", headers=headers)
+    assert response.status_code == 200
+
+def test_unauthorized_access():
+    response = client.get("/protected")
+    assert response.status_code == 401</div>
+        </div>
+
+        <h3>4. Testing File Uploads</h3>
+        <div class="code-container">
+            <button class="copy-button" onclick="copyCode(this)">Copy</button>
+            <div class="code-block">def test_file_upload():
+    with open("test_file.txt", "w") as f:
+        f.write("test content")
+    
+    with open("test_file.txt", "rb") as f:
+        response = client.post(
+            "/upload/",
+            files={"file": ("test_file.txt", f, "text/plain")}
+        )
+    assert response.status_code == 200
+    assert "filename" in response.json()</div>
+        </div>
+
+        <div id="testclient-role" class="question">
+            <h2>✅ What is the role of TestClient in FastAPI?</h2>
+            <p><strong>TestClient</strong> is FastAPI's built-in testing utility that provides a simple interface for testing FastAPI applications without running an actual server.</p>
+        </div>
+
+        <div class="features">
+            <h4>Key Features of TestClient:</h4>
+            <ul>
+                <li><strong>ASGI Test Client</strong> - Handles async operations automatically</li>
+                <li><strong>Request Methods Support</strong> - GET, POST, PUT, DELETE, PATCH</li>
+                <li><strong>Headers and Cookies</strong> - Custom headers and cookie support</li>
+                <li><strong>Query Parameters</strong> - Easy parameter handling</li>
+                <li><strong>Form Data</strong> - Form submissions and file uploads</li>
+            </ul>
+        </div>
+
+        <h3>1. ASGI Test Client</h3>
+        <div class="code-container">
+            <button class="copy-button" onclick="copyCode(this)">Copy</button>
+            <div class="code-block">from fastapi.testclient import TestClient
+from myapp import app
+
+client = TestClient(app)
+
+# TestClient handles async operations automatically
+def test_async_endpoint():
+    response = client.get("/async-endpoint")
+    assert response.status_code == 200</div>
+        </div>
+
+        <h3>2. Request Methods Support</h3>
+        <div class="code-container">
+            <button class="copy-button" onclick="copyCode(this)">Copy</button>
+            <div class="code-block"># GET requests
+response = client.get("/items/1")
+
+# POST requests with JSON
+response = client.post("/items/", json={"name": "item"})
+
+# PUT requests
+response = client.put("/items/1", json={"name": "updated"})
+
+# DELETE requests
+response = client.delete("/items/1")
+
+# PATCH requests
+response = client.patch("/items/1", json={"name": "patched"})</div>
+        </div>
+
+        <h3>3. Headers and Cookies</h3>
+        <div class="code-container">
+            <button class="copy-button" onclick="copyCode(this)">Copy</button>
+            <div class="code-block"># Custom headers
+headers = {"X-Token": "coneofsilence"}
+response = client.get("/protected/", headers=headers)
+
+# Cookies
+cookies = {"session_id": "test123"}
+response = client.get("/dashboard/", cookies=cookies)</div>
+        </div>
+
+        <h3>Complete TestClient Example</h3>
+        <div class="code-container">
+            <button class="copy-button" onclick="copyCode(this)">Copy</button>
+            <div class="code-block">from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi.security import HTTPBearer
+from fastapi.testclient import TestClient
+from pydantic import BaseModel
+
+app = FastAPI()
+security = HTTPBearer()
+
+class Item(BaseModel):
+    name: str
+    price: float
+
+items = []
+
+def get_current_user(token: str = Depends(security)):
+    if token.credentials != "valid_token":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token"
+        )
+    return {"username": "testuser"}
+
+@app.post("/items/")
+def create_item(item: Item, current_user: dict = Depends(get_current_user)):
+    items.append(item)
+    return item
+
+@app.get("/items/")
+def read_items():
+    return items
+
+# Testing
+client = TestClient(app)
+
+def test_create_item_authenticated():
+    headers = {"Authorization": "Bearer valid_token"}
+    response = client.post(
+        "/items/",
+        json={"name": "Test Item", "price": 10.5},
+        headers=headers
+    )
+    assert response.status_code == 200
+    assert response.json()["name"] == "Test Item"
+
+def test_create_item_unauthenticated():
+    response = client.post(
+        "/items/",
+        json={"name": "Test Item", "price": 10.5}
+    )
+    assert response.status_code == 403</div>
+        </div>
+
+        <div id="mocking-dependencies" class="question">
+            <h2>✅ How do you mock dependencies in FastAPI tests?</h2>
+            <p>FastAPI provides excellent dependency injection capabilities, and you can easily mock dependencies during testing.</p>
+        </div>
+
+        <h3>1. Basic Dependency Mocking</h3>
+        <div class="code-container">
+            <button class="copy-button" onclick="copyCode(this)">Copy</button>
+            <div class="code-block">from fastapi import FastAPI, Depends
+from fastapi.testclient import TestClient
+
+app = FastAPI()
+
+# Original dependency
+def get_db():
+    # This would normally connect to a real database
+    return {"db": "real_database"}
+
+@app.get("/users/")
+def read_users(db: dict = Depends(get_db)):
+    return {"users": ["user1", "user2"], "db": db["db"]}
+
+# Mock dependency
+def get_db_mock():
+    return {"db": "mock_database"}
+
+# Testing with mocked dependency
+client = TestClient(app)
+
+def test_read_users_with_mock():
+    # Override the dependency
+    app.dependency_overrides[get_db] = get_db_mock
+    
+    response = client.get("/users/")
+    assert response.status_code == 200
+    assert response.json()["db"] == "mock_database"
+    
+    # Clean up
+    app.dependency_overrides = {}</div>
+        </div>
+
+        <h3>2. Mocking Authentication Dependencies</h3>
+        <div class="code-container">
+            <button class="copy-button" onclick="copyCode(this)">Copy</button>
+            <div class="code-block">from fastapi import HTTPException, status
+from fastapi.security import HTTPBearer
+
+security = HTTPBearer()
+
+# Original auth dependency
+def get_current_user(token: str = Depends(security)):
+    # This would normally validate the token
+    if not verify_token(token.credentials):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token"
+        )
+    return get_user_from_token(token.credentials)
+
+# Mock auth dependency
+def get_current_user_mock():
+    return {
+        "id": 1,
+        "username": "testuser",
+        "email": "test@example.com"
+    }
+
+@app.get("/profile")
+def get_profile(current_user: dict = Depends(get_current_user)):
+    return current_user
+
+# Test without authentication
+def test_get_profile():
+    app.dependency_overrides[get_current_user] = get_current_user_mock
+    
+    response = client.get("/profile")
+    assert response.status_code == 200
+    assert response.json()["username"] == "testuser"
+    
+    app.dependency_overrides = {}</div>
+        </div>
+
+        <h3>3. Using Pytest Fixtures for Dependency Mocking</h3>
+        <div class="code-container">
+            <button class="copy-button" onclick="copyCode(this)">Copy</button>
+            <div class="code-block">import pytest
+from unittest.mock import Mock
+
+@pytest.fixture
+def mock_db():
+    """Mock database fixture"""
+    mock = Mock()
+    mock.query.return_value.filter.return_value.first.return_value = {
+        "id": 1, "name": "test_user"
+    }
+    return mock
+
+@pytest.fixture
+def mock_auth_user():
+    """Mock authenticated user fixture"""
+    return {"id": 1, "username": "testuser"}
+
+@pytest.fixture
+def client_with_mocks(mock_db, mock_auth_user):
+    """Test client with all dependencies mocked"""
+    app.dependency_overrides[get_db] = lambda: mock_db
+    app.dependency_overrides[get_current_user] = lambda: mock_auth_user
+    
+    client = TestClient(app)
+    yield client
+    
+    # Cleanup
+    app.dependency_overrides = {}
+
+def test_protected_endpoint(client_with_mocks):
+    response = client_with_mocks.get("/protected-users/")
+    assert response.status_code == 200</div>
+        </div>
+
+        <div id="testing-frameworks" class="question">
+            <h2>✅ What testing frameworks do you commonly use with FastAPI?</h2>
+        </div>
+
+        <h3>1. Pytest (Most Popular)</h3>
+        <p>Pytest is the most commonly used testing framework with FastAPI due to its powerful features and FastAPI's excellent integration.</p>
+
+        <div class="bash-command">pip install pytest pytest-asyncio</div>
+
+        <div class="code-container">
+            <button class="copy-button" onclick="copyCode(this)">Copy</button>
+            <div class="code-block"># conftest.py
+import pytest
+from fastapi.testclient import TestClient
+from main import app
+
+@pytest.fixture
+def client():
+    return TestClient(app)
+
+@pytest.fixture
+def sample_user():
+    return {
+        "username": "testuser",
+        "email": "test@example.com",
+        "password": "testpass123"
+    }
+
+# test_main.py
+import pytest
+
+def test_read_root(client):
+    response = client.get("/")
+    assert response.status_code == 200
+
+@pytest.mark.asyncio
+async def test_async_endpoint(client):
+    response = client.get("/async-endpoint")
+    assert response.status_code == 200
+
+class TestUserEndpoints:
+    def test_create_user(self, client, sample_user):
+        response = client.post("/users/", json=sample_user)
+        assert response.status_code == 201
+    
+    def test_get_user(self, client):
+        response = client.get("/users/1")
+        assert response.status_code == 200</div>
+        </div>
+
+        <h3>Pytest with Parametrization</h3>
+        <div class="code-container">
+            <button class="copy-button" onclick="copyCode(this)">Copy</button>
+            <div class="code-block">@pytest.mark.parametrize("item_id,expected", [
+    (1, 200),
+    (999, 404),
+    (-1, 422),
+])
+def test_get_item_status_codes(client, item_id, expected):
+    response = client.get(f"/items/{item_id}")
+    assert response.status_code == expected
+
+@pytest.mark.parametrize("data,status_code", [
+    ({"name": "valid", "price": 10}, 200),
+    ({"name": "", "price": 10}, 422),
+    ({"name": "valid", "price": -1}, 422),
+])
+def test_create_item_validation(client, data, status_code):
+    response = client.post("/items/", json=data)
+    assert response.status_code == status_code</div>
+        </div>
+
+        <h3>2. Testing with Database (SQLAlchemy + Pytest)</h3>
+        <div class="code-container">
+            <button class="copy-button" onclick="copyCode(this)">Copy</button>
+            <div class="code-block">import pytest
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from database import Base, get_db
+from main import app
+
+# Test database setup
+SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
+engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
+TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+@pytest.fixture
+def db_session():
+    Base.metadata.create_all(bind=engine)
+    db = TestingSessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+        Base.metadata.drop_all(bind=engine)
+
+@pytest.fixture
+def client(db_session):
+    def override_get_db():
+        try:
+            yield db_session
+        finally:
+            db_session.close()
+    
+    app.dependency_overrides[get_db] = override_get_db
+    yield TestClient(app)
+    app.dependency_overrides = {}
+
+def test_create_user_db(client, db_session):
+    user_data = {"username": "testuser", "email": "test@example.com"}
+    response = client.post("/users/", json=user_data)
+    assert response.status_code == 200
+    
+    # Verify in database
+    from models import User
+    user = db_session.query(User).filter(User.username == "testuser").first()
+    assert user is not None
+    assert user.email == "test@example.com"</div>
+        </div>
+
+        <h3>3. Performance Testing</h3>
+        <div class="code-container">
+            <button class="copy-button" onclick="copyCode(this)">Copy</button>
+            <div class="code-block">import time
+import pytest
+from concurrent.futures import ThreadPoolExecutor
+
+def test_endpoint_performance(client):
+    start_time = time.time()
+    response = client.get("/heavy-computation")
+    end_time = time.time()
+    
+    assert response.status_code == 200
+    assert (end_time - start_time) < 2.0  # Should complete in under 2 seconds
+
+def test_concurrent_requests(client):
+    def make_request():
+        return client.get("/")
+    
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        futures = [executor.submit(make_request) for _ in range(100)]
+        responses = [future.result() for future in futures]
+    
+    assert all(response.status_code == 200 for response in responses)</div>
+        </div>
+
+        <div id="best-practices" class="best-practices">
+            <h2>🛠️ Best Practices for FastAPI Testing</h2>
+            
+            <h3>1. Test Structure</h3>
+            <div class="code-container">
+                <button class="copy-button" onclick="copyCode(this)">Copy</button>
+                <div class="code-block">tests/
+├── __init__.py
+├── conftest.py              # Shared fixtures
+├── test_auth.py            # Authentication tests
+├── test_users.py           # User endpoint tests
+├── test_items.py           # Item endpoint tests
+├── integration/
+│   ├── __init__.py
+│   └── test_user_flow.py   # Integration tests
+└── unit/
+    ├── __init__.py
+    ├── test_services.py    # Service layer tests
+    └── test_models.py      # Model tests</div>
+            </div>
+
+            <h3>2. Use Fixtures Effectively</h3>
+            <div class="code-container">
+                <button class="copy-button" onclick="copyCode(this)">Copy</button>
+                <div class="code-block">@pytest.fixture(scope="session")
+def test_app():
+    """Create test app once per session"""
+    return FastAPI()
+
+@pytest.fixture(scope="function")
+def client(test_app):
+    """Create fresh client for each test"""
+    return TestClient(test_app)
+
+@pytest.fixture
+def auth_headers():
+    """Authenticated headers for protected endpoints"""
+    return {"Authorization": "Bearer test_token"}</div>
+            </div>
+
+            <h3>3. Test Coverage</h3>
+            <div class="bash-command">pip install pytest-cov
+
+# Run tests with coverage
+pytest --cov=app --cov-report=html
+
+# Coverage with missing lines
+pytest --cov=app --cov-report=term-missing</div>
+
+            <h3>4. Environment-Specific Testing</h3>
+            <div class="code-container">
+                <button class="copy-button" onclick="copyCode(this)">Copy</button>
+                <div class="code-block">import os
+import pytest
+
+@pytest.fixture(autouse=True)
+def setup_test_env():
+    """Setup test environment variables"""
+    os.environ["TESTING"] = "true"
+    os.environ["DATABASE_URL"] = "sqlite:///./test.db"
+    yield
+    # Cleanup after test</div>
+            </div>
+        </div>
+
+        <div class="testing-note">
+            <h4>🎯 Key Testing Tips:</h4>
+            <ul>
+                <li>Always test both success and failure scenarios</li>
+                <li>Use fixtures to avoid code duplication</li>
+                <li>Mock external dependencies and services</li>
+                <li>Test authentication and authorization thoroughly</li>
+                <li>Include integration tests for critical user flows</li>
+                <li>Monitor test coverage but focus on quality over quantity</li>
+                <li>Use parametrized tests for testing multiple scenarios</li>
+                <li>Keep tests isolated and independent</li>
+            </ul>
+        </div>
+
+    </div>
+
+    <script>
+        function copyCode(button) {
+            const codeBlock = button.nextElementSibling;
+            const text = codeBlock.textContent;
+            
+            navigator.clipboard.writeText(text).then(function() {
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.style.backgroundColor = '#27ae60';
+                
+                setTimeout(function() {
+                    button.textContent = originalText;
+                    button.style.backgroundColor = '#9b59b6';
+                }, 2000);
+            }).catch(function(err) {
+                console.error('Could not copy text: ', err);
+                
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.style.backgroundColor = '#27ae60';
+                
+                setTimeout(function() {
+                    button.textContent = originalText;
+                    button.style.backgroundColor = '#9b59b6';
+                }, 2000);
+            });
+        }
+
+        // Add smooth scrolling to all links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Sidebar functionality
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        function toggleSection(element) {
+            const section = element.parentElement;
+            const isActive = section.classList.contains('active');
+            
+            // Close all sections
+            document.querySelectorAll('.sidebar-section').forEach(sec => {
+                sec.classList.remove('active');
+                const arrow = sec.querySelector('.sidebar-section-title span');
+                if (arrow) arrow.textContent = '▶';
+            });
+            
+            // Open clicked section if it wasn't active
+            if (!isActive) {
+                section.classList.add('active');
+                const arrow = element.querySelector('span');
+                if (arrow) arrow.textContent = '▼';
+            }
+        }
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.querySelector('.sidebar-toggle');
+            
+            if (window.innerWidth <= 768 && 
+                !sidebar.contains(event.target) && 
+                !sidebarToggle.contains(event.target)) {
+                sidebar.classList.remove('active');
+            }
+        });
+    </script>
+    </div> <!-- End main-content -->
+</body>
+</html>

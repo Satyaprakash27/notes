@@ -9,20 +9,142 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }
-
-        body {
+        }        body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
             color: #333;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            margin: 0;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: #2c3e50;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background: #34495e;
+            border-bottom: 1px solid #455a75;
+        }
+
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 1.3em;
+            color: #ecf0f1;
+            border: none;
+            padding: 0;
+        }
+
+        .sidebar-nav {
+            padding: 0;
+        }
+
+        .sidebar-section {
+            border-bottom: 1px solid #455a75;
+        }
+
+        .sidebar-section-title {
+            background: #34495e;
+            color: #ecf0f1;
+            padding: 15px 20px;
+            margin: 0;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-section-title:hover {
+            background: #455a75;
+        }
+
+        .sidebar-links {
+            background: #2c3e50;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .sidebar-section.active .sidebar-links {
+            max-height: 500px;
+        }
+
+        .sidebar-links a {
+            display: block;
+            color: #bdc3c7;
+            text-decoration: none;
+            padding: 12px 25px;
+            border-bottom: 1px solid #34495e;
+            transition: background 0.2s ease;
+        }
+
+        .sidebar-links a:hover {
+            background: #34495e;
+            color: #ecf0f1;
+        }
+
+        .sidebar-links a.current {
+            background: #3498db;
+            color: white;
+            font-weight: 600;
+        }
+
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            min-height: 100vh;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1000px;
             margin: 0 auto;
             padding: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .sidebar-toggle {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
         }
 
         .header {
@@ -311,7 +433,72 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+    
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2>🐍 Python Guides</h2>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    🤖 Agentic AI <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../Agentic AI/agentic-ai-guide.html">AI Agents Guide</a>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    ⚡ Async Programming <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../Async Programming/async-programming-guide.html">Asyncio & Concurrency</a>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    🎨 Decorators <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../Decorators/decorators-guide.html">Python Decorators</a>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    🚀 FastAPI <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../FastAPI/fastapi-guide.html">FastAPI Overview</a>
+                    <a href="../FastAPI/1.Basic/fastapi-basics-complete.html">FastAPI Fundamentals</a>
+                    <a href="../FastAPI/2.API Development/api-development-guide.html">API Development</a>
+                    <a href="../FastAPI/3.Security/security-guide.html">Security & Authentication</a>
+                    <a href="../FastAPI/4.Testing/testing-guide.html">Testing Strategies</a>
+                    <a href="../FastAPI/5.Advanced Topics/advanced-topics-guide.html">Advanced Topics</a>
+                    <a href="../FastAPI/6.Miscellanous/miscellaneous-guide.html">Tips & Best Practices</a>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    🦜 LangChain <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../LangChain/langchain-documentation.html">LangChain Framework</a>
+                </div>
+            </div>
+            <div class="sidebar-section active">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    📊 LangGraph <span>▼</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../LangGraph/langgraph-guide.html" class="current">Graph-based AI</a>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="container">
         <header class="header">
             <h1>LangGraph: Advanced AI Agent Orchestration</h1>
             <p>Building stateful, multi-actor applications with Large Language Models</p>
@@ -1204,14 +1391,50 @@ def streaming_processor(state: LargeDataState):
                     entry.target.style.transform = 'translateY(0)';
                 }
             });
-        }, observerOptions);
-
-        document.querySelectorAll('.section').forEach(section => {
+        }, observerOptions);        document.querySelectorAll('.section').forEach(section => {
             section.style.opacity = '0';
             section.style.transform = 'translateY(20px)';
             section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
             observer.observe(section);
         });
+
+        // Sidebar functionality
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        function toggleSection(element) {
+            const section = element.parentElement;
+            const isActive = section.classList.contains('active');
+            
+            // Close all sections
+            document.querySelectorAll('.sidebar-section').forEach(sec => {
+                sec.classList.remove('active');
+                const arrow = sec.querySelector('.sidebar-section-title span');
+                if (arrow) arrow.textContent = '▶';
+            });
+            
+            // Open clicked section if it wasn't active
+            if (!isActive) {
+                section.classList.add('active');
+                const arrow = element.querySelector('span');
+                if (arrow) arrow.textContent = '▼';
+            }
+        }
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.querySelector('.sidebar-toggle');
+            
+            if (window.innerWidth <= 768 && 
+                !sidebar.contains(event.target) && 
+                !sidebarToggle.contains(event.target)) {
+                sidebar.classList.remove('active');
+            }
+        });
     </script>
+    </div> <!-- End main-content -->
 </body>
 </html>
