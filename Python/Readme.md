@@ -4,7 +4,7 @@ Welcome to your comprehensive Python documentation collection! This repository c
 
 ## 🚀 Quick Start
 
-**Main Entry Point**: Open [`Python.html`](../Python.html) in your browser for the interactive documentation hub.
+**Main Entry Point**: Open [`Python.html`](Python.html) in your browser for the interactive documentation hub.
 
 ## 📚 Documentation Structure
 
@@ -32,7 +32,7 @@ FastAPI is our most comprehensive topic with 7 detailed guides:
 4. **[Security & Authentication](FastAPI/3.Security/security-guide.html)** - OAuth2, JWT, and security patterns
 5. **[Testing Strategies](FastAPI/4.Testing/testing-guide.html)** - Unit testing, integration testing
 6. **[Advanced Topics](FastAPI/5.Advanced%20Topics/advanced-topics-guide.html)** - Performance, middleware, advanced patterns
-7. **[Tips & Best Practices](FastAPI/6.Miscellanous/miscellaneous-guide.html)** - Production tips and optimization
+7. **[Tips & Best Practices](FastAPI/6.Miscellaneous/miscellaneous-guide.html)** - Production tips and optimization
 
 ### 🦜 LangChain Framework
 - **Guide**: [LangChain Framework](LangChain/langchain-documentation.html)
@@ -47,7 +47,7 @@ FastAPI is our most comprehensive topic with 7 detailed guides:
 ## 🎯 How to Navigate
 
 ### Option 1: Interactive HTML Hub (Recommended)
-1. Open [`Python.html`](../Python.html) in your browser
+1. Open [`Python.html`](Python.html) in your browser
 2. Use the sidebar navigation to browse topics
 3. Click on topic cards for direct access
 4. Mobile-friendly with responsive design
@@ -121,7 +121,7 @@ Python Documentation Hub
 
 ## 💡 Tips for Best Experience
 
-1. **Start with the main hub**: [`Python.html`](../Python.html) provides the best overview
+1. **Start with the main hub**: [`Python.html`](Python.html) provides the best overview
 2. **Use the sidebar**: Navigate between topics without losing your place
 3. **Follow the FastAPI series**: Goes from beginner to advanced systematically
 4. **Bookmark frequently used guides**: For quick access to your most-used references
