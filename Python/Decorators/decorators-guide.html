@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Decorators: Complete Interview Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: #2c3e50;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background: #34495e;
+            border-bottom: 1px solid #455a75;
+        }
+
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 1.3em;
+            color: #ecf0f1;
+            border: none;
+            padding: 0;
+        }
+
+        .sidebar-nav {
+            padding: 0;
+        }
+
+        .sidebar-section {
+            border-bottom: 1px solid #455a75;
+        }
+
+        .sidebar-section-title {
+            background: #34495e;
+            color: #ecf0f1;
+            padding: 15px 20px;
+            margin: 0;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-section-title:hover {
+            background: #455a75;
+        }
+
+        .sidebar-links {
+            background: #2c3e50;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .sidebar-section.active .sidebar-links {
+            max-height: 500px;
+        }
+
+        .sidebar-links a {
+            display: block;
+            color: #bdc3c7;
+            text-decoration: none;
+            padding: 12px 25px;
+            border-bottom: 1px solid #34495e;
+            transition: background 0.2s ease;
+        }
+
+        .sidebar-links a:hover {
+            background: #34495e;
+            color: #ecf0f1;
+        }
+
+        .sidebar-links a.current {
+            background: #3498db;
+            color: white;
+            font-weight: 600;
+        }
+
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .sidebar-toggle {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.2rem;
+        }
+
+        .nav {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+        }
+
+        .nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .nav a {
+            color: #667eea;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav a:hover, .nav a.active {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .content {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .section {
+            margin-bottom: 3rem;
+        }
+
+        h2 {
+            color: #2c3e50;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid #667eea;
+            position: relative;
+        }
+
+        h3 {
+            color: #34495e;
+            font-size: 1.5rem;
+            margin: 2rem 0 1rem 0;
+            padding-left: 1rem;
+            border-left: 4px solid #764ba2;
+        }
+
+        h4 {
+            color: #555;
+            font-size: 1.2rem;
+            margin: 1.5rem 0 0.5rem 0;
+        }
+
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            overflow-x: auto;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .code-block pre {
+            margin: 0;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: #764ba2;
+            transform: scale(1.05);
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .comparison-table th {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            font-weight: 600;
+        }
+
+        .comparison-table tr:hover {
+            background: #f8f9ff;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #667eea20, #764ba220);
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .highlight-box h4 {
+            color: #667eea;
+            margin-top: 0;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #667eea;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-card h4 {
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .best-practice {
+            background: #e8f5e8;
+            border-left: 4px solid #27ae60;
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-radius: 5px;
+        }
+
+        .best-practice:before {
+            content: "✓ ";
+            color: #27ae60;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-radius: 5px;
+        }
+
+        .warning:before {
+            content: "⚠ ";
+            color: #ffc107;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .interview-question {
+            background: #f8f9ff;
+            border: 1px solid #667eea;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .interview-question .question {
+            color: #667eea;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .interview-question .answer {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+
+        .use-case-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #764ba2;
+        }
+
+        .use-case-card h4 {
+            color: #764ba2;
+            margin-bottom: 0.5rem;
+        }
+
+        .emoji-section {
+            font-size: 1.5rem;
+            margin-right: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .nav ul {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .code-block {
+                font-size: 0.8rem;
+            }
+            
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Code syntax highlighting */
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .comment { color: #6a9955; }
+        .function { color: #dcdcaa; }
+        .class { color: #4ec9b0; }
+        .number { color: #b5cea8; }
+    </style>
+</head>
+<body>
+    <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+    
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2>🐍 Python Guides</h2>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    🤖 Agentic AI <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../Agentic AI/agentic-ai-guide.html">AI Agents Guide</a>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    ⚡ Async Programming <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../Async Programming/async-programming-guide.html">Asyncio & Concurrency</a>
+                </div>
+            </div>
+            <div class="sidebar-section active">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    🎨 Decorators <span>▼</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../Decorators/decorators-guide.html" class="current">Python Decorators</a>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    🚀 FastAPI <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../FastAPI/fastapi-guide.html">FastAPI Overview</a>
+                    <a href="../FastAPI/1.Basic/fastapi-basics-complete.html">FastAPI Fundamentals</a>
+                    <a href="../FastAPI/2.API Development/api-development-guide.html">API Development</a>
+                    <a href="../FastAPI/3.Security/security-guide.html">Security & Authentication</a>
+                    <a href="../FastAPI/4.Testing/testing-guide.html">Testing Strategies</a>
+                    <a href="../FastAPI/5.Advanced Topics/advanced-topics-guide.html">Advanced Topics</a>
+                    <a href="../FastAPI/6.Miscellanous/miscellaneous-guide.html">Tips & Best Practices</a>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    🦜 LangChain <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../LangChain/langchain-documentation.html">LangChain Framework</a>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    📊 LangGraph <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../LangGraph/langgraph-guide.html">Graph-based AI</a>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="container">
+        <header class="header">
+            <h1>Python Decorators: Complete Interview Guide</h1>
+            <p>Master decorators from basics to advanced real-world applications</p>
+        </header>
+
+        <nav class="nav">
+            <ul>
+                <li><a href="#basic-questions" class="nav-link">Basic Questions</a></li>
+                <li><a href="#intermediate-questions" class="nav-link">Intermediate</a></li>
+                <li><a href="#advanced-questions" class="nav-link">Advanced/FastAPI</a></li>
+                <li><a href="#real-world" class="nav-link">Real-World Examples</a></li>
+                <li><a href="#best-practices" class="nav-link">Best Practices</a></li>
+                <li><a href="#performance" class="nav-link">Performance</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <section id="basic-questions" class="section">
+                <h2><span class="emoji-section">✅</span>Basic Decorator Questions</h2>
+
+                <div class="interview-question">
+                    <div class="question">1. What is a decorator in Python?</div>
+                    <div class="answer">
+                        <strong>Answer:</strong> A decorator is a function that takes another function as an argument, 
+                        adds some functionality, and returns it. Decorators allow you to modify or enhance functions 
+                        without permanently modifying their code.
+                    </div>
+                    
+                    <div class="highlight-box">
+                        <h4>Key Concepts:</h4>
+                        <ul>
+                            <li><strong>Higher-order functions:</strong> Functions that operate on other functions</li>
+                            <li><strong>Wrapper pattern:</strong> Encapsulating functionality around existing code</li>
+                            <li><strong>Syntactic sugar:</strong> The @ symbol provides a clean syntax</li>
+                        </ul>
+                    </div>
+
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre><code># Without decorator syntax
+def greet():
+    print("Hello!")
+
+greet = my_decorator(greet)
+
+# With decorator syntax (equivalent)
+@my_decorator
+def greet():
+    print("Hello!")</code></pre>
+                    </div>
+                </div>
+
+                <div class="interview-question">
+                    <div class="question">2. How do you define a simple decorator?</div>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre><code>def my_decorator(func):
+    def wrapper():
+        print("Before function call")
+        func()
+        print("After function call")
+    return wrapper
+
+@my_decorator
+def say_hello():
+    print("Hello")
+
+# Usage
+say_hello()
+# Output:
+# Before function call
+# Hello
+# After function call</code></pre>
+                    </div>
+                    
+                    <div class="highlight-box">
+                        <h4>Explanation:</h4>
+                        <ul>
+                            <li><code>my_decorator</code> is the decorator function</li>
+                            <li><code>wrapper</code> is the inner function that adds new behavior</li>
+                            <li>The original function <code>func</code> is called within the wrapper</li>
+                            <li>The decorator returns the wrapper function</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="interview-question">
+                    <div class="question">3. What is the purpose of @ syntax in Python?</div>
+                    <div class="answer">
+                        <strong>Answer:</strong> The @ symbol is syntactic sugar for applying decorators. 
+                        It makes code more readable and follows the DRY principle.
+                    </div>
+                    
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre><code># These are equivalent:
+
+# Method 1: Using @ syntax
+@my_decorator
+def function():
+    pass
+
+# Method 2: Manual application
+def function():
+    pass
+function = my_decorator(function)</code></pre>
+                    </div>
+                </div>
+
+                <div class="interview-question">
+                    <div class="question">4. What are common use cases for decorators?</div>
+                    
+                    <div class="feature-grid">
+                        <div class="use-case-card">
+                            <h4>Logging</h4>
+                            <p>Automatically log function calls, parameters, and return values</p>
+                        </div>
+                        <div class="use-case-card">
+                            <h4>Authentication</h4>
+                            <p>Check user permissions before allowing function execution</p>
+                        </div>
+                        <div class="use-case-card">
+                            <h4>Caching</h4>
+                            <p>Store function results to avoid repeated calculations</p>
+                        </div>
+                        <div class="use-case-card">
+                            <h4>Timing</h4>
+                            <p>Measure and profile function execution time</p>
+                        </div>
+                        <div class="use-case-card">
+                            <h4>Retry Logic</h4>
+                            <p>Automatically retry failed operations</p>
+                        </div>
+                        <div class="use-case-card">
+                            <h4>Validation</h4>
+                            <p>Validate input/output data before/after function execution</p>
+                        </div>
+                    </div>
+
+                    <h4>Logging Example:</h4>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre><code>import functools
+import logging
+
+def log_function_call(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        logging.info(f"Calling {func.__name__} with args={args}, kwargs={kwargs}")
+        result = func(*args, **kwargs)
+        logging.info(f"{func.__name__} returned {result}")
+        return result
+    return wrapper
+
+@log_function_call
+def calculate_total(price, tax_rate):
+    return price * (1 + tax_rate)</code></pre>
+                    </div>
+
+                    <h4>Caching Example:</h4>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre><code>def memoize(func):
+    cache = {}
+    @functools.wraps(func)
+    def wrapper(*args):
+        if args in cache:
+            return cache[args]
+        result = func(*args)
+        cache[args] = result
+        return result
+    return wrapper
+
+@memoize
+def fibonacci(n):
+    if n < 2:
+        return n
+    return fibonacci(n-1) + fibonacci(n-2)</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <section id="intermediate-questions" class="section">
+                <h2><span class="emoji-section">🔄</span>Intermediate Decorator Questions</h2>
+
+                <div class="interview-question">
+                    <div class="question">5. How do you pass arguments to a decorator?</div>
+                    <div class="answer">
+                        <strong>Answer:</strong> Create a decorator factory - a function that returns a decorator.
+                    </div>
+                    
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre><code>def repeat(n):
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            for _ in range(n):
+                result = func(*args, **kwargs)
+            return result  # Return last execution result
+        return wrapper
+    return decorator
+
+@repeat(3)
+def greet(name):
+    print(f"Hello, {name}!")
+
+greet("Alice")
+# Output:
+# Hello, Alice!
+# Hello, Alice!
+# Hello, Alice!</code></pre>
+                    </div>
+                </div>
+
+                <div class="interview-question">
+                    <div class="question">6. How do you write a decorator that accepts arguments for the inner function?</div>
+                    <div class="answer">
+                        <strong>Answer:</strong> Use *args and **kwargs in the wrapper to handle any number of arguments.
+                    </div>
+                    
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre><code>def debug(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        args_repr = [repr(a) for a in args]
+        kwargs_repr = [f"{k}={v!r}" for k, v in kwargs.items()]
+        signature = ", ".join(args_repr + kwargs_repr)
+        print(f"Calling {func.__name__}({signature})")
+        
+        result = func(*args, **kwargs)
+        print(f"{func.__name__} returned {result!r}")
+        return result
+    return wrapper
+
+@debug
+def add(x, y, operation="sum"):
+    return x + y
+
+add(5, 3, operation="addition")
+# Output:
+# Calling add(5, 3, operation='addition')
+# add returned 8</code></pre>
+                    </div>
+                </div>
+
+                <div class="interview-question">
+                    <div class="question">7. What does functools.wraps do and why is it important?</div>
+                    <div class="answer">
+                        <strong>Answer:</strong> functools.wraps preserves the metadata (name, docstring, annotations) 
+                        of the original function after decoration.
+                    </div>
+                    
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre><code>from functools import wraps
+
+# Without @wraps
+def bad_decorator(func):
+    def wrapper(*args, **kwargs):
+        """This is the wrapper function"""
+        return func(*args, **kwargs)
+    return wrapper
+
+# With @wraps
+def good_decorator(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        """This is the wrapper function"""
+        return func(*args, **kwargs)
+    return wrapper
+
+@bad_decorator
+def func1():
+    """Original docstring"""
+    pass
+
+@good_decorator
+def func2():
+    """Original docstring"""
+    pass
+
+print(func1.__name__)      # wrapper
+print(func1.__doc__)       # This is the wrapper function
+
+print(func2.__name__)      # func2
+print(func2.__doc__)       # Original docstring</code></pre>
+                    </div>
+                    
+                    <div class="highlight-box">
+                        <h4>Why it matters:</h4>
+                        <ul>
+                            <li><strong>Debugging:</strong> Proper function names in stack traces</li>
+                            <li><strong>Documentation:</strong> Preserves docstrings for help()</li>
+                            <li><strong>Introspection:</strong> Tools can access original function metadata</li>
+                            <li><strong>Testing:</strong> Test frameworks rely on function names</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="interview-question">
+                    <div class="question">8. Can you apply multiple decorators to a function?</div>
+                    <div class="answer">
+                        <strong>Answer:</strong> Yes, decorators are applied from bottom to top (inside-out).
+                    </div>
+                    
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre><code>def bold(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        result = func(*args, **kwargs)
+        return f"&lt;b&gt;{result}&lt;/b&gt;"
+    return wrapper
+
+def italic(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        result = func(*args, **kwargs)
+        return f"&lt;i&gt;{result}&lt;/i&gt;"
+    return wrapper
+
+@bold
+@italic
+def say_hello():
+    return "Hello World"
+
+print(say_hello())  # &lt;b&gt;&lt;i&gt;Hello World&lt;/i&gt;&lt;/b&gt;
+
+# Equivalent to:
+# say_hello = bold(italic(say_hello))</code></pre>
+                    </div>
+                </div>
+
+                <div class="interview-question">
+                    <div class="question">9. What is a class-based decorator?</div>
+                    <div class="answer">
+                        <strong>Answer:</strong> A class that implements __call__ method can be used as a decorator.
+                    </div>
+                    
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre><code>class CountCalls:
+    def __init__(self, func):
+        self.func = func
+        self.count = 0
+        # Preserve function metadata
+        functools.update_wrapper(self, func)
+
+    def __call__(self, *args, **kwargs):
+        self.count += 1
+        print(f"Call {self.count} to {self.func.__name__}")
+        return self.func(*args, **kwargs)
+    
+    def reset_count(self):
+        self.count = 0
+
+@CountCalls
+def greet(name):
+    return f"Hello, {name}!"
+
+greet("Alice")  # Call 1 to greet
+greet("Bob")    # Call 2 to greet
+print(greet.count)  # 2
+greet.reset_count()</code></pre>
+                    </div>
+                </div>
+
+                <div class="interview-question">
+                    <div class="question">10. What's the difference between function-based and class-based decorators?</div>
+                    
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>Function Decorator</th>
+                                <th>Class Decorator</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Simplicity</strong></td>
+                                <td>Easier to write and understand</td>
+                                <td>More complex setup</td>
+                            </tr>
+                            <tr>
+                                <td><strong>State Management</strong></td>
+                                <td>Stateless (unless using closures)</td>
+                                <td>Can maintain state between calls</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Memory Usage</strong></td>
+                                <td>Lower overhead</td>
+                                <td>Higher overhead (object creation)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Flexibility</strong></td>
+                                <td>Limited to closure variables</td>
+                                <td>Full OOP capabilities</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Performance</strong></td>
+                                <td>Faster (function calls)</td>
+                                <td>Slightly slower (method calls)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="advanced-questions" class="section">
+                <h2><span class="emoji-section">🔐</span>Advanced/FastAPI-Related Questions</h2>
+
+                <div class="interview-question">
+                    <div class="question">11. How does FastAPI use decorators internally?</div>
+                    <div class="answer">
+                        <strong>Answer:</strong> FastAPI uses decorators like @app.get(), @app.post() to register routes 
+                        and associate them with handler functions.
+                    </div>
+                    
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre><code>from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/users/{user_id}")
+async def get_user(user_id: int):
+    return {"user_id": user_id}
+
+# The decorator does several things:
+# 1. Registers the route path and HTTP method
+# 2. Extracts type hints for automatic validation
+# 3. Generates OpenAPI/Swagger documentation
+# 4. Handles request/response serialization</code></pre>
+                    </div>
+                </div>
+
+                <div class="interview-question">
+                    <div class="question">12. How can you implement a custom authentication decorator in FastAPI?</div>
+                    
+                    <h4>Method 1: Simple Decorator Approach</h4>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre><code>from functools import wraps
+from fastapi import HTTPException
+
+def require_auth(func):
+    @wraps(func)
+    async def wrapper(*args, **kwargs):
+        # Extract request from kwargs (FastAPI injects it)
+        request = kwargs.get('request')
+        
+        if not request:
+            raise HTTPException(status_code=400, detail="Request object not found")
+        
+        # Check authorization header
+        auth_header = request.headers.get("Authorization")
+        if not auth_header or not auth_header.startswith("Bearer "):
+            raise HTTPException(status_code=401, detail="Missing or invalid token")
+        
+        token = auth_header.split(" ")[1]
+        user = verify_token(token)  # Your token verification logic
+        
+        if not user:
+            raise HTTPException(status_code=401, detail="Invalid token")
+        
+        # Add user to kwargs
+        kwargs['current_user'] = user
+        return await func(*args, **kwargs)
+    
+    return wrapper
+
+@app.get("/protected")
+@require_auth
+async def protected_route(request: Request, current_user: dict = None):
+    return {"user": current_user["username"], "message": "Access granted"}</code></pre>
+                    </div>
+
+                    <h4>Method 2: FastAPI Dependency Approach (Recommended)</h4>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre><code>from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+
+security = HTTPBearer()
+
+def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    token = credentials.credentials
+    user = verify_token(token)
+    
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authentication credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return user
+
+@app.get("/secure/")
+async def secure_route(current_user: dict = Depends(get_current_user)):
+    return {"user": current_user["username"], "message": "Secure data"}</code></pre>
+                    </div>
+                </div>
+
+                <div class="interview-question">
+                    <div class="question">13. Can you decorate a method in a class?</div>
+                    <div class="answer">
+                        <strong>Answer:</strong> Yes, but be cautious about self parameter and method binding.
+                    </div>
+                    
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre><code>class UserService:
+    def __init__(self):
+        self.users = {}
+    
+    @measure_time
+    def create_user(self, name: str, email: str):
+        user_id = len(self.users) + 1
+        self.users[user_id] = {"name": name, "email": email}
+        return user_id
+    
+    @log_function_call
+    def get_user(self, user_id: int):
+        return self.users.get(user_id)
+
+# Usage
+service = UserService()
+user_id = service.create_user("John", "john@email.com")
+user = service.get_user(user_id)</code></pre>
+                    </div>
+                </div>
+
+                <div class="interview-question">
+                    <div class="question">14. How do decorators help with DRY principles?</div>
+                    <div class="answer">
+                        <strong>Answer:</strong> Decorators encapsulate reusable logic (like logging, security, validation), 
+                        keeping core functions clean and focused.
+                    </div>
+                    
+                    <div class="highlight-box">
+                        <h4>Cross-cutting concerns example:</h4>
+                        <p>Instead of repeating timing, logging, and auth code in every function, use decorators:</p>
+                    </div>
+
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        <pre><code># With decorators - DRY principle applied
+@measure_time
+@log_function_call
+@require_admin
+def create_user(name, email):
+    # Only core business logic
+    user = User(name=name, email=email)
+    user.save()
+    return user
+
+@measure_time
+@log_function_call
+@require_admin
+def update_user(user_id, name, email):
+    # Only core business logic
+    user = User.get(user_id)
+    user.name = name
+    user.email = email
+    user.save()
+    return user</code></pre>
+                    </div>
+                </div>
+
+                <div class="interview-question">
+                    <div class="question">15. What's the difference between decorator and middleware in FastAPI?</div>
+                    
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Aspect</th>
+                                <th>Decorator</th>
+                                <th>Middleware</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Scope</strong></td>
+                                <td>Applied to specific routes</td>
+                                <td>Applied to all routes</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Granularity</strong></td>
+                                <td>Fine-grained control</td>
+                                <td>Global behavior</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Use Cases</strong></td>
+                                <td>Auth, validation, rate limiting for specific endpoints</td>
+                                <td>CORS, logging, error handling for entire app</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Performance</strong></td>
+                                <td>Lower overhead (only for decorated routes)</td>
+                                <td>Higher overhead (runs for every request)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="real-world" class="section">
+                <h2><span class="emoji-section">🛠️</span>Real-World Examples</h2>
+
+                <h3>1. API Rate Limiting with Redis</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code>import redis
+import time
+from functools import wraps
+
+redis_client = redis.Redis(host='localhost', port=6379, db=0)
+
+def rate_limit_redis(max_requests: int, window_seconds: int):
+    def decorator(func):
+        @wraps(func)
+        async def wrapper(*args, **kwargs):
+            # Get user identifier (IP, user_id, etc.)
+            request = kwargs.get('request')
+            user_id = get_user_identifier(request)
+            
+            key = f"rate_limit:{func.__name__}:{user_id}"
+            
+            # Check current request count
+            current_requests = redis_client.get(key)
+            
+            if current_requests is None:
+                # First request in window
+                redis_client.setex(key, window_seconds, 1)
+            else:
+                current_count = int(current_requests)
+                if current_count >= max_requests:
+                    raise HTTPException(
+                        status_code=429,
+                        detail=f"Rate limit exceeded. Max {max_requests} requests per {window_seconds} seconds"
+                    )
+                redis_client.incr(key)
+            
+            return await func(*args, **kwargs)
+        return wrapper
+    return decorator
+
+@app.get("/api/data")
+@rate_limit_redis(max_requests=100, window_seconds=3600)  # 100 requests per hour
+async def get_data(request: Request):
+    return {"data": "sensitive information"}</code></pre>
+                </div>
+
+                <h3>2. Database Transaction Decorator</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code>from sqlalchemy.orm import Session
+
+def transactional(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        # Assume first argument is database session
+        db_session = args[0] if args else kwargs.get('db')
+        
+        if not isinstance(db_session, Session):
+            raise ValueError("First argument must be database session")
+        
+        try:
+            result = func(*args, **kwargs)
+            db_session.commit()
+            return result
+        except Exception as e:
+            db_session.rollback()
+            raise e
+    return wrapper
+
+@transactional
+def transfer_money(db: Session, from_account: int, to_account: int, amount: float):
+    # Debit from source account
+    source = db.query(Account).filter(Account.id == from_account).first()
+    source.balance -= amount
+    
+    # Credit to destination account
+    dest = db.query(Account).filter(Account.id == to_account).first()
+    dest.balance += amount
+    
+    # If any exception occurs, transaction will be rolled back automatically
+    return {"status": "success", "amount": amount}</code></pre>
+                </div>
+
+                <h3>3. Circuit Breaker Pattern</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code>import time
+from enum import Enum
+from dataclasses import dataclass
+
+class CircuitState(Enum):
+    CLOSED = "closed"
+    OPEN = "open"
+    HALF_OPEN = "half_open"
+
+@dataclass
+class CircuitBreakerConfig:
+    failure_threshold: int = 5
+    timeout: int = 60
+    expected_exception: type = Exception
+
+class CircuitBreaker:
+    def __init__(self, config: CircuitBreakerConfig):
+        self.config = config
+        self.state = CircuitState.CLOSED
+        self.failure_count = 0
+        self.last_failure_time = None
+    
+    def __call__(self, func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            if self.state == CircuitState.OPEN:
+                if time.time() - self.last_failure_time < self.config.timeout:
+                    raise Exception("Circuit breaker is OPEN")
+                else:
+                    self.state = CircuitState.HALF_OPEN
+            
+            try:
+                result = func(*args, **kwargs)
+                self._on_success()
+                return result
+            except self.config.expected_exception as e:
+                self._on_failure()
+                raise e
+        
+        return wrapper
+
+# Usage
+config = CircuitBreakerConfig(failure_threshold=3, timeout=30)
+circuit_breaker = CircuitBreaker(config)
+
+@circuit_breaker
+def external_api_call():
+    # This function will be circuit-broken if it fails 3 times
+    response = requests.get("https://unreliable-api.com/data")
+    response.raise_for_status()
+    return response.json()</code></pre>
+                </div>
+            </section>
+
+            <section id="best-practices" class="section">
+                <h2><span class="emoji-section">⚠️</span>Common Pitfalls and Best Practices</h2>
+
+                <div class="best-practice">
+                    Always use functools.wraps to preserve function metadata
+                </div>
+
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code># Good: Preserves function metadata
+def good_decorator(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        return func(*args, **kwargs)
+    return wrapper</code></pre>
+                </div>
+
+                <div class="best-practice">
+                    Use *args and **kwargs to handle any number of arguments
+                </div>
+
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code># Good: Handles any arguments
+def good_decorator(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        return func(*args, **kwargs)
+    return wrapper</code></pre>
+                </div>
+
+                <div class="warning">
+                    Decorator order matters! They are applied from bottom to top (inside-out).
+                </div>
+
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code>@decorator_a
+@decorator_b
+@decorator_c
+def my_function():
+    pass
+
+# Equivalent to:
+# my_function = decorator_a(decorator_b(decorator_c(my_function)))
+# Execution order: decorator_a → decorator_b → decorator_c → function</code></pre>
+                </div>
+
+                <div class="best-practice">
+                    Implement cache cleanup for class decorators to avoid memory leaks
+                </div>
+
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code># Good: Implement cache cleanup
+class GoodDecorator:
+    def __init__(self, func, max_cache_size=100):
+        self.func = func
+        self.cache = {}
+        self.max_cache_size = max_cache_size
+    
+    def __call__(self, *args, **kwargs):
+        key = str(args) + str(kwargs)
+        
+        if key not in self.cache:
+            if len(self.cache) >= self.max_cache_size:
+                # Remove oldest entry
+                oldest_key = next(iter(self.cache))
+                del self.cache[oldest_key]
+            
+            self.cache[key] = self.func(*args, **kwargs)
+        
+        return self.cache[key]</code></pre>
+                </div>
+            </section>
+
+            <section id="performance" class="section">
+                <h2><span class="emoji-section">📊</span>Performance Considerations</h2>
+
+                <h3>Decorator Overhead</h3>
+                <div class="highlight-box">
+                    <h4>Typical Performance Impact:</h4>
+                    <ul>
+                        <li><strong>Function call overhead:</strong> ~0.1-0.2 microseconds per call</li>
+                        <li><strong>Memory overhead:</strong> Minimal for simple decorators</li>
+                        <li><strong>Class decorators:</strong> Slightly higher overhead due to object creation</li>
+                    </ul>
+                </div>
+
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code>def measure_decorator_overhead():
+    def simple_decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            return func(*args, **kwargs)
+        return wrapper
+    
+    def simple_function():
+        return 42
+    
+    @simple_decorator
+    def decorated_function():
+        return 42
+    
+    # Measure execution time
+    iterations = 1000000
+    
+    # Results typically show ~0.1-0.2 microseconds overhead per call</code></pre>
+                </div>
+
+                <h3>Optimization Tips</h3>
+                <div class="best-practice">
+                    Pre-compile format strings and minimize object creation in decorators
+                </div>
+
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                    <pre><code># Faster: Minimize object creation
+def fast_decorator(func):
+    # Pre-compile format string
+    format_string = f"Execution time for {func.__name__}: {{:.6f}}s"
+    
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        start_time = time.perf_counter()  # More precise timing
+        result = func(*args, **kwargs)
+        execution_time = time.perf_counter() - start_time
+        print(format_string.format(execution_time))
+        return result
+    return wrapper</code></pre>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Copy code functionality
+        function copyCode(button) {
+            const codeBlock = button.nextElementSibling.textContent;
+            navigator.clipboard.writeText(codeBlock).then(() => {
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.style.background = '#27ae60';
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = '#667eea';
+                }, 2000);
+            });
+        }
+
+        // Smooth scrolling for navigation
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+                
+                // Update active link
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+            });
+        });
+
+        // Update active navigation on scroll
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('.section');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.pageYOffset >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').substring(1) === current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Add fade-in animation to sections
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.section').forEach(section => {            section.style.opacity = '0';
+            section.style.transform = 'translateY(20px)';
+            section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(section);
+        });
+
+        // Sidebar functionality
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        function toggleSection(element) {
+            const section = element.parentElement;
+            const isActive = section.classList.contains('active');
+            
+            // Close all sections
+            document.querySelectorAll('.sidebar-section').forEach(sec => {
+                sec.classList.remove('active');
+                const arrow = sec.querySelector('.sidebar-section-title span');
+                if (arrow) arrow.textContent = '▶';
+            });
+            
+            // Open clicked section if it wasn't active
+            if (!isActive) {
+                section.classList.add('active');
+                const arrow = element.querySelector('span');
+                if (arrow) arrow.textContent = '▼';
+            }
+        }
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.querySelector('.sidebar-toggle');
+            
+            if (window.innerWidth <= 768 && 
+                !sidebar.contains(event.target) && 
+                !sidebarToggle.contains(event.target)) {
+                sidebar.classList.remove('active');
+            }
+        });
+    </script>
+    </div> <!-- End main-content -->
+</body>
+</html>

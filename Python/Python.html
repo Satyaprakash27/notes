@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Documentation Hub</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: #2c3e50;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background: #34495e;
+            border-bottom: 1px solid #455a75;
+        }
+
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 1.3em;
+            color: #ecf0f1;
+            border: none;
+            padding: 0;
+        }
+
+        .sidebar-nav {
+            padding: 0;
+        }
+
+        .sidebar-section {
+            border-bottom: 1px solid #455a75;
+        }
+
+        .sidebar-section-title {
+            background: #34495e;
+            color: #ecf0f1;
+            padding: 15px 20px;
+            margin: 0;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-section-title:hover {
+            background: #455a75;
+        }
+
+        .sidebar-links {
+            background: #2c3e50;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .sidebar-section.active .sidebar-links {
+            max-height: 500px;
+        }
+
+        .sidebar-links a {
+            display: block;
+            color: #bdc3c7;
+            text-decoration: none;
+            padding: 12px 25px;
+            border-bottom: 1px solid #34495e;
+            transition: background 0.2s ease;
+        }
+
+        .sidebar-links a:hover {
+            background: #34495e;
+            color: #ecf0f1;
+        }
+
+        .sidebar-links a.current {
+            background: #3498db;
+            color: white;
+            font-weight: 600;
+        }
+
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .hero-section {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 60px 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .hero-title {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: bold;
+        }
+
+        .hero-subtitle {
+            font-size: 1.3em;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .hero-description {
+            font-size: 1.1em;
+            color: #555;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .topics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .topic-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .topic-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .topic-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .topic-title {
+            font-size: 1.4em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .topic-description {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .topic-guides {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .guide-tag {
+            background: #667eea;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 500;
+        }
+
+        .stats-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 40px auto;
+            max-width: 800px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 30px;
+            text-align: center;
+        }
+
+        .stat-item {
+            padding: 20px;
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 1em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .sidebar-toggle {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            .hero-title {
+                font-size: 2.5em;
+            }
+
+            .hero-section {
+                padding: 40px 20px;
+            }
+
+            .topics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .topic-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+    
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2>🐍 Python Guides</h2>
+        </div>
+        <nav class="sidebar-nav">            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    🤖 Agentic AI <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="Agentic AI/agentic-ai-guide.html">AI Agents Guide</a>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    ⚡ Async Programming <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="Async Programming/async-programming-guide.html">Asyncio & Concurrency</a>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    🎨 Decorators <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="Decorators/decorators-guide.html">Python Decorators</a>
+                </div>
+            </div>            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    🚀 FastAPI <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="FastAPI/fastapi-guide.html">FastAPI Overview</a>
+                    <a href="FastAPI/1.Basic/fastapi-basics-complete.html">FastAPI Fundamentals</a>
+                    <a href="FastAPI/2.API Development/api-development-guide.html">API Development</a>
+                    <a href="FastAPI/3.Security/security-guide.html">Security & Authentication</a>
+                    <a href="FastAPI/4.Testing/testing-guide.html">Testing Strategies</a>
+                    <a href="FastAPI/5.Advanced Topics/advanced-topics-guide.html">Advanced Topics</a>
+                    <a href="FastAPI/6.Miscellanous/miscellaneous-guide.html">Tips & Best Practices</a>
+                </div>
+            </div>            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    🦜 LangChain <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="LangChain/langchain-documentation.html">LangChain Framework</a>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    📊 LangGraph <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="LangGraph/langgraph-guide.html">Graph-based AI</a>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="hero-section">
+            <h1 class="hero-title">🐍 Python Documentation Hub</h1>
+            <p class="hero-subtitle">Your comprehensive guide to Python development</p>
+            <p class="hero-description">
+                Explore in-depth documentation covering everything from basic Python concepts to advanced 
+                frameworks like FastAPI, LangChain, and cutting-edge AI development techniques.
+            </p>
+        </div>
+
+        <div class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-number">12</span>
+                    <div class="stat-label">Documentation Pages</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">6</span>
+                    <div class="stat-label">Major Topics</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">7</span>
+                    <div class="stat-label">FastAPI Guides</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">100%</span>
+                    <div class="stat-label">Comprehensive</div>
+                </div>
+            </div>
+        </div>        <div class="topics-grid">
+            <a href="Agentic AI/agentic-ai-guide.html" class="topic-card">
+                <span class="topic-icon">🤖</span>
+                <h3 class="topic-title">Agentic AI</h3>
+                <p class="topic-description">
+                    Build intelligent AI agents with comprehensive guides on agent architecture, 
+                    design patterns, and implementation strategies.
+                </p>
+                <div class="topic-guides">
+                    <span class="guide-tag">AI Agents</span>
+                    <span class="guide-tag">Architecture</span>
+                    <span class="guide-tag">Patterns</span>
+                </div>
+            </a>
+
+            <a href="Async Programming/async-programming-guide.html" class="topic-card">
+                <span class="topic-icon">⚡</span>
+                <h3 class="topic-title">Async Programming</h3>
+                <p class="topic-description">
+                    Master asynchronous programming with asyncio, concurrent programming patterns, 
+                    and performance optimization techniques.
+                </p>
+                <div class="topic-guides">
+                    <span class="guide-tag">Asyncio</span>
+                    <span class="guide-tag">Concurrency</span>
+                    <span class="guide-tag">Performance</span>
+                </div>
+            </a>
+
+            <a href="Decorators/decorators-guide.html" class="topic-card">
+                <span class="topic-icon">🎨</span>
+                <h3 class="topic-title">Python Decorators</h3>
+                <p class="topic-description">
+                    Deep dive into Python decorators, from basic concepts to advanced patterns 
+                    for clean and maintainable code.
+                </p>
+                <div class="topic-guides">
+                    <span class="guide-tag">Decorators</span>
+                    <span class="guide-tag">Patterns</span>
+                    <span class="guide-tag">Best Practices</span>
+                </div>
+            </a>
+
+            <a href="FastAPI/fastapi-guide.html" class="topic-card">
+                <span class="topic-icon">🚀</span>
+                <h3 class="topic-title">FastAPI Framework</h3>
+                <p class="topic-description">
+                    Complete FastAPI documentation covering fundamentals, API development, 
+                    security, testing, and advanced topics.
+                </p>
+                <div class="topic-guides">
+                    <span class="guide-tag">7 Guides</span>
+                    <span class="guide-tag">API Development</span>
+                    <span class="guide-tag">Security</span>
+                    <span class="guide-tag">Testing</span>
+                </div>
+            </a>
+
+            <a href="LangChain/langchain-documentation.html" class="topic-card">
+                <span class="topic-icon">🦜</span>
+                <h3 class="topic-title">LangChain Framework</h3>
+                <p class="topic-description">
+                    Comprehensive guide to LangChain for building applications with large 
+                    language models and AI-powered workflows.
+                </p>
+                <div class="topic-guides">
+                    <span class="guide-tag">LLM Apps</span>
+                    <span class="guide-tag">Chains</span>
+                    <span class="guide-tag">Agents</span>
+                </div>
+            </a>
+
+            <a href="LangGraph/langgraph-guide.html" class="topic-card">
+                <span class="topic-icon">📊</span>
+                <h3 class="topic-title">LangGraph</h3>
+                <p class="topic-description">
+                    Build sophisticated graph-based AI applications with LangGraph for 
+                    complex reasoning and workflow orchestration.
+                </p>
+                <div class="topic-guides">
+                    <span class="guide-tag">Graphs</span>
+                    <span class="guide-tag">Workflows</span>
+                    <span class="guide-tag">AI Reasoning</span>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Sidebar functionality
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        function toggleSection(element) {
+            const section = element.parentElement;
+            const isActive = section.classList.contains('active');
+            
+            // Close all sections
+            document.querySelectorAll('.sidebar-section').forEach(sec => {
+                sec.classList.remove('active');
+                const arrow = sec.querySelector('.sidebar-section-title span');
+                if (arrow) arrow.textContent = '▶';
+            });
+            
+            // Open clicked section if it wasn't active
+            if (!isActive) {
+                section.classList.add('active');
+                const arrow = element.querySelector('span');
+                if (arrow) arrow.textContent = '▼';
+            }
+        }
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.querySelector('.sidebar-toggle');
+            
+            if (window.innerWidth <= 768 && 
+                !sidebar.contains(event.target) && 
+                !sidebarToggle.contains(event.target)) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // Add smooth scrolling for better UX
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add entrance animations
+        window.addEventListener('load', function() {
+            const cards = document.querySelectorAll('.topic-card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                    
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 100);
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>
