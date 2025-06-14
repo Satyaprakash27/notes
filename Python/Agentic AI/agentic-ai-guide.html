@@ -114,19 +114,82 @@
 
         tr:hover {
             background-color: #f8f9ff;
-        }
-
-        .code-block {
-            background: #2d3748;
+        }        .code-block {
+            background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
             color: #e2e8f0;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 15px 0;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
             overflow-x: auto;
             border-left: 4px solid #667eea;
-            font-family: 'Courier New', monospace;
-            line-height: 1.4;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            line-height: 1.5;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
         }
+
+        .code-block pre {
+            margin: 0;
+            padding: 0;
+            background: transparent;
+            color: inherit;
+            font-family: inherit;
+            font-size: 14px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .code-block code {
+            background: transparent;
+            color: inherit;
+            font-family: inherit;
+            font-size: inherit;
+            padding: 0;
+            border: none;
+        }
+
+        .code-block::before {
+            content: "Python";
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: rgba(102, 126, 234, 0.2);
+            color: #667eea;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 80px;
+            background: rgba(102, 126, 234, 0.8);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .code-block:hover .copy-btn {
+            opacity: 1;
+        }
+        
+        .copy-btn:hover {
+            background: rgba(102, 126, 234, 1);
+        }
+
+        /* Syntax highlighting for code */
+        .code-block .keyword { color: #ff79c6; }
+        .code-block .string { color: #f1fa8c; }
+        .code-block .comment { color: #6272a4; }
+        .code-block .number { color: #bd93f9; }
 
         .workflow-diagram {
             background: #f8f9ff;
@@ -450,40 +513,34 @@
                 </ul>
             </div>
 
-            <h3>🔧 Key Components:</h3>
-
-            <h4>1. Agents</h4>
+            <h3>🔧 Key Components:</h3>            <h4>1. Agents</h4>
             <div class="code-block">
-from crewai import Agent
+                <pre><code>from crewai import Agent
 
 researcher = Agent(
     role='Research Specialist',
     goal='Gather comprehensive information on given topics',
     backstory='Expert researcher with access to various data sources',
     tools=[search_tool, web_scraper]
-)
-            </div>
-
-            <h4>2. Tasks</h4>
+)</code></pre>
+            </div>            <h4>2. Tasks</h4>
             <div class="code-block">
-from crewai import Task
+                <pre><code>from crewai import Task
 
 research_task = Task(
     description='Research the latest trends in AI',
     agent=researcher,
     expected_output='Detailed report with key findings'
-)
-            </div>
-
-            <h4>3. Crew (Team)</h4>
+)</code></pre>
+            </div>            <h4>3. Crew (Team)</h4>
             <div class="code-block">
-from crewai import Crew
+                <pre><code>from crewai import Crew
 
 crew = Crew(
     agents=[researcher, writer, reviewer],
     tasks=[research_task, writing_task, review_task],
     process=Process.sequential
-)
+)</code></pre>
             </div>
         </section>
 
@@ -581,11 +638,9 @@ crew = Crew(
         </section>
 
         <section id="implementation">
-            <h2>⚙️ Implementing Multi-Agent Tasks</h2>
-
-            <h3>🚀 Simple CrewAI Implementation</h3>
+            <h2>⚙️ Implementing Multi-Agent Tasks</h2>            <h3>🚀 Simple CrewAI Implementation</h3>
             <div class="code-block">
-import os
+                <pre><code>import os
 from crewai import Agent, Task, Crew, Process
 from crewai_tools import SerperDevTool, WebsiteSearchTool
 
@@ -639,12 +694,10 @@ crew = Crew(
 
 # Execute the crew
 result = crew.kickoff()
-print(result)
-            </div>
-
-            <h3>🛠️ Custom Agentic Workflow (Without CrewAI)</h3>
+print(result)</code></pre>
+            </div>            <h3>🛠️ Custom Agentic Workflow (Without CrewAI)</h3>
             <div class="code-block">
-import openai
+                <pre><code>import openai
 from typing import List, Dict, Any
 import json
 
@@ -759,7 +812,7 @@ steps = [
 ]
 
 # Execute workflow
-results = workflow.execute_workflow(steps)
+results = workflow.execute_workflow(steps)</code></pre>
             </div>
         </section>
 
@@ -808,22 +861,20 @@ results = workflow.execute_workflow(steps)
         </section>
 
         <section id="installation">
-            <h2>📦 Installation and Setup</h2>
-
-            <h3>🛠️ CrewAI Installation</h3>
-            <div class="installation-box">
-pip install crewai crewai-tools
+            <h2>📦 Installation and Setup</h2>            <h3>🛠️ CrewAI Installation</h3>
+            <div class="code-block">
+                <pre><code>pip install crewai crewai-tools</code></pre>
             </div>
 
             <h3>📚 Basic Dependencies</h3>
-            <div class="installation-box">
-pip install openai langchain chromadb
+            <div class="code-block">
+                <pre><code>pip install openai langchain chromadb</code></pre>
             </div>
 
             <h3>🔑 Environment Variables</h3>
-            <div class="installation-box">
-export OPENAI_API_KEY="your-api-key"
-export SERPER_API_KEY="your-serper-key"  # For web search
+            <div class="code-block">
+                <pre><code>export OPENAI_API_KEY="your-api-key"
+export SERPER_API_KEY="your-serper-key"  # For web search</code></pre>
             </div>
         </section>
 
@@ -832,7 +883,59 @@ export SERPER_API_KEY="your-serper-key"  # For web search
             <p>Agentic AI represents a significant evolution in artificial intelligence, moving from reactive systems to proactive, goal-oriented agents. Frameworks like <span class="highlight">CrewAI</span> make it easier to implement multi-agent systems that can tackle complex, multi-faceted problems through collaboration and specialization.</p>
             
             <p>The future of AI lies in these agentic systems that can work together, learn from each other, and adapt to achieve sophisticated goals with minimal human intervention. By understanding and implementing these concepts, developers can create more powerful, autonomous, and efficient AI solutions.</p>
-        </section>
-    </div>
+        </section>    </div>
+
+    <script>
+        // Add copy functionality to code blocks
+        document.addEventListener('DOMContentLoaded', function() {
+            const codeBlocks = document.querySelectorAll('.code-block');
+            
+            codeBlocks.forEach(block => {
+                // Create copy button
+                const copyBtn = document.createElement('button');
+                copyBtn.className = 'copy-btn';
+                copyBtn.textContent = 'Copy';
+                copyBtn.onclick = function() {
+                    const code = block.querySelector('code');
+                    if (code) {
+                        navigator.clipboard.writeText(code.textContent).then(() => {
+                            copyBtn.textContent = 'Copied!';
+                            setTimeout(() => {
+                                copyBtn.textContent = 'Copy';
+                            }, 2000);
+                        }).catch(err => {
+                            console.error('Failed to copy: ', err);
+                            // Fallback for older browsers
+                            const textArea = document.createElement('textarea');
+                            textArea.value = code.textContent;
+                            document.body.appendChild(textArea);
+                            textArea.select();
+                            document.execCommand('copy');
+                            document.body.removeChild(textArea);
+                            copyBtn.textContent = 'Copied!';
+                            setTimeout(() => {
+                                copyBtn.textContent = 'Copy';
+                            }, 2000);
+                        });
+                    }
+                };
+                block.appendChild(copyBtn);
+            });
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
 </body>
 </html>
