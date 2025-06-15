@@ -386,12 +386,46 @@
             scroll-behavior: smooth;
         }
         
-        /* Highlight target section */
-        :target {
+        /* Highlight target section */        :target {
             background-color: #fff3cd;
             padding: 10px;
             border-radius: 5px;
             margin: -10px;
+        }
+
+        .nav {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+        }
+
+        .nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .nav a {
+            color: #667eea;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav a:hover, .nav a.active {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
     </style>
 </head>
@@ -437,7 +471,7 @@
                     <a href="../3.Security/security-guide.html">Security & Authentication</a>
                     <a href="../4.Testing/testing-guide.html" class="current">Testing Strategies</a>
                     <a href="../5.Advanced Topics/advanced-topics-guide.html">Advanced Topics</a>
-                    <a href="../6.Miscellanous/miscellaneous-guide.html">Tips & Best Practices</a>
+                    <a href="../6.Miscellaneous/miscellaneous-guide.html">Tips & Best Practices</a>
                 </div>
             </div>
             <div class="sidebar-section">
@@ -467,17 +501,15 @@
             <h2>📋 Overview</h2>
             <p>Testing is a crucial part of building robust FastAPI applications. FastAPI provides excellent testing capabilities through its integration with popular testing frameworks and its built-in <strong>TestClient</strong> class.</p>
         </div>
-        
-        <div class="toc">
-            <h3>📚 Table of Contents</h3>
+          <nav class="nav">
             <ul>
-                <li><a href="#testing-fastapi">How to Test FastAPI Applications</a></li>
-                <li><a href="#testclient-role">Role of TestClient in FastAPI</a></li>
-                <li><a href="#mocking-dependencies">Mocking Dependencies</a></li>
-                <li><a href="#testing-frameworks">Testing Frameworks</a></li>
-                <li><a href="#best-practices">Best Practices</a></li>
+                <li><a href="#testing-fastapi" class="nav-link">🧪 Testing FastAPI</a></li>
+                <li><a href="#testclient-role" class="nav-link">🔧 TestClient Role</a></li>
+                <li><a href="#mocking-dependencies" class="nav-link">🎭 Mocking</a></li>
+                <li><a href="#testing-frameworks" class="nav-link">⚒️ Frameworks</a></li>
+                <li><a href="#best-practices" class="nav-link">✨ Best Practices</a></li>
             </ul>
-        </div>
+        </nav>
 
         <div id="testing-fastapi" class="question">
             <h2>✅ How do you test FastAPI applications?</h2>
@@ -1113,9 +1145,7 @@ def setup_test_env():
                 const arrow = element.querySelector('span');
                 if (arrow) arrow.textContent = '▼';
             }
-        }
-
-        // Close sidebar when clicking outside on mobile
+        }        // Close sidebar when clicking outside on mobile
         document.addEventListener('click', function(event) {
             const sidebar = document.getElementById('sidebar');
             const sidebarToggle = document.querySelector('.sidebar-toggle');
@@ -1125,6 +1155,48 @@ def setup_test_env():
                 !sidebarToggle.contains(event.target)) {
                 sidebar.classList.remove('active');
             }
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+                
+                // Update active link
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+            });
+        });
+
+        // Update active navigation on scroll
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('[id]');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.pageYOffset >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').substring(1) === current) {
+                    link.classList.add('active');
+                }
+            });
         });
     </script>
     </div> <!-- End main-content -->

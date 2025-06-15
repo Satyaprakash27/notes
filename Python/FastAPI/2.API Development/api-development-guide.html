@@ -441,11 +441,44 @@
             padding: 15px;
             border-radius: 8px;
             text-align: center;
-        }
-
-        .method-card h4 {
+        }        .method-card h4 {
             color: white;
             margin-bottom: 5px;
+        }
+
+        .nav {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+        }
+
+        .nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .nav a {
+            color: #667eea;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav a:hover, .nav a.active {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
     </style>
 </head>
@@ -491,7 +524,7 @@
                     <a href="../3.Security/security-guide.html">Security & Authentication</a>
                     <a href="../4.Testing/testing-guide.html">Testing Strategies</a>
                     <a href="../5.Advanced Topics/advanced-topics-guide.html">Advanced Topics</a>
-                    <a href="../6.Miscellanous/miscellaneous-guide.html">Tips & Best Practices</a>
+                    <a href="../6.Miscellaneous/miscellaneous-guide.html">Tips & Best Practices</a>
                 </div>
             </div>
             <div class="sidebar-section">
@@ -519,22 +552,19 @@
         
         <div class="intro">
             Master the art of building robust and scalable APIs with FastAPI. This comprehensive guide covers everything from basic routing to advanced features like file uploads, validation, versioning, and CORS implementation.
-        </div>
-
-        <div class="toc">
-            <h3>📚 Table of Contents</h3>
+        </div>        <nav class="nav">
             <ul>
-                <li><a href="#simple-routes">Simple Routes/Endpoints</a></li>
-                <li><a href="#query-parameters">Query Parameters</a></li>
-                <li><a href="#path-parameters">Path Parameters</a></li>
-                <li><a href="#request-bodies">Request Bodies</a></li>
-                <li><a href="#pydantic-advantages">Pydantic Model Advantages</a></li>
-                <li><a href="#data-validation">Data Validation</a></li>
-                <li><a href="#file-uploads">File Uploads</a></li>
-                <li><a href="#api-versioning">API Versioning</a></li>
-                <li><a href="#cors-implementation">CORS Implementation</a></li>
+                <li><a href="#simple-routes" class="nav-link">🛣️ Simple Routes</a></li>
+                <li><a href="#query-parameters" class="nav-link">❓ Query Parameters</a></li>
+                <li><a href="#path-parameters" class="nav-link">🛤️ Path Parameters</a></li>
+                <li><a href="#request-bodies" class="nav-link">📝 Request Bodies</a></li>
+                <li><a href="#pydantic-advantages" class="nav-link">⚡ Pydantic Advantages</a></li>
+                <li><a href="#data-validation" class="nav-link">✅ Data Validation</a></li>
+                <li><a href="#file-uploads" class="nav-link">📁 File Uploads</a></li>
+                <li><a href="#api-versioning" class="nav-link">🔢 API Versioning</a></li>
+                <li><a href="#cors-implementation" class="nav-link">🌐 CORS</a></li>
             </ul>
-        </div>
+        </nav>
 
         <h2 id="simple-routes">How do you define a simple route/endpoint in FastAPI?</h2>
         
@@ -1334,9 +1364,7 @@ async def main():
                 const arrow = element.querySelector('span');
                 if (arrow) arrow.textContent = '▼';
             }
-        }
-
-        // Close sidebar when clicking outside on mobile
+        }        // Close sidebar when clicking outside on mobile
         document.addEventListener('click', function(event) {
             const sidebar = document.getElementById('sidebar');
             const sidebarToggle = document.querySelector('.sidebar-toggle');
@@ -1346,6 +1374,48 @@ async def main():
                 !sidebarToggle.contains(event.target)) {
                 sidebar.classList.remove('active');
             }
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+                
+                // Update active link
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+            });
+        });
+
+        // Update active navigation on scroll
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('[id]');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.pageYOffset >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').substring(1) === current) {
+                    link.classList.add('active');
+                }
+            });
         });
     </script>
     </div> <!-- End main-content -->

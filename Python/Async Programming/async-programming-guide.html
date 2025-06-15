@@ -601,7 +601,7 @@
                     <a href="../FastAPI/3.Security/security-guide.html">Security & Authentication</a>
                     <a href="../FastAPI/4.Testing/testing-guide.html">Testing Strategies</a>
                     <a href="../FastAPI/5.Advanced Topics/advanced-topics-guide.html">Advanced Topics</a>
-                    <a href="../FastAPI/6.Miscellanous/miscellaneous-guide.html">Tips & Best Practices</a>
+                    <a href="../FastAPI/6.Miscellaneous/miscellaneous-guide.html">Tips & Best Practices</a>
                 </div>
             </div>
             <div class="sidebar-section">
@@ -638,21 +638,18 @@
                 <li><a href="#advanced">Advanced</a></li>
                 <li><a href="#performance">Performance</a></li>
             </ul>
-        </nav>
-
-        <div class="toc">
-            <h3>📚 Table of Contents</h3>
+        </nav>        <nav class="nav">
             <ul>
-                <li><a href="#what-is-async">What is Async Programming in Python?</a></li>
-                <li><a href="#under-the-hood">Async/Await Syntax Under the Hood</a></li>
-                <li><a href="#use-cases">Real-World Use Cases</a></li>
-                <li><a href="#fastapi">Implementing Async FastAPI Endpoints</a></li>
-                <li><a href="#best-practices">Best Practices</a></li>
-                <li><a href="#pitfalls">Common Pitfalls</a></li>
-                <li><a href="#advanced">Advanced Concepts</a></li>
-                <li><a href="#performance">Performance Comparison</a></li>
+                <li><a href="#what-is-async" class="nav-link">🎯 What is Async?</a></li>
+                <li><a href="#under-the-hood" class="nav-link">⚙️ Under the Hood</a></li>
+                <li><a href="#use-cases" class="nav-link">🌍 Use Cases</a></li>
+                <li><a href="#fastapi" class="nav-link">🚀 FastAPI</a></li>
+                <li><a href="#best-practices" class="nav-link">🎯 Best Practices</a></li>
+                <li><a href="#pitfalls" class="nav-link">⚠️ Pitfalls</a></li>
+                <li><a href="#advanced" class="nav-link">🔬 Advanced</a></li>
+                <li><a href="#performance" class="nav-link">📊 Performance</a></li>
             </ul>
-        </div>
+        </nav>
 
         <section id="what-is-async" class="section">
             <h2><span class="emoji">🎯</span>What is Async Programming in Python?</h2>
@@ -1457,9 +1454,7 @@ asyncio.run(main())</code></pre>
                 const arrow = element.querySelector('span');
                 if (arrow) arrow.textContent = '▼';
             }
-        }
-
-        // Close sidebar when clicking outside on mobile
+        }        // Close sidebar when clicking outside on mobile
         document.addEventListener('click', function(event) {
             const sidebar = document.getElementById('sidebar');
             const sidebarToggle = document.querySelector('.sidebar-toggle');
@@ -1469,6 +1464,48 @@ asyncio.run(main())</code></pre>
                 !sidebarToggle.contains(event.target)) {
                 sidebar.classList.remove('active');
             }
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+                
+                // Update active link
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+            });
+        });
+
+        // Update active navigation on scroll
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('section[id]');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.pageYOffset >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').substring(1) === current) {
+                    link.classList.add('active');
+                }
+            });
         });
     </script>
     </div> <!-- End main-content -->

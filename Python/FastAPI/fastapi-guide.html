@@ -121,9 +121,7 @@
             margin-left: 280px;
             flex: 1;
             min-height: 100vh;
-        }
-
-        .container {
+        }        .container {
             max-width: 1000px;
             margin: 0 auto;
             padding: 20px;
@@ -132,6 +130,50 @@
             border-radius: 20px;
             margin-top: 20px;
             margin-bottom: 20px;
+        }
+
+        .nav {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+        }
+
+        .nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .nav li {
+            margin: 0;
+        }
+
+        .nav a {
+            color: #667eea;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 0.9rem;
+            display: block;
+            white-space: nowrap;
+        }
+
+        .nav a:hover, .nav a.active {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
 
         @media (max-width: 768px) {
@@ -813,7 +855,7 @@
                     <a href="../FastAPI/3.Security/security-guide.html">Security & Authentication</a>
                     <a href="../FastAPI/4.Testing/testing-guide.html">Testing Strategies</a>
                     <a href="../FastAPI/5.Advanced Topics/advanced-topics-guide.html">Advanced Topics</a>
-                    <a href="../FastAPI/6.Miscellanous/miscellaneous-guide.html">Tips & Best Practices</a>
+                    <a href="../FastAPI/6.Miscellaneous/miscellaneous-guide.html">Tips & Best Practices</a>
                 </div>
             </div>
             <div class="sidebar-section">
@@ -836,26 +878,24 @@
     </div>
 
     <div class="main-content">
-        <div class="container">
-        <h1>
+        <div class="container">        <h1>
             <span class="fastapi-logo">⚡</span>
             FastAPI: Comprehensive Guide
             <span class="fastapi-logo">🚀</span>
         </h1>
         
-        <div class="toc">
-            <h3>📚 Table of Contents</h3>
+        <nav class="nav">
             <ul>
-                <li><a href="#what-is-fastapi">🎯 What is FastAPI?</a></li>
-                <li><a href="#fastapi-vs-others">⚔️ FastAPI vs Other Frameworks</a></li>
-                <li><a href="#use-cases">💼 Common Use Cases</a></li>
-                <li><a href="#rest-api-building">🏗️ Building REST APIs</a></li>
-                <li><a href="#ai-model-endpoints">🤖 AI Model Endpoints</a></li>
-                <li><a href="#best-practices">🎯 Best Practices</a></li>
-                <li><a href="#performance">⚡ Performance Optimization</a></li>
-                <li><a href="#deployment">🚀 Deployment</a></li>
+                <li><a href="#what-is-fastapi" class="nav-link">🎯 What is FastAPI?</a></li>
+                <li><a href="#fastapi-vs-others" class="nav-link">⚔️ FastAPI vs Others</a></li>
+                <li><a href="#use-cases" class="nav-link">💼 Use Cases</a></li>
+                <li><a href="#rest-api-building" class="nav-link">🏗️ Building REST APIs</a></li>
+                <li><a href="#ai-model-endpoints" class="nav-link">🤖 AI Model Endpoints</a></li>
+                <li><a href="#best-practices" class="nav-link">🎯 Best Practices</a></li>
+                <li><a href="#performance" class="nav-link">⚡ Performance</a></li>
+                <li><a href="#deployment" class="nav-link">🚀 Deployment</a></li>
             </ul>
-        </div>
+        </nav>
 
         <section id="what-is-fastapi">
             <h2><span class="emoji">🎯</span>What is FastAPI?</h2>
@@ -1614,9 +1654,7 @@ REDIS_URL=redis://localhost:6379</code></pre>
                 const arrow = element.querySelector('span');
                 if (arrow) arrow.textContent = '▼';
             }
-        }
-
-        // Close sidebar when clicking outside on mobile
+        }        // Close sidebar when clicking outside on mobile
         document.addEventListener('click', function(event) {
             const sidebar = document.getElementById('sidebar');
             const sidebarToggle = document.querySelector('.sidebar-toggle');
@@ -1626,6 +1664,48 @@ REDIS_URL=redis://localhost:6379</code></pre>
                 !sidebarToggle.contains(event.target)) {
                 sidebar.classList.remove('active');
             }
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+                
+                // Update active link
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+            });
+        });
+
+        // Update active navigation on scroll
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('section[id]');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.pageYOffset >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').substring(1) === current) {
+                    link.classList.add('active');
+                }
+            });
         });
     </script>
     </div> <!-- End main-content -->

@@ -536,12 +536,46 @@
             font-weight: 600;
         }
 
-        code {
-            background: #f1f1f1;
+        code {            background: #f1f1f1;
             padding: 2px 6px;
             border-radius: 3px;
             font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
             color: #e83e8c;
+        }
+
+        .nav {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+        }
+
+        .nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .nav a {
+            color: #667eea;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav a:hover, .nav a.active {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
     </style>
 </head>
@@ -587,7 +621,7 @@
                     <a href="../3.Security/security-guide.html">Security & Authentication</a>
                     <a href="../4.Testing/testing-guide.html">Testing Strategies</a>
                     <a href="../5.Advanced Topics/advanced-topics-guide.html">Advanced Topics</a>
-                    <a href="../6.Miscellanous/miscellaneous-guide.html">Tips & Best Practices</a>
+                    <a href="../6.Miscellaneous/miscellaneous-guide.html">Tips & Best Practices</a>
                 </div>
             </div>
             <div class="sidebar-section">
@@ -615,23 +649,20 @@
         
         <div class="intro">
             <strong>FastAPI</strong> is a modern, fast (high-performance), web framework for building APIs with Python 3.7+ based on standard Python type hints. This comprehensive guide covers everything you need to know to get started with FastAPI development.
-        </div>
-
-        <div class="toc">
-            <h3>📚 Table of Contents</h3>
+        </div>        <nav class="nav">
             <ul>
-                <li><a href="#what-is-fastapi">What is FastAPI?</a></li>
-                <li><a href="#advantages">Main Advantages</a></li>
-                <li><a href="#installation">Installation Guide</a></li>
-                <li><a href="#running">Running FastAPI Applications</a></li>
-                <li><a href="#uvicorn">Understanding Uvicorn</a></li>
-                <li><a href="#asgi">ASGI vs WSGI</a></li>
-                <li><a href="#dependency-injection">Dependency Injection</a></li>
-                <li><a href="#performance">Performance Features</a></li>
-                <li><a href="#documentation">Automatic API Documentation</a></li>
-                <li><a href="#pydantic">Pydantic Integration</a></li>
+                <li><a href="#what-is-fastapi" class="nav-link">🎯 What is FastAPI?</a></li>
+                <li><a href="#advantages" class="nav-link">⭐ Advantages</a></li>
+                <li><a href="#installation" class="nav-link">📦 Installation</a></li>
+                <li><a href="#running" class="nav-link">▶️ Running Apps</a></li>
+                <li><a href="#uvicorn" class="nav-link">🦄 Uvicorn</a></li>
+                <li><a href="#asgi" class="nav-link">🔄 ASGI vs WSGI</a></li>
+                <li><a href="#dependency-injection" class="nav-link">💉 Dependency Injection</a></li>
+                <li><a href="#performance" class="nav-link">⚡ Performance</a></li>
+                <li><a href="#documentation" class="nav-link">📚 Documentation</a></li>
+                <li><a href="#pydantic" class="nav-link">🔧 Pydantic</a></li>
             </ul>
-        </div>
+        </nav>
 
         <h2 id="what-is-fastapi">What is FastAPI? How does it compare to Flask or Django?</h2>
         
@@ -1246,9 +1277,7 @@ async def create_user(user: User):
                 const arrow = element.querySelector('span');
                 if (arrow) arrow.textContent = '▼';
             }
-        }
-
-        // Close sidebar when clicking outside on mobile
+        }        // Close sidebar when clicking outside on mobile
         document.addEventListener('click', function(event) {
             const sidebar = document.getElementById('sidebar');
             const sidebarToggle = document.querySelector('.sidebar-toggle');
@@ -1258,6 +1287,48 @@ async def create_user(user: User):
                 !sidebarToggle.contains(event.target)) {
                 sidebar.classList.remove('active');
             }
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+                
+                // Update active link
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+            });
+        });
+
+        // Update active navigation on scroll
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('[id]');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.pageYOffset >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').substring(1) === current) {
+                    link.classList.add('active');
+                }
+            });
         });
     </script>
     </div> <!-- End main-content -->

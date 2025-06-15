@@ -441,8 +441,7 @@
             padding: 30px;
             background: #343a40;
             color: white;
-            border-radius: 15px;
-        }        .progress-bar {
+            border-radius: 15px;        }        .progress-bar {
             position: fixed;
             top: 0;
             left: 0;
@@ -450,6 +449,41 @@
             background: linear-gradient(90deg, #007bff, #28a745);
             z-index: 1000;
             transition: width 0.3s ease;
+        }
+
+        .nav {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+        }
+
+        .nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .nav a {
+            color: #667eea;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav a:hover, .nav a.active {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
     </style>
 </head>
@@ -495,7 +529,7 @@
                     <a href="../3.Security/security-guide.html">Security & Authentication</a>
                     <a href="../4.Testing/testing-guide.html">Testing Strategies</a>
                     <a href="../5.Advanced Topics/advanced-topics-guide.html">Advanced Topics</a>
-                    <a href="../6.Miscellanous/miscellaneous-guide.html" class="current">Tips & Best Practices</a>
+                    <a href="../6.Miscellaneous/miscellaneous-guide.html" class="current">Tips & Best Practices</a>
                 </div>
             </div>
             <div class="sidebar-section">
@@ -524,16 +558,13 @@
         <div class="header">
             <h1>🔧 FastAPI Miscellaneous Topics</h1>
             <p>Advanced concepts and utilities for FastAPI development</p>
-        </div>
-
-        <nav class="toc">
-            <h2>📑 Table of Contents</h2>
+        </div>        <nav class="nav">
             <ul>
-                <li><a href="#openapi-generation">🔄 OpenAPI and Swagger Documentation Generation</a></li>
-                <li><a href="#depends-vs-middleware">⚡ Depends vs Middleware</a></li>
-                <li><a href="#response-model">📤 Response Model Usage</a></li>
-                <li><a href="#depends-security">🔐 Depends and Security Utilities</a></li>
-                <li><a href="#streaming-responses">🌊 Streaming Large Responses</a></li>
+                <li><a href="#openapi-generation" class="nav-link">🔄 OpenAPI Docs</a></li>
+                <li><a href="#depends-vs-middleware" class="nav-link">⚡ Depends vs Middleware</a></li>
+                <li><a href="#response-model" class="nav-link">📤 Response Models</a></li>
+                <li><a href="#depends-security" class="nav-link">🔐 Security Utils</a></li>
+                <li><a href="#streaming-responses" class="nav-link">🌊 Streaming</a></li>
             </ul>
         </nav>
 
@@ -1663,9 +1694,7 @@ async def process_upload_stream(file: UploadFile = File(...)):
                 const arrow = element.querySelector('span');
                 if (arrow) arrow.textContent = '▼';
             }
-        }
-
-        // Close sidebar when clicking outside on mobile
+        }        // Close sidebar when clicking outside on mobile
         document.addEventListener('click', function(event) {
             const sidebar = document.getElementById('sidebar');
             const sidebarToggle = document.querySelector('.sidebar-toggle');
@@ -1675,6 +1704,48 @@ async def process_upload_stream(file: UploadFile = File(...)):
                 !sidebarToggle.contains(event.target)) {
                 sidebar.classList.remove('active');
             }
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+                
+                // Update active link
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+            });
+        });
+
+        // Update active navigation on scroll
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('[id]');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.pageYOffset >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').substring(1) === current) {
+                    link.classList.add('active');
+                }
+            });
         });
 
         // Progress bar functionality (if exists)
