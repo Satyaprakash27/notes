@@ -474,7 +474,7 @@
                     <a href="../FastAPI/3.Security/security-guide.html">Security & Authentication</a>
                     <a href="../FastAPI/4.Testing/testing-guide.html">Testing Strategies</a>
                     <a href="../FastAPI/5.Advanced Topics/advanced-topics-guide.html">Advanced Topics</a>
-                    <a href="../FastAPI/6.Miscellanous/miscellaneous-guide.html">Tips & Best Practices</a>
+                    <a href="../FastAPI/6.Miscellaneous/miscellaneous-guide.html">Tips & Best Practices</a>
                 </div>
             </div>
             <div class="sidebar-section active">
@@ -502,17 +502,15 @@
             <h1>LangChain Documentation</h1>
             <p>Comprehensive Guide to Building LLM Applications</p>
         </div>
-        
-        <div class="nav">
-            <h3>Table of Contents</h3>
+          <nav class="nav">
             <ul>
-                <li><a href="#what-is-langchain">What is LangChain? What is LLM Chain?</a></li>
-                <li><a href="#what-does-langchain-do">What does LangChain do in an LLM application?</a></li>
-                <li><a href="#major-use-cases">Major use cases of LangChain</a></li>
-                <li><a href="#creating-simple-llmchain">Creating a simple LLMChain in Python</a></li>
-                <li><a href="#additional-resources">Additional Resources</a></li>
+                <li><a href="#what-is-langchain" class="nav-link">🦜 What is LangChain?</a></li>
+                <li><a href="#what-does-langchain-do" class="nav-link">⚙️ What does it do?</a></li>
+                <li><a href="#major-use-cases" class="nav-link">💼 Use Cases</a></li>
+                <li><a href="#creating-simple-llmchain" class="nav-link">🚀 Simple LLMChain</a></li>
+                <li><a href="#additional-resources" class="nav-link">📚 Resources</a></li>
             </ul>
-        </div>
+        </nav>
         
         <div class="content">
             <section id="what-is-langchain" class="section">
@@ -972,9 +970,53 @@ print(story_result["story"])</code></pre>
                 if (link.getAttribute('href') === '#' + current) {
                     link.style.color = '#3498db';
                 }
+            });        });
+    </script>
+    
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+                
+                // Update active link
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+            });
+        });
+
+        // Update active navigation on scroll
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('section[id]');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.pageYOffset >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').substring(1) === current) {
+                    link.classList.add('active');
+                }
             });
         });
     </script>
+
     <script>
         // Sidebar functionality
         function toggleSidebar() {

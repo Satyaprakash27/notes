@@ -351,12 +351,46 @@
             scroll-behavior: smooth;
         }
         
-        /* Highlight target section */
-        :target {
+        /* Highlight target section */        :target {
             background-color: #fff3cd;
             padding: 10px;
             border-radius: 5px;
             margin: -10px;
+        }
+
+        .nav {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+        }
+
+        .nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .nav a {
+            color: #667eea;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav a:hover, .nav a.active {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
     </style>
 </head>
@@ -402,7 +436,7 @@
                     <a href="../3.Security/security-guide.html" class="current">Security & Authentication</a>
                     <a href="../4.Testing/testing-guide.html">Testing Strategies</a>
                     <a href="../5.Advanced Topics/advanced-topics-guide.html">Advanced Topics</a>
-                    <a href="../6.Miscellanous/miscellaneous-guide.html">Tips & Best Practices</a>
+                    <a href="../6.Miscellaneous/miscellaneous-guide.html">Tips & Best Practices</a>
                 </div>
             </div>
             <div class="sidebar-section">
@@ -427,16 +461,14 @@
     <div class="main-content">
         <div class="container">
         <h1>🔒 FastAPI Security Guide</h1>
-        
-        <div class="toc">
-            <h3>📚 Table of Contents</h3>
+          <nav class="nav">
             <ul>
-                <li><a href="#authentication">Authentication Implementation</a></li>
-                <li><a href="#oauth2-jwt">OAuth2 and JWT</a></li>
-                <li><a href="#role-authorization">Role-based Authorization</a></li>
-                <li><a href="#password-hashing">Password Hashing</a></li>
+                <li><a href="#authentication" class="nav-link">🔐 Authentication</a></li>
+                <li><a href="#oauth2-jwt" class="nav-link">🔑 OAuth2 & JWT</a></li>
+                <li><a href="#role-authorization" class="nav-link">👥 Role-based Auth</a></li>
+                <li><a href="#password-hashing" class="nav-link">🔒 Password Hashing</a></li>
             </ul>
-        </div>
+        </nav>
 
         <div class="warning">
             <strong>⚠️ Security Warning:</strong> The examples in this guide use simplified implementations for educational purposes. In production, ensure you use secure secret keys, proper error handling, rate limiting, and follow security best practices.
@@ -1227,9 +1259,7 @@ async def reset_password(reset_data: PasswordReset):
                 const arrow = element.querySelector('span');
                 if (arrow) arrow.textContent = '▼';
             }
-        }
-
-        // Close sidebar when clicking outside on mobile
+        }        // Close sidebar when clicking outside on mobile
         document.addEventListener('click', function(event) {
             const sidebar = document.getElementById('sidebar');
             const sidebarToggle = document.querySelector('.sidebar-toggle');
@@ -1239,6 +1269,48 @@ async def reset_password(reset_data: PasswordReset):
                 !sidebarToggle.contains(event.target)) {
                 sidebar.classList.remove('active');
             }
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+                
+                // Update active link
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+            });
+        });
+
+        // Update active navigation on scroll
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('[id]');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.pageYOffset >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').substring(1) === current) {
+                    link.classList.add('active');
+                }
+            });
         });
     </script>
     </div> <!-- End main-content -->

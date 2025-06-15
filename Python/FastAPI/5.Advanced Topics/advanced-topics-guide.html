@@ -415,11 +415,45 @@
         .code-container:hover .copy-button {
             opacity: 1;
         }
-        
-        .topic-section:hover {
+          .topic-section:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(0,0,0,0.1);
             transition: all 0.3s ease;
+        }
+
+        .nav {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+        }
+
+        .nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .nav a {
+            color: #667eea;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav a:hover, .nav a.active {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
     </style>
 </head>
@@ -465,7 +499,7 @@
                     <a href="../3.Security/security-guide.html">Security & Authentication</a>
                     <a href="../4.Testing/testing-guide.html">Testing Strategies</a>
                     <a href="../5.Advanced Topics/advanced-topics-guide.html" class="current">Advanced Topics</a>
-                    <a href="../6.Miscellanous/miscellaneous-guide.html">Tips & Best Practices</a>
+                    <a href="../6.Miscellaneous/miscellaneous-guide.html">Tips & Best Practices</a>
                 </div>
             </div>
             <div class="sidebar-section">
@@ -490,21 +524,19 @@
     <div class="main-content">
         <div class="container">
         <h1>⚡ FastAPI Advanced Topics</h1>
-        
-        <div class="toc">
-            <h3>📚 Advanced Topics Overview</h3>
+          <nav class="nav">
             <ul>
-                <li><a href="#middleware">🔧 Middleware</a></li>
-                <li><a href="#background-tasks">⚙️ Background Tasks</a></li>
-                <li><a href="#database-connections">🗄️ Database Connections</a></li>
-                <li><a href="#sqlalchemy">📊 SQLAlchemy Integration</a></li>
-                <li><a href="#dependency-injection">💉 Dependency Injection</a></li>
-                <li><a href="#exception-handling">⚠️ Exception Handling</a></li>
-                <li><a href="#application-structure">🏗️ Application Structure</a></li>
-                <li><a href="#deployment">🚀 Deployment</a></li>
-                <li><a href="#performance">⚡ Performance</a></li>
+                <li><a href="#middleware" class="nav-link">🔧 Middleware</a></li>
+                <li><a href="#background-tasks" class="nav-link">⚙️ Background Tasks</a></li>
+                <li><a href="#database-connections" class="nav-link">🗄️ Database</a></li>
+                <li><a href="#sqlalchemy" class="nav-link">📊 SQLAlchemy</a></li>
+                <li><a href="#dependency-injection" class="nav-link">💉 Dependencies</a></li>
+                <li><a href="#exception-handling" class="nav-link">⚠️ Exceptions</a></li>
+                <li><a href="#application-structure" class="nav-link">🏗️ Structure</a></li>
+                <li><a href="#deployment" class="nav-link">🚀 Deployment</a></li>
+                <li><a href="#performance" class="nav-link">⚡ Performance</a></li>
             </ul>
-        </div>
+        </nav>
 
         <div class="advanced-note">
             <h4>🎯 About Advanced Topics</h4>
@@ -824,9 +856,7 @@ spec:
                 const arrow = element.querySelector('span');
                 if (arrow) arrow.textContent = '▼';
             }
-        }
-
-        // Close sidebar when clicking outside on mobile
+        }        // Close sidebar when clicking outside on mobile
         document.addEventListener('click', function(event) {
             const sidebar = document.getElementById('sidebar');
             const sidebarToggle = document.querySelector('.sidebar-toggle');
@@ -836,6 +866,48 @@ spec:
                 !sidebarToggle.contains(event.target)) {
                 sidebar.classList.remove('active');
             }
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+                
+                // Update active link
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+            });
+        });
+
+        // Update active navigation on scroll
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('[id]');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.pageYOffset >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').substring(1) === current) {
+                    link.classList.add('active');
+                }
+            });
         });
     </script>
     </div> <!-- End main-content -->
