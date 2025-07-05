@@ -1,0 +1,1396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algorithms & Problem Solving - Complete Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: #2c3e50;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background: #34495e;
+            border-bottom: 1px solid #455a75;
+        }
+
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 1.3em;
+            color: #ecf0f1;
+            border: none;
+            padding: 0;
+        }
+
+        .sidebar-nav {
+            padding: 0;
+        }
+
+        .sidebar-section {
+            border-bottom: 1px solid #455a75;
+        }
+
+        .sidebar-section-title {
+            background: #34495e;
+            color: #ecf0f1;
+            padding: 15px 20px;
+            margin: 0;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-section-title:hover {
+            background: #455a75;
+        }
+
+        .sidebar-links {
+            background: #2c3e50;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .sidebar-section.active .sidebar-links {
+            max-height: 500px;
+        }
+
+        .sidebar-links a {
+            display: block;
+            color: #bdc3c7;
+            text-decoration: none;
+            padding: 12px 25px;
+            border-bottom: 1px solid #34495e;
+            transition: background 0.2s ease;
+        }
+
+        .sidebar-links a:hover {
+            background: #34495e;
+            color: #ecf0f1;
+        }
+
+        .sidebar-links a.current {
+            background: #3498db;
+            color: white;
+            font-weight: 600;
+        }
+
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .sidebar-toggle {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #3498db, #e74c3c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        h2 {
+            color: #27ae60;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-left: 5px solid #27ae60;
+            padding-left: 15px;
+            position: relative;
+        }
+
+        h2::before {
+            content: "✅";
+            position: absolute;
+            left: -30px;
+            top: 0;
+            font-size: 0.8em;
+        }
+
+        h3 {
+            color: #34495e;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        h4 {
+            color: #2c3e50;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        .intro {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 1.1em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        tr:hover {
+            background: #e3f2fd;
+            transition: background 0.3s ease;
+        }
+
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.4;
+            position: relative;
+            border-left: 4px solid #007acc;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .code-block::before {
+            content: attr(data-lang);
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            color: #888;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            background: #333;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+
+        .code-block.python { border-left-color: #3776ab; }
+        .code-block.bash { border-left-color: #4eaa25; }
+        .code-block.txt { border-left-color: #6c757d; }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #ffecd2, #fcb69f);
+            border: 2px solid #ff6b6b;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .highlight-box::before {
+            content: "💡";
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background: #ff6b6b;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9em;
+        }
+
+        .theory-box {
+            background: linear-gradient(135deg, #e8f5e8, #f0f8ff);
+            border: 2px solid #27ae60;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .theory-box::before {
+            content: "📖";
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background: #27ae60;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9em;
+        }
+
+        .complexity-box {
+            background: linear-gradient(135deg, #f8e1ff, #e8f5e8);
+            border: 2px solid #9b59b6;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .complexity-box::before {
+            content: "⚡";
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background: #9b59b6;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9em;
+        }
+
+        .pattern-box {
+            background: linear-gradient(135deg, #fff9e6, #f0f8ff);
+            border: 2px solid #f39c12;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .pattern-box::before {
+            content: "🎯";
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background: #f39c12;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9em;
+        }
+
+        .algorithm-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .algorithm-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            transform: translateY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .algorithm-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .algorithm-card h4 {
+            margin-bottom: 10px;
+            font-size: 1.2em;
+            color: white;
+        }
+
+        .nav {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+        }
+
+        .nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .nav a {
+            color: #667eea;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav a:hover, .nav a.active {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        ul, ol {
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 5px;
+        }
+
+        strong {
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        code {
+            background: #f1f1f1;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            color: #e83e8c;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                padding: 15px;
+                border-radius: 10px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            table {
+                font-size: 0.9em;
+            }
+
+            .code-block {
+                font-size: 0.9em;
+                padding: 15px;
+            }
+
+            .algorithm-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+    
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2><a href="../../Python.html" style="color: #ecf0f1; text-decoration: none;">🐍 Python Guides</a></h2>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="sidebar-section active">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    🐍 Basic Python <span>▼</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../basic-python-guide.html">Python Fundamentals</a>
+                    <a href="../1.Python Concepts/python-concepts.html">Core Concepts</a>
+                    <a href="../2.Data Structures/python-data-structures.html">Data Structures</a>
+                    <a href="../3.Algorithms & Problem Solving/algorithms-problem-solving.html" class="current">Algorithms & Problem Solving</a>
+                    <a href="../4.Testing & Debugging/testing-debugging.html">Testing & Debugging</a>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    ⚡ Async Programming <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../../2.Async Programming/async-programming-guide.html">Asyncio & Concurrency</a>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    🚀 FastAPI <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../../3.FastAPI/fastapi-guide.html">FastAPI Overview</a>
+                    <a href="../../3.FastAPI/1.Basic/fastapi-basics-complete.html">FastAPI Fundamentals</a>
+                    <a href="../../3.FastAPI/2.API Development/api-development-guide.html">API Development</a>
+                    <a href="../../3.FastAPI/3.Security/security-guide.html">Security & Authentication</a>
+                    <a href="../../3.FastAPI/4.Testing/testing-guide.html">Testing Strategies</a>
+                    <a href="../../3.FastAPI/5.Advanced Topics/advanced-topics-guide.html">Advanced Topics</a>
+                    <a href="../../3.FastAPI/6.Miscellaneous/miscellaneous-guide.html">Tips & Best Practices</a>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    🦜 LangChain <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../../4.LangChain/langchain-documentation.html">LangChain Framework</a>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    📊 LangGraph <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../../5.LangGraph/langgraph-guide.html">Graph-based AI</a>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    🤖 Agentic AI <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../../7.Agentic AI/agentic-ai-guide.html">AI Agents Guide</a>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="container">
+            <h1>🧠 Algorithms & Problem Solving - Complete Guide</h1>
+            
+            <div class="intro">
+                <strong>Algorithms & Problem Solving</strong> covers essential algorithms, problem-solving techniques, and coding interview preparation using Python. Master the art of algorithmic thinking and develop skills to tackle complex programming challenges efficiently.
+            </div>
+
+            <nav class="nav">
+                <ul>
+                    <li><a href="#algorithmic-thinking" class="nav-link">🧠 Algorithmic Thinking</a></li>
+                    <li><a href="#complexity" class="nav-link">⚡ Time & Space Complexity</a></li>
+                    <li><a href="#basic-algorithms" class="nav-link">🔍 Basic Algorithms</a></li>
+                    <li><a href="#data-structure-algorithms" class="nav-link">📊 Data Structure Algorithms</a></li>
+                    <li><a href="#advanced-algorithms" class="nav-link">🚀 Advanced Algorithms</a></li>
+                    <li><a href="#problem-solving" class="nav-link">🎯 Problem-Solving Patterns</a></li>
+                    <li><a href="#interview-prep" class="nav-link">💼 Interview Preparation</a></li>
+                    <li><a href="#practice" class="nav-link">📝 Practice Problems</a></li>
+                </ul>
+            </nav>
+
+            <h2 id="algorithmic-thinking">Algorithmic Thinking</h2>
+            
+            <div class="theory-box">
+                <h3>What is Algorithmic Thinking?</h3>
+                <p>Algorithmic thinking is the process of breaking down complex problems into smaller, manageable steps that can be solved systematically. It's a fundamental skill that combines logical reasoning, pattern recognition, and systematic problem-solving approaches.</p>
+                <p><strong>Core Definition:</strong> An algorithm is a finite sequence of well-defined, computer-implementable instructions for solving a problem or performing a computation.</p>
+            </div>
+
+            <div class="theory-box">
+                <h3>Computational Thinking Framework</h3>
+                <ol>
+                    <li><strong>Decomposition:</strong> Breaking down complex problems into smaller, more manageable sub-problems</li>
+                    <li><strong>Pattern Recognition:</strong> Identifying similarities and patterns among problems</li>
+                    <li><strong>Abstraction:</strong> Focusing on essential features while ignoring irrelevant details</li>
+                    <li><strong>Algorithm Design:</strong> Creating step-by-step solutions that can be implemented</li>
+                </ol>
+            </div>
+
+            <div class="algorithm-grid">
+                <div class="algorithm-card">
+                    <h4>🔨 Brute Force</h4>
+                    <p>Exhaustively search all possible solutions</p>
+                </div>
+                <div class="algorithm-card">
+                    <h4>⚡ Divide & Conquer</h4>
+                    <p>Break problem into smaller subproblems</p>
+                </div>
+                <div class="algorithm-card">
+                    <h4>💾 Dynamic Programming</h4>
+                    <p>Store results to avoid redundant calculations</p>
+                </div>
+                <div class="algorithm-card">
+                    <h4>🎯 Greedy Algorithms</h4>
+                    <p>Make locally optimal choices</p>
+                </div>
+                <div class="algorithm-card">
+                    <h4>🔄 Backtracking</h4>
+                    <p>Systematic trial and error approach</p>
+                </div>
+            </div>
+
+            <h2 id="complexity">Time and Space Complexity</h2>
+            
+            <div class="theory-box">
+                <h3>What is Complexity Analysis?</h3>
+                <p>Complexity analysis is the practice of determining how the running time and space requirements of an algorithm scale with the size of the input. It helps us:</p>
+                <ul>
+                    <li>Compare different algorithms objectively</li>
+                    <li>Predict performance on large inputs</li>
+                    <li>Identify bottlenecks in code</li>
+                    <li>Make informed decisions about algorithm selection</li>
+                </ul>
+            </div>
+
+            <div class="complexity-box">
+                <h3>Big O Notation Hierarchy</h3>
+                <ol>
+                    <li><strong>O(1)</strong> - Constant: Array access, hash table lookup</li>
+                    <li><strong>O(log n)</strong> - Logarithmic: Binary search, balanced tree operations</li>
+                    <li><strong>O(n)</strong> - Linear: Array traversal, linear search</li>
+                    <li><strong>O(n log n)</strong> - Linearithmic: Efficient sorting (merge sort, heap sort)</li>
+                    <li><strong>O(n²)</strong> - Quadratic: Nested loops, bubble sort</li>
+                    <li><strong>O(n³)</strong> - Cubic: Triple nested loops, naive matrix multiplication</li>
+                    <li><strong>O(2ⁿ)</strong> - Exponential: Recursive fibonacci, subset generation</li>
+                    <li><strong>O(n!)</strong> - Factorial: Traveling salesman (brute force), permutations</li>
+                </ol>
+            </div>
+
+            <div class="code-block python" data-lang="python"># O(1) - Constant Time
+def constant_time_example(arr):
+    return arr[0] if arr else None
+
+# O(log n) - Logarithmic Time
+def binary_search(arr, target):
+    left, right = 0, len(arr) - 1
+    while left <= right:
+        mid = (left + right) // 2
+        if arr[mid] == target:
+            return mid
+        elif arr[mid] < target:
+            left = mid + 1
+        else:
+            right = mid - 1
+    return -1
+
+# O(n) - Linear Time
+def linear_search(arr, target):
+    for i, value in enumerate(arr):
+        if value == target:
+            return i
+    return -1
+
+# O(n²) - Quadratic Time
+def bubble_sort(arr):
+    n = len(arr)
+    for i in range(n):
+        for j in range(0, n - i - 1):
+            if arr[j] > arr[j + 1]:
+                arr[j], arr[j + 1] = arr[j + 1], arr[j]
+    return arr</div>
+
+            <h2 id="basic-algorithms">Basic Algorithms</h2>
+            
+            <h3>Searching Algorithms</h3>
+            
+            <div class="theory-box">
+                <h4>Linear Search Theory</h4>
+                <ul>
+                    <li><strong>Concept:</strong> Sequentially check each element until target is found</li>
+                    <li><strong>Time Complexity:</strong> O(n) - must check each element in worst case</li>
+                    <li><strong>Space Complexity:</strong> O(1) - no extra space needed</li>
+                    <li><strong>When to use:</strong> Small datasets, unsorted data, simplicity is important</li>
+                </ul>
+            </div>
+
+            <div class="code-block python" data-lang="python">def linear_search(arr, target):
+    """
+    Search for target in unsorted array
+    Time: O(n), Space: O(1)
+    """
+    for i, value in enumerate(arr):
+        if value == target:
+            return i
+    return -1
+
+# Example usage
+numbers = [64, 34, 25, 12, 22, 11, 90]
+print(linear_search(numbers, 22))  # Output: 4</div>
+
+            <div class="theory-box">
+                <h4>Binary Search Theory</h4>
+                <ul>
+                    <li><strong>Concept:</strong> Divide and conquer approach for sorted arrays</li>
+                    <li><strong>Prerequisites:</strong> Array must be sorted</li>
+                    <li><strong>Time Complexity:</strong> O(log n) - eliminates half the elements each iteration</li>
+                    <li><strong>Space Complexity:</strong> O(1) iterative, O(log n) recursive</li>
+                    <li><strong>When to use:</strong> Large sorted datasets, frequent searches</li>
+                </ul>
+            </div>
+
+            <div class="code-block python" data-lang="python">def binary_search(arr, target):
+    """
+    Search for target in sorted array
+    Time: O(log n), Space: O(1)
+    """
+    left, right = 0, len(arr) - 1
+    
+    while left <= right:
+        mid = (left + right) // 2
+        if arr[mid] == target:
+            return mid
+        elif arr[mid] < target:
+            left = mid + 1
+        else:
+            right = mid - 1
+    
+    return -1
+
+# Example usage
+sorted_numbers = [11, 12, 22, 25, 34, 64, 90]
+print(binary_search(sorted_numbers, 25))  # Output: 3</div>
+
+            <h3>Sorting Algorithms</h3>
+            
+            <div class="theory-box">
+                <h4>Sorting Algorithm Classification</h4>
+                <ul>
+                    <li><strong>By Stability:</strong> Stable (maintains relative order of equal elements) vs Unstable</li>
+                    <li><strong>By Method:</strong> Comparison-based vs Non-comparison based</li>
+                    <li><strong>By Memory Usage:</strong> In-place (O(1) extra space) vs Out-of-place (O(n) extra space)</li>
+                    <li><strong>By Adaptability:</strong> Adaptive (performs better on partially sorted data) vs Non-adaptive</li>
+                </ul>
+            </div>
+
+            <div class="code-block python" data-lang="python">def bubble_sort(arr):
+    """
+    Simple comparison-based sorting
+    Time: O(n²), Space: O(1)
+    """
+    n = len(arr)
+    for i in range(n):
+        swapped = False
+        for j in range(0, n - i - 1):
+            if arr[j] > arr[j + 1]:
+                arr[j], arr[j + 1] = arr[j + 1], arr[j]
+                swapped = True
+        
+        # Optimization: if no swapping occurred, array is sorted
+        if not swapped:
+            break
+    
+    return arr
+
+def merge_sort(arr):
+    """
+    Stable divide-and-conquer sorting
+    Time: O(n log n), Space: O(n)
+    """
+    if len(arr) <= 1:
+        return arr
+    
+    mid = len(arr) // 2
+    left = merge_sort(arr[:mid])
+    right = merge_sort(arr[mid:])
+    
+    return merge(left, right)
+
+def merge(left, right):
+    """
+    Merge two sorted arrays
+    """
+    result = []
+    i = j = 0
+    
+    while i < len(left) and j < len(right):
+        if left[i] <= right[j]:
+            result.append(left[i])
+            i += 1
+        else:
+            result.append(right[j])
+            j += 1
+    
+    result.extend(left[i:])
+    result.extend(right[j:])
+    return result
+
+def quick_sort(arr):
+    """
+    Divide-and-conquer sorting algorithm
+    Average Time: O(n log n), Worst Time: O(n²), Space: O(log n)
+    """
+    if len(arr) <= 1:
+        return arr
+    
+    pivot = arr[len(arr) // 2]
+    left = [x for x in arr if x < pivot]
+    middle = [x for x in arr if x == pivot]
+    right = [x for x in arr if x > pivot]
+    
+    return quick_sort(left) + middle + quick_sort(right)</div>
+
+            <h2 id="data-structure-algorithms">Data Structure Algorithms</h2>
+            
+            <h3>Array Algorithms</h3>
+            
+            <div class="pattern-box">
+                <h4>Two Pointers Technique</h4>
+                <p><strong>Concept:</strong> Use two pointers to traverse array from different positions</p>
+                <p><strong>When to use:</strong> Array is sorted, finding pairs with certain property, reversing elements</p>
+                <p><strong>Advantage:</strong> Reduces time complexity from O(n²) to O(n)</p>
+            </div>
+
+            <div class="code-block python" data-lang="python">def two_sum_sorted(arr, target):
+    """
+    Find two numbers that add up to target in sorted array
+    Time: O(n), Space: O(1)
+    """
+    left, right = 0, len(arr) - 1
+    
+    while left < right:
+        current_sum = arr[left] + arr[right]
+        if current_sum == target:
+            return [left, right]
+        elif current_sum < target:
+            left += 1
+        else:
+            right -= 1
+    
+    return []
+
+def container_with_most_water(height):
+    """
+    Find two lines that form container with most water
+    Time: O(n), Space: O(1)
+    """
+    left, right = 0, len(height) - 1
+    max_area = 0
+    
+    while left < right:
+        area = min(height[left], height[right]) * (right - left)
+        max_area = max(max_area, area)
+        
+        if height[left] < height[right]:
+            left += 1
+        else:
+            right -= 1
+    
+    return max_area</div>
+
+            <div class="pattern-box">
+                <h4>Sliding Window Technique</h4>
+                <p><strong>Concept:</strong> Maintain a window of fixed or variable size over array elements</p>
+                <p><strong>When to use:</strong> Finding subarray with specific property, optimization over contiguous elements</p>
+                <p><strong>Advantage:</strong> Avoids redundant calculations, reduces time complexity</p>
+            </div>
+
+            <div class="code-block python" data-lang="python">def max_sum_subarray(arr, k):
+    """
+    Find maximum sum of subarray of size k
+    Time: O(n), Space: O(1)
+    """
+    if len(arr) < k:
+        return None
+    
+    # Calculate sum of first window
+    window_sum = sum(arr[:k])
+    max_sum = window_sum
+    
+    # Slide the window
+    for i in range(k, len(arr)):
+        window_sum = window_sum - arr[i - k] + arr[i]
+        max_sum = max(max_sum, window_sum)
+    
+    return max_sum
+
+def longest_substring_k_distinct(s, k):
+    """
+    Find longest substring with at most k distinct characters
+    Time: O(n), Space: O(k)
+    """
+    if k == 0:
+        return 0
+    
+    char_count = {}
+    left = 0
+    max_length = 0
+    
+    for right in range(len(s)):
+        # Add character to window
+        char_count[s[right]] = char_count.get(s[right], 0) + 1
+        
+        # Shrink window if more than k distinct characters
+        while len(char_count) > k:
+            char_count[s[left]] -= 1
+            if char_count[s[left]] == 0:
+                del char_count[s[left]]
+            left += 1
+        
+        max_length = max(max_length, right - left + 1)
+    
+    return max_length</div>
+
+            <h3>String Algorithms</h3>
+            
+            <div class="code-block python" data-lang="python">def naive_pattern_search(text, pattern):
+    """
+    Naive pattern matching algorithm
+    Time: O(nm), Space: O(1)
+    """
+    matches = []
+    n, m = len(text), len(pattern)
+    
+    for i in range(n - m + 1):
+        j = 0
+        while j < m and text[i + j] == pattern[j]:
+            j += 1
+        if j == m:
+            matches.append(i)
+    
+    return matches
+
+def is_palindrome(s):
+    """
+    Check if string is palindrome (ignoring case and non-alphanumeric)
+    Time: O(n), Space: O(1)
+    """
+    left, right = 0, len(s) - 1
+    
+    while left < right:
+        # Skip non-alphanumeric characters
+        while left < right and not s[left].isalnum():
+            left += 1
+        while left < right and not s[right].isalnum():
+            right -= 1
+        
+        if s[left].lower() != s[right].lower():
+            return False
+        
+        left += 1
+        right -= 1
+    
+    return True</div>
+
+            <h3>Tree Algorithms</h3>
+            
+            <div class="code-block python" data-lang="python">class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+def inorder_traversal(root):
+    """
+    Left -> Root -> Right
+    Time: O(n), Space: O(h) where h is height
+    """
+    result = []
+    
+    def inorder(node):
+        if node:
+            inorder(node.left)
+            result.append(node.val)
+            inorder(node.right)
+    
+    inorder(root)
+    return result
+
+def level_order_traversal(root):
+    """
+    Breadth-first traversal
+    Time: O(n), Space: O(w) where w is maximum width
+    """
+    if not root:
+        return []
+    
+    result = []
+    queue = [root]
+    
+    while queue:
+        level_size = len(queue)
+        level_values = []
+        
+        for _ in range(level_size):
+            node = queue.pop(0)
+            level_values.append(node.val)
+            
+            if node.left:
+                queue.append(node.left)
+            if node.right:
+                queue.append(node.right)
+        
+        result.append(level_values)
+    
+    return result</div>
+
+            <h2 id="advanced-algorithms">Advanced Algorithms</h2>
+            
+            <h3>Dynamic Programming</h3>
+            
+            <div class="theory-box">
+                <h4>Dynamic Programming Principles</h4>
+                <ol>
+                    <li><strong>Optimal Substructure:</strong> Optimal solution contains optimal solutions to subproblems</li>
+                    <li><strong>Overlapping Subproblems:</strong> Same subproblems are solved multiple times</li>
+                </ol>
+                <p><strong>Types:</strong></p>
+                <ul>
+                    <li><strong>Memoization (Top-down):</strong> Add caching to recursive solution</li>
+                    <li><strong>Tabulation (Bottom-up):</strong> Fill table iteratively</li>
+                </ul>
+            </div>
+
+            <div class="code-block python" data-lang="python">def fibonacci_dp(n):
+    """
+    Fibonacci using dynamic programming
+    Time: O(n), Space: O(n)
+    """
+    if n <= 1:
+        return n
+    
+    dp = [0] * (n + 1)
+    dp[1] = 1
+    
+    for i in range(2, n + 1):
+        dp[i] = dp[i - 1] + dp[i - 2]
+    
+    return dp[n]
+
+def coin_change(coins, amount):
+    """
+    Minimum coins needed to make amount
+    Time: O(amount * len(coins)), Space: O(amount)
+    """
+    dp = [float('inf')] * (amount + 1)
+    dp[0] = 0
+    
+    for coin in coins:
+        for i in range(coin, amount + 1):
+            dp[i] = min(dp[i], dp[i - coin] + 1)
+    
+    return dp[amount] if dp[amount] != float('inf') else -1
+
+def longest_common_subsequence(text1, text2):
+    """
+    Length of longest common subsequence
+    Time: O(m * n), Space: O(m * n)
+    """
+    m, n = len(text1), len(text2)
+    dp = [[0] * (n + 1) for _ in range(m + 1)]
+    
+    for i in range(1, m + 1):
+        for j in range(1, n + 1):
+            if text1[i - 1] == text2[j - 1]:
+                dp[i][j] = dp[i - 1][j - 1] + 1
+            else:
+                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])
+    
+    return dp[m][n]</div>
+
+            <h3>Graph Algorithms</h3>
+            
+            <div class="code-block python" data-lang="python">def dfs_recursive(graph, start, visited=None):
+    """
+    Depth-First Search (recursive)
+    Time: O(V + E), Space: O(V)
+    """
+    if visited is None:
+        visited = set()
+    
+    visited.add(start)
+    print(start, end=' ')
+    
+    for neighbor in graph.get(start, []):
+        if neighbor not in visited:
+            dfs_recursive(graph, neighbor, visited)
+
+def bfs(graph, start):
+    """
+    Breadth-First Search
+    Time: O(V + E), Space: O(V)
+    """
+    visited = set()
+    queue = [start]
+    visited.add(start)
+    
+    while queue:
+        vertex = queue.pop(0)
+        print(vertex, end=' ')
+        
+        for neighbor in graph.get(vertex, []):
+            if neighbor not in visited:
+                visited.add(neighbor)
+                queue.append(neighbor)</div>
+
+            <h2 id="problem-solving">Problem-Solving Patterns</h2>
+            
+            <div class="pattern-box">
+                <h4>Backtracking Pattern</h4>
+                <p><strong>Concept:</strong> Systematic trial and error, undoing choices that lead to dead ends</p>
+                <p><strong>Template:</strong> Choose → Explore → Unchoose</p>
+                <p><strong>Applications:</strong> Constraint satisfaction problems, finding all solutions</p>
+            </div>
+
+            <div class="code-block python" data-lang="python">def generate_parentheses(n):
+    """
+    Generate all valid combinations of n pairs of parentheses
+    Time: O(4^n / √n), Space: O(4^n / √n)
+    """
+    result = []
+    
+    def backtrack(current_string, open_count, close_count):
+        if len(current_string) == 2 * n:
+            result.append(current_string)
+            return
+        
+        if open_count < n:
+            backtrack(current_string + "(", open_count + 1, close_count)
+        
+        if close_count < open_count:
+            backtrack(current_string + ")", open_count, close_count + 1)
+    
+    backtrack("", 0, 0)
+    return result
+
+def solve_n_queens(n):
+    """
+    Solve N-Queens problem
+    Time: O(N!), Space: O(N²)
+    """
+    def is_safe(board, row, col):
+        # Check column
+        for i in range(row):
+            if board[i][col] == 'Q':
+                return False
+        
+        # Check diagonal
+        for i, j in zip(range(row - 1, -1, -1), range(col - 1, -1, -1)):
+            if board[i][j] == 'Q':
+                return False
+        
+        # Check anti-diagonal
+        for i, j in zip(range(row - 1, -1, -1), range(col + 1, n)):
+            if board[i][j] == 'Q':
+                return False
+        
+        return True
+    
+    def solve(board, row):
+        if row == n:
+            return [[''.join(row) for row in board]]
+        
+        solutions = []
+        for col in range(n):
+            if is_safe(board, row, col):
+                board[row][col] = 'Q'
+                solutions.extend(solve(board, row + 1))
+                board[row][col] = '.'
+        
+        return solutions
+    
+    board = [['.' for _ in range(n)] for _ in range(n)]
+    return solve(board, 0)</div>
+
+            <h2 id="interview-prep">Interview Preparation</h2>
+            
+            <div class="theory-box">
+                <h3>The UMPIRE Method</h3>
+                <ol>
+                    <li><strong>U</strong>nderstand: Clarify the problem</li>
+                    <li><strong>M</strong>atch: Identify similar problems/patterns</li>
+                    <li><strong>P</strong>lan: Design the algorithm</li>
+                    <li><strong>I</strong>mplement: Write the code</li>
+                    <li><strong>R</strong>eview: Test and debug</li>
+                    <li><strong>E</strong>valuate: Analyze complexity and optimize</li>
+                </ol>
+            </div>
+
+            <div class="highlight-box">
+                <h4>Common Interview Problem Categories</h4>
+                <ul>
+                    <li><strong>Array/String manipulation (35%):</strong> Two pointers, sliding window</li>
+                    <li><strong>Tree/Graph traversal (25%):</strong> DFS, BFS, tree algorithms</li>
+                    <li><strong>Dynamic programming (15%):</strong> Optimization, counting problems</li>
+                    <li><strong>Sorting/Searching (10%):</strong> Binary search, custom sorting</li>
+                    <li><strong>Math/Logic (10%):</strong> Number theory, bit manipulation</li>
+                    <li><strong>Design (5%):</strong> Data structure design, system design</li>
+                </ul>
+            </div>
+
+            <div class="code-block python" data-lang="python">def rotate_array(nums, k):
+    """
+    Rotate array to the right by k steps
+    Time: O(n), Space: O(1)
+    """
+    n = len(nums)
+    k = k % n
+    
+    def reverse(start, end):
+        while start < end:
+            nums[start], nums[end] = nums[end], nums[start]
+            start += 1
+            end -= 1
+    
+    reverse(0, n - 1)
+    reverse(0, k - 1)
+    reverse(k, n - 1)
+
+def group_anagrams(strs):
+    """
+    Group strings that are anagrams
+    Time: O(N * K log K), Space: O(N * K)
+    """
+    groups = {}
+    for s in strs:
+        sorted_s = ''.join(sorted(s))
+        if sorted_s not in groups:
+            groups[sorted_s] = []
+        groups[sorted_s].append(s)
+    
+    return list(groups.values())
+
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+
+def reverse_linked_list(head):
+    """
+    Reverse a linked list
+    Time: O(n), Space: O(1)
+    """
+    prev = None
+    current = head
+    
+    while current:
+        next_temp = current.next
+        current.next = prev
+        prev = current
+        current = next_temp
+    
+    return prev</div>
+
+            <h2 id="practice">Practice Problems</h2>
+            
+            <div class="algorithm-grid">
+                <div class="algorithm-card">
+                    <h4>Easy Problems</h4>
+                    <ul style="text-align: left;">
+                        <li>Two Sum</li>
+                        <li>Valid Palindrome</li>
+                        <li>Maximum Subarray</li>
+                        <li>Merge Two Sorted Lists</li>
+                        <li>Binary Tree Inorder Traversal</li>
+                    </ul>
+                </div>
+                <div class="algorithm-card">
+                    <h4>Medium Problems</h4>
+                    <ul style="text-align: left;">
+                        <li>3Sum</li>
+                        <li>Longest Substring Without Repeating Characters</li>
+                        <li>Add Two Numbers</li>
+                        <li>Group Anagrams</li>
+                        <li>Product of Array Except Self</li>
+                    </ul>
+                </div>
+                <div class="algorithm-card">
+                    <h4>Hard Problems</h4>
+                    <ul style="text-align: left;">
+                        <li>Median of Two Sorted Arrays</li>
+                        <li>Trapping Rain Water</li>
+                        <li>Merge k Sorted Lists</li>
+                        <li>Word Ladder</li>
+                        <li>Sliding Window Maximum</li>
+                    </ul>
+                </div>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Problem Type</th>
+                        <th>Common Patterns</th>
+                        <th>Key Indicators</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Array/String</td>
+                        <td>Two Pointers, Sliding Window</td>
+                        <td>Sorted input, pairs, subarrays</td>
+                    </tr>
+                    <tr>
+                        <td>Tree/Graph</td>
+                        <td>DFS, BFS, Backtracking</td>
+                        <td>Hierarchical data, paths, cycles</td>
+                    </tr>
+                    <tr>
+                        <td>Optimization</td>
+                        <td>Dynamic Programming, Greedy</td>
+                        <td>"Maximum", "minimum", "optimal"</td>
+                    </tr>
+                    <tr>
+                        <td>Counting</td>
+                        <td>Dynamic Programming, Recursion</td>
+                        <td>"How many ways", combinations</td>
+                    </tr>
+                    <tr>
+                        <td>Search</td>
+                        <td>Binary Search, DFS, BFS</td>
+                        <td>Sorted data, finding elements</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="highlight-box">
+                <h4>30-Day Practice Schedule</h4>
+                <ul>
+                    <li><strong>Week 1:</strong> Array basics, two pointers, string manipulation, hash tables, stacks & queues</li>
+                    <li><strong>Week 2:</strong> Linked lists, binary trees, basic DP, graph traversal, sliding window</li>
+                    <li><strong>Week 3:</strong> Advanced trees, heaps, advanced DP, backtracking, greedy algorithms</li>
+                    <li><strong>Week 4:</strong> Advanced graphs, tries, bit manipulation, mock interviews, review</li>
+                </ul>
+            </div>
+
+            <div class="theory-box">
+                <h3>Key Takeaways</h3>
+                <ol>
+                    <li><strong>Understand time and space complexity</strong> - Essential for optimization</li>
+                    <li><strong>Learn common patterns</strong> - Two pointers, sliding window, backtracking, etc.</li>
+                    <li><strong>Practice regularly</strong> - Consistency beats intensity</li>
+                    <li><strong>Explain your thinking</strong> - Communication is as important as coding</li>
+                    <li><strong>Start simple, then optimize</strong> - Get a working solution first</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        function toggleSection(element) {
+            const section = element.parentElement;
+            section.classList.toggle('active');
+        }
+
+        // Navigation functionality
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const targetId = link.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+                
+                // Update active link
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+            });
+        });
+
+        // Update active navigation on scroll
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('[id]');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.pageYOffset >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').substring(1) === current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
