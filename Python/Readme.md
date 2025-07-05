@@ -8,40 +8,49 @@ Welcome to your comprehensive Python documentation collection! This repository c
 
 ## 📚 Documentation Structure
 
-### 🤖 Agentic AI
-- **Guide**: [AI Agents Guide](Agentic%20AI/agentic-ai-guide.html)
-- **Topics**: Agent architecture, design patterns, implementation strategies
-- **Level**: Advanced
+### 📚 Basic Python
+- **Guide**: [Basic Python Guide](1.Basic%20Python/basic-python-guide.html)
+- **Topics**: Python fundamentals, syntax, core concepts
+- **Subsections**:
+  - [Python Concepts](1.Basic%20Python/1.Python%20Concepts/python-concepts.html)
+  - [Data Structures](1.Basic%20Python/2.Data%20Structures/python-data-structures.html)
+  - [Algorithms & Problem Solving](1.Basic%20Python/3.Algorithms%20&%20Problem%20Solving/algorithms-problem-solving.html)
+  - [Testing & Debugging](1.Basic%20Python/4.Testing%20&%20Debugging/testing-debugging.html)
+- **Level**: Beginner to Intermediate
 
 ### ⚡ Async Programming
-- **Guide**: [Asyncio & Concurrency](Async%20Programming/async-programming-guide.html)
+- **Guide**: [Asyncio & Concurrency](2.Async%20Programming/async-programming-guide.html)
 - **Topics**: Asyncio, concurrent programming, performance optimization
 - **Level**: Intermediate to Advanced
-
-### 🎨 Python Decorators
-- **Guide**: [Python Decorators](Decorators/decorators-guide.html)
-- **Topics**: Decorator patterns, advanced usage, best practices
-- **Level**: Intermediate
 
 ### 🚀 FastAPI Framework (Complete Series)
 FastAPI is our most comprehensive topic with 7 detailed guides:
 
-1. **[FastAPI Overview](FastAPI/fastapi-guide.html)** - Framework introduction and ecosystem
-2. **[FastAPI Fundamentals](FastAPI/1.Basic/fastapi-basics-complete.html)** - Core concepts and basics
-3. **[API Development](FastAPI/2.API%20Development/api-development-guide.html)** - Building robust APIs
-4. **[Security & Authentication](FastAPI/3.Security/security-guide.html)** - OAuth2, JWT, and security patterns
-5. **[Testing Strategies](FastAPI/4.Testing/testing-guide.html)** - Unit testing, integration testing
-6. **[Advanced Topics](FastAPI/5.Advanced%20Topics/advanced-topics-guide.html)** - Performance, middleware, advanced patterns
-7. **[Tips & Best Practices](FastAPI/6.Miscellaneous/miscellaneous-guide.html)** - Production tips and optimization
+1. **[FastAPI Overview](3.FastAPI/fastapi-guide.html)** - Framework introduction and ecosystem
+2. **[FastAPI Fundamentals](3.FastAPI/1.Basic/fastapi-basics-complete.html)** - Core concepts and basics
+3. **[API Development](3.FastAPI/2.API%20Development/api-development-guide.html)** - Building robust APIs
+4. **[Security & Authentication](3.FastAPI/3.Security/security-guide.html)** - OAuth2, JWT, and security patterns
+5. **[Testing Strategies](3.FastAPI/4.Testing/testing-guide.html)** - Unit testing, integration testing
+6. **[Advanced Topics](3.FastAPI/5.Advanced%20Topics/advanced-topics-guide.html)** - Performance, middleware, advanced patterns
+7. **[Tips & Best Practices](3.FastAPI/6.Miscellaneous/miscellaneous-guide.html)** - Production tips and optimization
 
 ### 🦜 LangChain Framework
-- **Guide**: [LangChain Framework](LangChain/langchain-documentation.html)
+- **Guide**: [LangChain Framework](4.LangChain/langchain-documentation.html)
 - **Topics**: LLM applications, chains, agents, workflows
 - **Level**: Intermediate to Advanced
 
 ### 📊 LangGraph
-- **Guide**: [Graph-based AI](LangGraph/langgraph-guide.html)
+- **Guide**: [Graph-based AI](5.LangGraph/langgraph-guide.html)
 - **Topics**: Graph-based AI applications, complex reasoning, workflow orchestration
+- **Level**: Advanced
+
+### 🔧 Agentic Framework
+- **Topics**: Framework structure and foundation
+- **Level**: Advanced
+
+### 🤖 Agentic AI
+- **Guide**: [AI Agents Guide](7.Agentic%20AI/agentic-ai-guide.html)
+- **Topics**: Agent architecture, design patterns, implementation strategies
 - **Level**: Advanced
 
 ## 🎯 How to Navigate
@@ -60,8 +69,9 @@ Use the links in this README to jump to specific guides.
 
 ## 📊 Documentation Stats
 
-- **Total Pages**: 12 comprehensive guides
-- **Major Topics**: 6 core areas covered
+- **Total Pages**: 16 comprehensive guides
+- **Major Topics**: 7 core areas covered
+- **Basic Python Guides**: 5 fundamental topics
 - **FastAPI Guides**: 7 specialized guides
 - **Format**: HTML with interactive navigation
 - **Mobile Support**: ✅ Fully responsive
@@ -93,31 +103,37 @@ Use the links in this README to jump to specific guides.
 
 ```
 Python Documentation Hub
-├── 🤖 Agentic AI
-├── ⚡ Async Programming  
-├── 🎨 Decorators
-├── 🚀 FastAPI (7 guides)
-│   ├── Overview
-│   ├── Fundamentals
-│   ├── API Development
-│   ├── Security
-│   ├── Testing
-│   ├── Advanced Topics
-│   └── Best Practices
-├── 🦜 LangChain
-└── 📊 LangGraph
+├── 1.Basic Python/
+│   ├── Python Concepts
+│   ├── Data Structures
+│   ├── Algorithms & Problem Solving
+│   └── Testing & Debugging
+├── 2.Async Programming/
+├── 3.FastAPI/ (7 guides)
+│   ├── FastAPI Overview
+│   ├── 1.Basic/ - Fundamentals
+│   ├── 2.API Development/
+│   ├── 3.Security/
+│   ├── 4.Testing/
+│   ├── 5.Advanced Topics/
+│   └── 6.Miscellaneous/ - Best Practices
+├── 4.LangChain/
+├── 5.LangGraph/
+├── 6.Agentic Framework/
+└── 7.Agentic AI/
 ```
 
 ## 🔍 Quick Reference
 
 | Topic | Difficulty | File Count | Key Focus |
 |-------|------------|------------|-----------|
-| Agentic AI | Advanced | 1 | AI agent patterns |
+| Basic Python | Beginner-Intermediate | 5 | Python fundamentals & core concepts |
 | Async Programming | Intermediate | 1 | Concurrency & performance |
-| Decorators | Intermediate | 1 | Python patterns |
-| **FastAPI** | **Beginner-Advanced** | **7** | **Complete web framework** |
+| FastAPI | Beginner-Advanced | 7 | Complete web framework |
 | LangChain | Intermediate | 1 | LLM applications |
 | LangGraph | Advanced | 1 | Graph-based AI |
+| Agentic Framework | Advanced | 0 | Framework foundation |
+| Agentic AI | Advanced | 1 | AI agent patterns |
 
 ## 💡 Tips for Best Experience
 

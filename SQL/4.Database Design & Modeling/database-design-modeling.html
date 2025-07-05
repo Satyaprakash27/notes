@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🟣 Database Design & Modeling Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: #2c3e50;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background: #34495e;
+            border-bottom: 1px solid #455a75;
+        }
+
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 1.3em;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #ecf0f1;
+            border: none;
+            padding: 0;
+        }
+
+        .sidebar-nav {
+            padding: 0;
+        }
+
+        .sidebar-link {
+            display: block;
+            color: #bdc3c7;
+            text-decoration: none;
+            padding: 15px 20px;
+            border-bottom: 1px solid #455a75;
+            transition: background 0.2s ease;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 1.1em;
+            font-weight: 500;
+        }
+
+        .sidebar-link:hover {
+            background: #34495e;
+            color: #ecf0f1;
+        }
+
+        .sidebar-link.current {
+            background: #9b59b6;
+            color: white;
+            font-weight: 600;
+        }
+
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: #9b59b6;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            border-bottom: 3px solid #9b59b6;
+            padding-bottom: 10px;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #34495e;
+            border-left: 4px solid #9b59b6;
+            padding-left: 15px;
+            margin-top: 30px;
+            font-size: 1.8em;
+        }
+        h3 {
+            color: #9b59b6;
+            margin-top: 25px;
+            font-size: 1.4em;
+        }
+        h4 {
+            color: #8e44ad;
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+        .toc {
+            background: rgba(155, 89, 182, 0.15);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(155, 89, 182, 0.3);
+        }
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-evenly;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .toc li {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex: 0 1 calc(18% - 0.5rem);
+            min-width: 140px;
+        }
+        .toc a {
+            color: #2c3e50;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            white-space: nowrap;
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(155, 89, 182, 0.3);
+            min-height: 40px;
+            width: 100%;
+        }
+        .toc a:hover, .toc a.active {
+            background: linear-gradient(45deg, #9b59b6, #bb7bc8);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(155, 89, 182, 0.4);
+        }
+        
+        pre {
+            background: #000000;
+            color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        code {
+            background: #000000;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #ffffff;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        th, td {
+            border: 1px solid #e9ecef;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #9b59b6;
+            color: white;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        tr:hover {
+            background: #e8f4f8;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .warning::before {
+            content: "⚠️ ";
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .tip {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .tip::before {
+            content: "💡 ";
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .example {
+            background: #f8f9fa;
+            border-left: 4px solid #17a2b8;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .example h5 {
+            margin-top: 0;
+            color: #17a2b8;
+            font-size: 1.1em;
+        }
+        .syntax {
+            background: #e9ecef;
+            border-left: 4px solid #6c757d;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .syntax h5 {
+            margin-top: 0;
+            color: #6c757d;
+            font-size: 1.1em;
+        }
+        .benefits {
+            background: #e8f5e8;
+            border: 1px solid #9b59b6;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .benefits ul {
+            margin: 10px 0;
+        }
+        .benefits li {
+            margin: 5px 0;
+        }
+        .checklist {
+            background: #f0f4ff;
+            border: 1px solid #9b59b6;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .diagram {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            white-space: pre-line;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        @media (max-width: 1024px) {
+            .toc ul {
+                justify-content: center;
+                gap: 0.75rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .sidebar-toggle {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            h2 {
+                font-size: 1.5em;
+            }
+
+            table {
+                font-size: 0.9em;
+            }
+
+            .toc {
+                position: static;
+                margin: 20px 0;
+            }
+
+            .toc ul {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+    
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2><a href="../SQL.html" style="color: inherit; text-decoration: none;">🗃️ SQL Guides</a></h2>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="../1.Beginner/beginner-sql.html" class="sidebar-link">
+                🟢 Beginner SQL
+            </a>
+            <a href="../2.Intermediate/intermediate-sql.html" class="sidebar-link">
+                🟡 Intermediate SQL
+            </a>
+            <a href="../3.Advanced/advanced-sql.html" class="sidebar-link">
+                🔵 Advanced SQL
+            </a>
+            <a href="../4.Database Design & Modeling/database-design-modeling.html" class="sidebar-link current">
+                🟣 Database Design & Modeling
+            </a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="container">
+        <h1>🟣 Database Design & Modeling Guide</h1>
+        
+        <div class="toc" id="toc">
+            <ul>
+                <li><a href="#introduction">Introduction</a></li>
+                <li><a href="#normalization">Normalization</a></li>
+                <li><a href="#denormalization">Denormalization</a></li>
+                <li><a href="#er-diagrams">ER Diagrams</a></li>
+                <li><a href="#best-practices">Best Practices</a></li>
+            </ul>
+        </div>
+
+        <h2 id="introduction">Introduction to Database Design</h2>
+        <p>Database design is the process of organizing data to minimize redundancy and dependency. Good database design ensures data integrity, reduces storage space, and improves query performance.</p>
+
+        <h3>Key Principles of Database Design</h3>
+        <div class="benefits">
+            <ol>
+                <li><strong>Data Integrity</strong> - Ensure data accuracy and consistency</li>
+                <li><strong>Minimize Redundancy</strong> - Store each piece of data only once</li>
+                <li><strong>Logical Structure</strong> - Organize data in a way that makes sense</li>
+                <li><strong>Performance</strong> - Design for efficient queries and updates</li>
+                <li><strong>Scalability</strong> - Plan for future growth and changes</li>
+            </ol>
+        </div>
+
+        <h2 id="normalization">Normalization</h2>
+        <p>Normalization is the process of organizing data in a database to reduce redundancy and improve data integrity. It involves decomposing tables into smaller, related tables.</p>
+
+        <h3>Sample Unnormalized Data</h3>
+        <p>Let's start with a poorly designed table that violates normalization rules:</p>
+
+        <h4>student_courses table (Unnormalized):</h4>
+        <table>
+            <tr>
+                <th>student_id</th>
+                <th>student_name</th>
+                <th>student_email</th>
+                <th>course_id</th>
+                <th>course_name</th>
+                <th>instructor_name</th>
+                <th>instructor_email</th>
+                <th>grade</th>
+            </tr>
+            <tr><td>1001</td><td>John Doe</td><td>john@email.com</td><td>CS101</td><td>Computer Science</td><td>Dr. Smith</td><td>smith@uni.edu</td><td>A</td></tr>
+            <tr><td>1001</td><td>John Doe</td><td>john@email.com</td><td>MATH201</td><td>Calculus</td><td>Dr. Johnson</td><td>johnson@uni.edu</td><td>B+</td></tr>
+            <tr><td>1002</td><td>Jane Smith</td><td>jane@email.com</td><td>CS101</td><td>Computer Science</td><td>Dr. Smith</td><td>smith@uni.edu</td><td>A-</td></tr>
+            <tr><td>1002</td><td>Jane Smith</td><td>jane@email.com</td><td>ENG101</td><td>English Literature</td><td>Dr. Brown</td><td>brown@uni.edu</td><td>A</td></tr>
+            <tr><td>1003</td><td>Mike Wilson</td><td>mike@email.com</td><td>MATH201</td><td>Calculus</td><td>Dr. Johnson</td><td>johnson@uni.edu</td><td>B</td></tr>
+        </table>
+
+        <div class="warning">
+            <strong>Problems with this design:</strong>
+            <ul>
+                <li>Student information is repeated for each course</li>
+                <li>Instructor information is repeated for each course</li>
+                <li>Course information is repeated for each enrollment</li>
+                <li>Update anomalies: changing a student's email requires multiple updates</li>
+                <li>Deletion anomalies: removing a student removes course information</li>
+            </ul>
+        </div>
+
+        <h3>First Normal Form (1NF)</h3>
+        <div class="syntax">
+            <h5>Definition:</h5>
+            <p>A table is in 1NF if:</p>
+            <ul>
+                <li>Each column contains atomic (indivisible) values</li>
+                <li>Each column contains values of the same type</li>
+                <li>Each column has a unique name</li>
+                <li>The order of rows and columns doesn't matter</li>
+            </ul>
+        </div>
+
+        <div class="example">
+            <h5>Example - Violating 1NF:</h5>
+            <table>
+                <tr>
+                    <th>student_id</th>
+                    <th>student_name</th>
+                    <th>phone_numbers</th>
+                </tr>
+                <tr><td>1001</td><td>John Doe</td><td>555-1234, 555-5678</td></tr>
+                <tr><td>1002</td><td>Jane Smith</td><td>555-9876</td></tr>
+            </table>
+        </div>
+
+        <div class="example">
+            <h5>Converting to 1NF:</h5>
+            <table>
+                <tr>
+                    <th>student_id</th>
+                    <th>student_name</th>
+                    <th>phone_number</th>
+                </tr>
+                <tr><td>1001</td><td>John Doe</td><td>555-1234</td></tr>
+                <tr><td>1001</td><td>John Doe</td><td>555-5678</td></tr>
+                <tr><td>1002</td><td>Jane Smith</td><td>555-9876</td></tr>
+            </table>
+        </div>
+
+        <h3>Second Normal Form (2NF)</h3>
+        <div class="syntax">
+            <h5>Definition:</h5>
+            <p>A table is in 2NF if:</p>
+            <ul>
+                <li>It is in 1NF</li>
+                <li>All non-key attributes are fully functionally dependent on the primary key</li>
+            </ul>
+        </div>
+
+        <div class="example">
+            <h5>Example - Violating 2NF:</h5>
+            <p>Consider a table with composite primary key (student_id, course_id):</p>
+            <table>
+                <tr>
+                    <th>student_id</th>
+                    <th>course_id</th>
+                    <th>student_name</th>
+                    <th>student_email</th>
+                    <th>course_name</th>
+                    <th>instructor_name</th>
+                    <th>grade</th>
+                </tr>
+                <tr><td>1001</td><td>CS101</td><td>John Doe</td><td>john@email.com</td><td>Computer Science</td><td>Dr. Smith</td><td>A</td></tr>
+                <tr><td>1001</td><td>MATH201</td><td>John Doe</td><td>john@email.com</td><td>Calculus</td><td>Dr. Johnson</td><td>B+</td></tr>
+                <tr><td>1002</td><td>CS101</td><td>Jane Smith</td><td>jane@email.com</td><td>Computer Science</td><td>Dr. Smith</td><td>A-</td></tr>
+            </table>
+        </div>
+
+        <div class="warning">
+            <strong>Problems:</strong>
+            <ul>
+                <li><code>student_name</code> depends only on <code>student_id</code>, not on the full key</li>
+                <li><code>course_name</code> depends only on <code>course_id</code>, not on the full key</li>
+            </ul>
+        </div>
+
+        <div class="example">
+            <h5>Converting to 2NF:</h5>
+            
+            <h6>students table:</h6>
+            <table>
+                <tr>
+                    <th>student_id</th>
+                    <th>student_name</th>
+                    <th>student_email</th>
+                </tr>
+                <tr><td>1001</td><td>John Doe</td><td>john@email.com</td></tr>
+                <tr><td>1002</td><td>Jane Smith</td><td>jane@email.com</td></tr>
+                <tr><td>1003</td><td>Mike Wilson</td><td>mike@email.com</td></tr>
+            </table>
+
+            <h6>courses table:</h6>
+            <table>
+                <tr>
+                    <th>course_id</th>
+                    <th>course_name</th>
+                    <th>instructor_name</th>
+                </tr>
+                <tr><td>CS101</td><td>Computer Science</td><td>Dr. Smith</td></tr>
+                <tr><td>MATH201</td><td>Calculus</td><td>Dr. Johnson</td></tr>
+                <tr><td>ENG101</td><td>English Literature</td><td>Dr. Brown</td></tr>
+            </table>
+
+            <h6>enrollments table:</h6>
+            <table>
+                <tr>
+                    <th>student_id</th>
+                    <th>course_id</th>
+                    <th>grade</th>
+                </tr>
+                <tr><td>1001</td><td>CS101</td><td>A</td></tr>
+                <tr><td>1001</td><td>MATH201</td><td>B+</td></tr>
+                <tr><td>1002</td><td>CS101</td><td>A-</td></tr>
+                <tr><td>1002</td><td>ENG101</td><td>A</td></tr>
+                <tr><td>1003</td><td>MATH201</td><td>B</td></tr>
+            </table>
+        </div>
+
+        <h3>Third Normal Form (3NF)</h3>
+        <div class="syntax">
+            <h5>Definition:</h5>
+            <p>A table is in 3NF if:</p>
+            <ul>
+                <li>It is in 2NF</li>
+                <li>No non-key attribute depends on another non-key attribute (no transitive dependencies)</li>
+            </ul>
+        </div>
+
+        <div class="example">
+            <h5>Example - Violating 3NF:</h5>
+            <table>
+                <tr>
+                    <th>course_id</th>
+                    <th>course_name</th>
+                    <th>instructor_name</th>
+                    <th>instructor_email</th>
+                    <th>department_name</th>
+                </tr>
+                <tr><td>CS101</td><td>Computer Science</td><td>Dr. Smith</td><td>smith@uni.edu</td><td>Computer Science</td></tr>
+                <tr><td>MATH201</td><td>Calculus</td><td>Dr. Johnson</td><td>johnson@uni.edu</td><td>Mathematics</td></tr>
+                <tr><td>ENG101</td><td>English Literature</td><td>Dr. Brown</td><td>brown@uni.edu</td><td>English</td></tr>
+            </table>
+        </div>
+
+        <div class="warning">
+            <strong>Problem:</strong>
+            <ul>
+                <li><code>instructor_email</code> depends on <code>instructor_name</code> (transitive dependency)</li>
+                <li><code>department_name</code> might depend on <code>instructor_name</code></li>
+            </ul>
+        </div>
+
+        <div class="example">
+            <h5>Converting to 3NF:</h5>
+            
+            <h6>instructors table:</h6>
+            <table>
+                <tr>
+                    <th>instructor_id</th>
+                    <th>instructor_name</th>
+                    <th>instructor_email</th>
+                    <th>department_id</th>
+                </tr>
+                <tr><td>1</td><td>Dr. Smith</td><td>smith@uni.edu</td><td>1</td></tr>
+                <tr><td>2</td><td>Dr. Johnson</td><td>johnson@uni.edu</td><td>2</td></tr>
+                <tr><td>3</td><td>Dr. Brown</td><td>brown@uni.edu</td><td>3</td></tr>
+            </table>
+
+            <h6>departments table:</h6>
+            <table>
+                <tr>
+                    <th>department_id</th>
+                    <th>department_name</th>
+                </tr>
+                <tr><td>1</td><td>Computer Science</td></tr>
+                <tr><td>2</td><td>Mathematics</td></tr>
+                <tr><td>3</td><td>English</td></tr>
+            </table>
+
+            <h6>courses table:</h6>
+            <table>
+                <tr>
+                    <th>course_id</th>
+                    <th>course_name</th>
+                    <th>instructor_id</th>
+                </tr>
+                <tr><td>CS101</td><td>Computer Science</td><td>1</td></tr>
+                <tr><td>MATH201</td><td>Calculus</td><td>2</td></tr>
+                <tr><td>ENG101</td><td>English Literature</td><td>3</td></tr>
+            </table>
+        </div>
+
+        <h3>Boyce-Codd Normal Form (BCNF)</h3>
+        <div class="syntax">
+            <h5>Definition:</h5>
+            <p>A table is in BCNF if:</p>
+            <ul>
+                <li>It is in 3NF</li>
+                <li>For every functional dependency X → Y, X is a candidate key</li>
+            </ul>
+        </div>
+
+        <h3>Normalization Summary</h3>
+        <table>
+            <tr>
+                <th>Normal Form</th>
+                <th>Key Requirements</th>
+                <th>Benefits</th>
+                <th>Drawbacks</th>
+            </tr>
+            <tr><td><strong>1NF</strong></td><td>Atomic values, unique columns</td><td>Eliminates repeating groups</td><td>May still have redundancy</td></tr>
+            <tr><td><strong>2NF</strong></td><td>1NF + no partial dependencies</td><td>Reduces redundancy</td><td>Complex queries for related data</td></tr>
+            <tr><td><strong>3NF</strong></td><td>2NF + no transitive dependencies</td><td>Further reduces redundancy</td><td>More joins required</td></tr>
+            <tr><td><strong>BCNF</strong></td><td>3NF + determinants are candidate keys</td><td>Eliminates most anomalies</td><td>May require more tables</td></tr>
+        </table>
+
+        <h3>Normalization Benefits and Drawbacks</h3>
+        <div class="benefits">
+            <h5>Benefits:</h5>
+            <ul>
+                <li>Eliminates data redundancy</li>
+                <li>Prevents update anomalies</li>
+                <li>Saves storage space</li>
+                <li>Improves data integrity</li>
+                <li>Reduces maintenance complexity</li>
+            </ul>
+        </div>
+
+        <div class="warning">
+            <strong>Drawbacks:</strong>
+            <ul>
+                <li>Requires more joins for queries</li>
+                <li>May impact query performance</li>
+                <li>Increases complexity for simple operations</li>
+                <li>May require more foreign key constraints</li>
+            </ul>
+        </div>
+
+        <h2 id="denormalization">Denormalization</h2>
+        <p>Denormalization is the process of intentionally introducing redundancy to improve query performance. It's done after normalization when performance requirements justify it.</p>
+
+        <h3>When to Denormalize</h3>
+        <div class="benefits">
+            <ol>
+                <li><strong>Read-heavy workloads</strong> - When queries are more frequent than updates</li>
+                <li><strong>Performance requirements</strong> - When normalized queries are too slow</li>
+                <li><strong>Reporting needs</strong> - When complex joins impact reporting performance</li>
+                <li><strong>Data warehousing</strong> - When analytical queries need fast response times</li>
+            </ol>
+        </div>
+
+        <h3>Denormalization Techniques</h3>
+
+        <h4>1. Adding Redundant Columns</h4>
+        <div class="example">
+            <h5>Normalized tables:</h5>
+            <h6>orders table:</h6>
+            <table>
+                <tr>
+                    <th>order_id</th>
+                    <th>customer_id</th>
+                    <th>order_date</th>
+                    <th>total_amount</th>
+                </tr>
+                <tr><td>1001</td><td>501</td><td>2023-01-15</td><td>1500.00</td></tr>
+                <tr><td>1002</td><td>502</td><td>2023-01-16</td><td>800.00</td></tr>
+                <tr><td>1003</td><td>501</td><td>2023-01-17</td><td>1200.00</td></tr>
+            </table>
+
+            <h6>customers table:</h6>
+            <table>
+                <tr>
+                    <th>customer_id</th>
+                    <th>customer_name</th>
+                    <th>customer_email</th>
+                </tr>
+                <tr><td>501</td><td>John Doe</td><td>john@email.com</td></tr>
+                <tr><td>502</td><td>Jane Smith</td><td>jane@email.com</td></tr>
+            </table>
+        </div>
+
+        <div class="example">
+            <h5>Denormalized approach:</h5>
+            <h6>orders table (with redundant customer_name):</h6>
+            <table>
+                <tr>
+                    <th>order_id</th>
+                    <th>customer_id</th>
+                    <th>customer_name</th>
+                    <th>order_date</th>
+                    <th>total_amount</th>
+                </tr>
+                <tr><td>1001</td><td>501</td><td>John Doe</td><td>2023-01-15</td><td>1500.00</td></tr>
+                <tr><td>1002</td><td>502</td><td>Jane Smith</td><td>2023-01-16</td><td>800.00</td></tr>
+                <tr><td>1003</td><td>501</td><td>John Doe</td><td>2023-01-17</td><td>1200.00</td></tr>
+            </table>
+        </div>
+
+        <div class="benefits">
+            <h5>Benefits:</h5>
+            <ul>
+                <li>Faster queries (no join needed)</li>
+                <li>Simpler query syntax</li>
+            </ul>
+        </div>
+
+        <div class="warning">
+            <strong>Drawbacks:</strong>
+            <ul>
+                <li>Data redundancy</li>
+                <li>Update complexity (customer name changes require multiple updates)</li>
+            </ul>
+        </div>
+
+        <h3>Denormalization Strategy</h3>
+        <div class="example">
+            <h5>Step 1: Identify Performance Bottlenecks</h5>
+            <pre><code>-- Slow query example
+SELECT o.order_id, c.customer_name, p.product_name, oi.quantity
+FROM orders o
+JOIN customers c ON o.customer_id = c.customer_id
+JOIN order_items oi ON o.order_id = oi.order_id
+JOIN products p ON oi.product_id = p.product_id
+WHERE o.order_date > '2023-01-01';</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Step 2: Apply Selective Denormalization</h5>
+            <pre><code>-- Faster query with denormalized data
+SELECT order_id, customer_name, product_name, quantity
+FROM denormalized_order_details
+WHERE order_date > '2023-01-01';</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Step 3: Implement Maintenance Strategy</h5>
+            <pre><code>-- Trigger to maintain denormalized data
+CREATE TRIGGER tr_update_customer_name
+ON customers
+AFTER UPDATE
+AS
+BEGIN
+    UPDATE orders
+    SET customer_name = i.customer_name
+    FROM inserted i
+    WHERE orders.customer_id = i.customer_id;
+END</code></pre>
+        </div>
+
+        <h2 id="er-diagrams">ER Diagrams</h2>
+        <p>Entity-Relationship (ER) diagrams are visual representations of database structure showing entities, attributes, and relationships.</p>
+
+        <h3>Basic ER Diagram Components</h3>
+
+        <h4>1. Entities</h4>
+        <p>Represent objects or concepts in the real world.</p>
+        <div class="mermaid">
+            graph TD
+                A[Student]
+        </div>
+        <div>
+            <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+            <script>
+                mermaid.initialize({startOnLoad:true});
+            </script>
+        </div>
+        <h4>2. Attributes</h4>
+        <p>Properties or characteristics of entities.</p>
+        <div class="mermaid">
+            graph LR
+                student_id((student_id))
+                student_name((student_name))
+                email((email))
+                phone((phone))
+                student[Student]
+
+                student_id --> student
+                student_name --> student
+                email --> student
+                phone --> student
+        </div>
+        <div>
+            <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+            <script>
+                mermaid.initialize({startOnLoad:true});
+            </script>
+        </div>
+
+        <h4>3. Relationships</h4>
+        <p>Connections between entities.</p>
+        <div class="mermaid">
+            graph LR
+                student[Student]
+                enrolls[Enrolls]
+                course[Course]
+
+                student <--> enrolls
+                enrolls <--> course
+        </div>
+        <div>
+            <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+            <script>
+                mermaid.initialize({ startOnLoad: true });
+            </script>
+        </div>
+
+        <h3>Relationship Types</h3>
+
+        <h4>1. One-to-One (1:1)</h4>
+        <p>Each entity instance relates to exactly one instance of another entity.</p>
+        <div class="mermaid">
+            graph LR
+                student[Student]
+                enrolls[Enrolls]
+                course[Course]
+
+                student <-- "1" --> enrolls
+                enrolls <-- "1" --> course
+        </div>
+        <div>
+            <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+            <script>
+                mermaid.initialize({ startOnLoad: true });
+            </script>
+        </div>
+
+        <div class="example">
+            <h5>Implementation:</h5>
+            <h6>employees table:</h6>
+            <table>
+                <tr>
+                    <th>employee_id</th>
+                    <th>employee_name</th>
+                    <th>office_id</th>
+                </tr>
+                <tr><td>1</td><td>John Doe</td><td>101</td></tr>
+                <tr><td>2</td><td>Jane Smith</td><td>102</td></tr>
+            </table>
+
+            <h6>offices table:</h6>
+            <table>
+                <tr>
+                    <th>office_id</th>
+                    <th>office_number</th>
+                    <th>floor</th>
+                </tr>
+                <tr><td>101</td><td>A101</td><td>1</td></tr>
+                <tr><td>102</td><td>A102</td><td>1</td></tr>
+            </table>
+        </div>
+
+        <h4>2. One-to-Many (1:M)</h4>
+        <p>One entity instance relates to multiple instances of another entity.</p>
+        <div class="mermaid">
+            graph LR
+                student[Student]
+                enrolls[Enrolls]
+                course[Course]
+
+                student <-- "1" --> enrolls
+                enrolls <-- "M" --> course
+        </div>
+        <div>
+            <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+            <script>
+                mermaid.initialize({ startOnLoad: true });
+            </script>
+        </div>
+
+        <div class="example">
+            <h5>Implementation:</h5>
+            <h6>departments table:</h6>
+            <table>
+                <tr>
+                    <th>department_id</th>
+                    <th>department_name</th>
+                    <th>manager_id</th>
+                </tr>
+                <tr><td>1</td><td>IT</td><td>1</td></tr>
+                <tr><td>2</td><td>HR</td><td>3</td></tr>
+            </table>
+
+            <h6>employees table:</h6>
+            <table>
+                <tr>
+                    <th>employee_id</th>
+                    <th>employee_name</th>
+                    <th>department_id</th>
+                </tr>
+                <tr><td>1</td><td>John Doe</td><td>1</td></tr>
+                <tr><td>2</td><td>Jane Smith</td><td>1</td></tr>
+                <tr><td>3</td><td>Mike Wilson</td><td>2</td></tr>
+            </table>
+        </div>
+
+        <h4>3. Many-to-Many (M:M)</h4>
+        <p>Multiple instances of one entity relate to multiple instances of another entity.</p>
+        <div class="mermaid">
+            graph LR
+                student[Student]
+                enrolls[Enrolls]
+                course[Course]
+
+                student <-- "M" --> enrolls
+                enrolls <-- "M" --> course
+        </div>
+        <div>
+            <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+            <script>
+                mermaid.initialize({ startOnLoad: true });
+            </script>
+        </div>
+
+        <div class="example">
+            <h5>Implementation requires junction table:</h5>
+            <h6>students table:</h6>
+            <table>
+                <tr>
+                    <th>student_id</th>
+                    <th>student_name</th>
+                    <th>student_email</th>
+                </tr>
+                <tr><td>1</td><td>John Doe</td><td>john@email.com</td></tr>
+                <tr><td>2</td><td>Jane Smith</td><td>jane@email.com</td></tr>
+            </table>
+
+            <h6>courses table:</h6>
+            <table>
+                <tr>
+                    <th>course_id</th>
+                    <th>course_name</th>
+                    <th>credits</th>
+                </tr>
+                <tr><td>CS101</td><td>Computer Science</td><td>3</td></tr>
+                <tr><td>MATH201</td><td>Calculus</td><td>4</td></tr>
+            </table>
+
+            <h6>enrollments table (junction table):</h6>
+            <table>
+                <tr>
+                    <th>student_id</th>
+                    <th>course_id</th>
+                    <th>enrollment_date</th>
+                    <th>grade</th>
+                </tr>
+                <tr><td>1</td><td>CS101</td><td>2023-01-15</td><td>A</td></tr>
+                <tr><td>1</td><td>MATH201</td><td>2023-01-15</td><td>B+</td></tr>
+                <tr><td>2</td><td>CS101</td><td>2023-01-16</td><td>A-</td></tr>
+            </table>
+        </div>
+
+        <h3>Complex ER Diagram Example</h3>
+        <p><strong>University Database System:</strong></p>
+        <div class="mermaid">
+            graph LR
+                Department["Department"]
+                Instructor["Instructor"]
+                Course["Course"]
+                Enrolls["Enrolls"]
+                Student["Student"]
+                Section["Section"]
+                Major["Major"]
+
+                Department -- "1 : M" --> Instructor
+                Instructor -- "1 : M" --> Course
+                Course -- "M : M" --> Enrolls
+                Enrolls -- "M : M" --> Student
+                Course -- "1 : M" --> Section
+                Student -- "1 : M" --> Major
+        </div>
+
+        <div>
+            <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+            <script>
+                mermaid.initialize({ startOnLoad: true });
+            </script>
+        </div>
+
+        <h3>ER Diagram Best Practices</h3>
+        <div class="benefits">
+            <ol>
+                <li><strong>Use Clear Naming Conventions</strong>
+                    <ul>
+                        <li>Entity names: singular nouns (Student, not Students)</li>
+                        <li>Relationship names: verbs (Enrolls, Teaches)</li>
+                        <li>Attribute names: descriptive and consistent</li>
+                    </ul>
+                </li>
+                <li><strong>Identify Key Attributes</strong>
+                    <ul>
+                        <li>Primary keys: underlined</li>
+                        <li>Foreign keys: clearly marked</li>
+                        <li>Composite keys: multiple underlined attributes</li>
+                    </ul>
+                </li>
+                <li><strong>Handle Weak Entities</strong>
+                    <ul>
+                        <li>Entities that cannot exist without another entity</li>
+                        <li>Double rectangles for weak entities</li>
+                        <li>Double diamonds for identifying relationships</li>
+                    </ul>
+                </li>
+            </ol>
+        </div>
+
+        <h2 id="best-practices">Schema Design Best Practices</h2>
+
+        <h3>1. Naming Conventions</h3>
+
+        <h4>Table Names</h4>
+        <div class="example">
+            <h5>Good practices:</h5>
+            <pre><code>-- Good
+CREATE TABLE customer (...);
+CREATE TABLE order_item (...);
+
+-- Avoid
+CREATE TABLE cust (...);
+CREATE TABLE ord_itm (...);</code></pre>
+        </div>
+
+        <div class="benefits">
+            <ul>
+                <li>Use singular nouns</li>
+                <li>Be descriptive but concise</li>
+                <li>Avoid abbreviations when possible</li>
+            </ul>
+        </div>
+
+        <h4>Column Names</h4>
+        <div class="example">
+            <h5>Good practices:</h5>
+            <pre><code>-- Good
+customer_id INT,
+customer_name VARCHAR(100),
+created_date DATE,
+is_active BOOLEAN
+
+-- Avoid
+id INT,
+name VARCHAR(100),
+date DATE,
+flag BOOLEAN</code></pre>
+        </div>
+
+        <div class="benefits">
+            <ul>
+                <li>Use descriptive names</li>
+                <li>Include data type hints when helpful</li>
+                <li>Use consistent prefixes/suffixes</li>
+            </ul>
+        </div>
+
+        <h3>2. Data Types Selection</h3>
+
+        <h4>Choose Appropriate Data Types</h4>
+        <table>
+            <tr>
+                <th>Category</th>
+                <th>Use Case</th>
+                <th>Data Type</th>
+                <th>Example</th>
+            </tr>
+            <tr><td rowspan="5"><strong>Numeric</strong></td><td>Small integers</td><td>TINYINT</td><td>Age (0-255)</td></tr>
+            <tr><td>Regular integers</td><td>INT</td><td>ID numbers</td></tr>
+            <tr><td>Large integers</td><td>BIGINT</td><td>Very large counts</td></tr>
+            <tr><td>Decimal numbers</td><td>DECIMAL(p,s)</td><td>Currency amounts</td></tr>
+            <tr><td>Floating point</td><td>FLOAT/DOUBLE</td><td>Scientific calculations</td></tr>
+            <tr><td rowspan="4"><strong>String</strong></td><td>Fixed length</td><td>CHAR(n)</td><td>Country codes</td></tr>
+            <tr><td>Variable length</td><td>VARCHAR(n)</td><td>Names, addresses</td></tr>
+            <tr><td>Large text</td><td>TEXT</td><td>Descriptions, comments</td></tr>
+            <tr><td>Binary data</td><td>BLOB</td><td>Images, documents</td></tr>
+            <tr><td rowspan="4"><strong>Date/Time</strong></td><td>Date only</td><td>DATE</td><td>Birth date</td></tr>
+            <tr><td>Time only</td><td>TIME</td><td>Business hours</td></tr>
+            <tr><td>Date and time</td><td>DATETIME</td><td>Transaction timestamp</td></tr>
+            <tr><td>With timezone</td><td>TIMESTAMP</td><td>International events</td></tr>
+        </table>
+
+        <h3>3. Primary Key Design</h3>
+
+        <h4>Single Column Primary Keys</h4>
+        <div class="example">
+            <h5>Example:</h5>
+            <pre><code>CREATE TABLE customer (
+    customer_id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE
+);</code></pre>
+        </div>
+
+        <h4>Composite Primary Keys</h4>
+        <div class="example">
+            <h5>Example:</h5>
+            <pre><code>CREATE TABLE order_item (
+    order_id INT,
+    product_id INT,
+    quantity INT,
+    unit_price DECIMAL(10,2),
+    PRIMARY KEY (order_id, product_id),
+    FOREIGN KEY (order_id) REFERENCES orders(order_id),
+    FOREIGN KEY (product_id) REFERENCES products(product_id)
+);</code></pre>
+        </div>
+
+        <h3>4. Foreign Key Relationships</h3>
+
+        <h4>Referential Integrity</h4>
+        <div class="example">
+            <h5>Example:</h5>
+            <pre><code>CREATE TABLE orders (
+    order_id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_id INT NOT NULL,
+    order_date DATE NOT NULL,
+    total_amount DECIMAL(10,2),
+    FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+        ON DELETE RESTRICT
+        ON UPDATE CASCADE
+);</code></pre>
+        </div>
+
+        <h4>Cascade Options</h4>
+        <table>
+            <tr>
+                <th>Option</th>
+                <th>Description</th>
+                <th>Use Case</th>
+            </tr>
+            <tr><td>CASCADE</td><td>Automatically delete/update related records</td><td>Parent-child relationships</td></tr>
+            <tr><td>SET NULL</td><td>Set foreign key to NULL</td><td>Optional relationships</td></tr>
+            <tr><td>RESTRICT</td><td>Prevent deletion/update if related records exist</td><td>Preserve data integrity</td></tr>
+            <tr><td>NO ACTION</td><td>Same as RESTRICT</td><td>Default behavior</td></tr>
+        </table>
+
+        <h3>5. Indexing Strategy</h3>
+
+        <div class="example">
+            <h5>Primary Indexes:</h5>
+            <pre><code>-- Automatically created for primary keys
+CREATE TABLE products (
+    product_id INT AUTO_INCREMENT PRIMARY KEY,
+    product_name VARCHAR(100),
+    category_id INT
+);</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Secondary Indexes:</h5>
+            <pre><code>-- Single column index
+CREATE INDEX idx_product_name ON products(product_name);
+
+-- Composite index
+CREATE INDEX idx_category_date ON products(category_id, created_date);
+
+-- Unique index
+CREATE UNIQUE INDEX idx_product_sku ON products(sku);</code></pre>
+        </div>
+
+        <h4>Index Guidelines</h4>
+        <div class="benefits">
+            <ul>
+                <li>Index frequently queried columns</li>
+                <li>Consider composite indexes for multi-column queries</li>
+                <li>Avoid over-indexing (impacts insert/update performance)</li>
+                <li>Monitor and maintain index usage</li>
+            </ul>
+        </div>
+
+        <h3>6. Constraints and Validation</h3>
+
+        <div class="example">
+            <h5>Data Validation:</h5>
+            <pre><code>CREATE TABLE employee (
+    employee_id INT AUTO_INCREMENT PRIMARY KEY,
+    employee_name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    salary DECIMAL(10,2) CHECK (salary > 0),
+    hire_date DATE NOT NULL,
+    department_id INT,
+    status ENUM('active', 'inactive', 'terminated') DEFAULT 'active',
+    FOREIGN KEY (department_id) REFERENCES departments(department_id)
+);</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Business Rule Constraints:</h5>
+            <pre><code>-- Age constraint
+ALTER TABLE employee 
+ADD CONSTRAINT chk_age 
+CHECK (DATEDIFF(CURDATE(), birth_date) / 365.25 >= 18);
+
+-- Salary range constraint
+ALTER TABLE employee 
+ADD CONSTRAINT chk_salary_range 
+CHECK (salary BETWEEN 30000 AND 500000);</code></pre>
+        </div>
+
+        <h3>7. Design Patterns</h3>
+
+        <h4>Audit Trail Pattern</h4>
+        <div class="example">
+            <h5>Example:</h5>
+            <pre><code>CREATE TABLE customer_audit (
+    audit_id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_id INT,
+    action VARCHAR(10), -- INSERT, UPDATE, DELETE
+    old_values JSON,
+    new_values JSON,
+    changed_by VARCHAR(100),
+    changed_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);</code></pre>
+        </div>
+
+        <h4>Soft Delete Pattern</h4>
+        <div class="example">
+            <h5>Example:</h5>
+            <pre><code>ALTER TABLE customers 
+ADD COLUMN is_deleted BOOLEAN DEFAULT FALSE,
+ADD COLUMN deleted_date TIMESTAMP NULL;
+
+-- Instead of DELETE, use UPDATE
+UPDATE customers 
+SET is_deleted = TRUE, deleted_date = CURRENT_TIMESTAMP 
+WHERE customer_id = 1001;</code></pre>
+        </div>
+
+        <h4>Lookup Table Pattern</h4>
+        <div class="example">
+            <h5>Example:</h5>
+            <pre><code>CREATE TABLE countries (
+    country_code CHAR(2) PRIMARY KEY,
+    country_name VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE customers (
+    customer_id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_name VARCHAR(100),
+    country_code CHAR(2),
+    FOREIGN KEY (country_code) REFERENCES countries(country_code)
+);</code></pre>
+        </div>
+
+        <h3>Schema Design Checklist</h3>
+        <div class="checklist">
+            <h5>✅ Naming Conventions</h5>
+            <ul>
+                <li>☐ Consistent table and column names</li>
+                <li>☐ Clear, descriptive names</li>
+                <li>☐ Avoid reserved words</li>
+            </ul>
+
+            <h5>✅ Data Types</h5>
+            <ul>
+                <li>☐ Appropriate data types selected</li>
+                <li>☐ Consistent data type usage</li>
+                <li>☐ Consider storage requirements</li>
+            </ul>
+
+            <h5>✅ Primary Keys</h5>
+            <ul>
+                <li>☐ Every table has a primary key</li>
+                <li>☐ Primary keys are stable and unique</li>
+                <li>☐ Consider surrogate keys for natural keys</li>
+            </ul>
+
+            <h5>✅ Foreign Keys</h5>
+            <ul>
+                <li>☐ All relationships properly defined</li>
+                <li>☐ Cascade options considered</li>
+                <li>☐ Referential integrity maintained</li>
+            </ul>
+
+            <h5>✅ Constraints</h5>
+            <ul>
+                <li>☐ Data validation rules implemented</li>
+                <li>☐ Business rules enforced</li>
+                <li>☐ Default values provided</li>
+            </ul>
+
+            <h5>✅ Indexes</h5>
+            <ul>
+                <li>☐ Query performance optimized</li>
+                <li>☐ Avoiding over-indexing</li>
+                <li>☐ Regular maintenance planned</li>
+            </ul>
+
+            <h5>✅ Security</h5>
+            <ul>
+                <li>☐ Access control implemented</li>
+                <li>☐ Sensitive data protected</li>
+                <li>☐ Audit trail considered</li>
+            </ul>
+
+            <h5>✅ Documentation</h5>
+            <ul>
+                <li>☐ Schema documented</li>
+                <li>☐ Comments added to tables/columns</li>
+                <li>☐ Migration scripts maintained</li>
+            </ul>
+        </div>
+
+        <h2>Summary</h2>
+        <p>This database design and modeling guide covered essential concepts for creating robust, efficient databases:</p>
+        
+        <div class="benefits">
+            <h3>Key Takeaways</h3>
+            <ol>
+                <li><strong>Normalization</strong> - Systematically reduce redundancy through 1NF, 2NF, 3NF, and BCNF</li>
+                <li><strong>Denormalization</strong> - Strategic introduction of redundancy for performance gains</li>
+                <li><strong>ER Diagrams</strong> - Visual modeling of entities, relationships, and attributes</li>
+                <li><strong>Best Practices</strong> - Comprehensive guidelines for schema design and maintenance</li>
+            </ol>
+        </div>
+
+        <h3>Design Process</h3>
+        <div class="benefits">
+            <ol>
+                <li><strong>Requirements Analysis</strong> - Understand business needs and data relationships</li>
+                <li><strong>Conceptual Design</strong> - Create ER diagrams and identify entities</li>
+                <li><strong>Logical Design</strong> - Apply normalization rules and define relationships</li>
+                <li><strong>Physical Design</strong> - Choose data types, indexes, and constraints</li>
+                <li><strong>Implementation</strong> - Create tables and implement security measures</li>
+                <li><strong>Maintenance</strong> - Monitor performance and maintain documentation</li>
+            </ol>
+        </div>
+
+        <h3>Critical Success Factors</h3>
+        <div class="tip">
+            <ul>
+                <li><strong>Balance normalization with performance</strong> - Don't over-normalize</li>
+                <li><strong>Plan for scalability</strong> - Design for future growth</li>
+                <li><strong>Implement proper constraints</strong> - Ensure data integrity</li>
+                <li><strong>Document everything</strong> - Maintain clear documentation</li>
+                <li><strong>Monitor and optimize</strong> - Regular performance reviews</li>
+            </ul>
+        </div>
+
+        <h3>Next Steps</h3>
+        <p>After mastering these concepts, consider exploring:</p>
+        <ul>
+            <li><strong>Advanced modeling techniques</strong> - Temporal databases, graph databases</li>
+            <li><strong>Data warehousing design</strong> - Star schema, snowflake schema</li>
+            <li><strong>NoSQL design patterns</strong> - Document stores, key-value stores</li>
+            <li><strong>Cloud database architectures</strong> - Multi-tenant designs, microservices patterns</li>
+        </ul>
+
+        <p style="text-align: center; font-size: 1.2em; color: #9b59b6; margin-top: 30px;">
+            <strong>Proper database design is the foundation of successful applications. Take time to plan, model, and implement your database schema correctly from the start! 🚀</strong>
+        </p>
+
+        </div>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.querySelector('.sidebar-toggle');
+            
+            if (window.innerWidth <= 768 && 
+                !sidebar.contains(event.target) && 
+                !toggle.contains(event.target) && 
+                sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    // Calculate offset to account for sticky TOC
+                    const tocElement = document.querySelector('.toc');
+                    const tocHeight = tocElement ? tocElement.offsetHeight : 0;
+                    const offset = tocHeight + 40; // Extra 40px for better spacing
+                    
+                    const targetPosition = target.offsetTop - offset;
+                    
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Update active link in TOC
+                    document.querySelectorAll('.toc a').forEach(link => {
+                        link.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                }
+            });
+        });
+
+        // Highlight current section in TOC on scroll
+        window.addEventListener('scroll', function() {
+            const sections = document.querySelectorAll('h2[id]');
+            const tocLinks = document.querySelectorAll('.toc a');
+            
+            let current = '';
+            const tocElement = document.querySelector('.toc');
+            const tocHeight = tocElement ? tocElement.offsetHeight : 0;
+            const offset = tocHeight + 50; // Same offset as smooth scrolling
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (window.scrollY >= sectionTop - offset) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            tocLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

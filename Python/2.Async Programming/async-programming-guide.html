@@ -1,0 +1,1513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Async Programming: Complete Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: #2c3e50;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background: #34495e;
+            border-bottom: 1px solid #455a75;
+        }
+
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 1.3em;
+            color: #ecf0f1;
+            border: none;
+            padding: 0;
+        }
+
+        .sidebar-nav {
+            padding: 0;
+        }
+
+        .sidebar-section {
+            border-bottom: 1px solid #455a75;
+        }
+
+        .sidebar-section-title {
+            background: #34495e;
+            color: #ecf0f1;
+            padding: 15px 20px;
+            margin: 0;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-section-title:hover {
+            background: #455a75;
+        }
+
+        .sidebar-links {
+            background: #2c3e50;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .sidebar-section.active .sidebar-links {
+            max-height: 500px;
+        }
+
+        .sidebar-links a {
+            display: block;
+            color: #bdc3c7;
+            text-decoration: none;
+            padding: 12px 25px;
+            border-bottom: 1px solid #34495e;
+            transition: background 0.2s ease;
+        }
+
+        .sidebar-links a:hover {
+            background: #34495e;
+            color: #ecf0f1;
+        }
+
+        .sidebar-links a.current {
+            background: #3498db;
+            color: white;
+            font-weight: 600;
+        }
+
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .sidebar-toggle {
+                display: block;
+            }            .main-content {
+                margin-left: 0;
+            }
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        h2 {
+            color: #34495e;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+            margin: 30px 0 20px 0;
+            font-size: 1.8em;
+        }
+
+        h3 {
+            color: #555;
+            margin: 25px 0 15px 0;
+            font-size: 1.3em;
+        }
+
+        h4 {
+            color: #666;
+            margin: 20px 0 10px 0;
+            font-size: 1.1em;
+        }
+
+        .toc {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border-left: 5px solid #667eea;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .toc h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .toc ul {
+            list-style: none;
+            padding-left: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 10px;
+        }
+
+        .toc li {
+            margin: 8px 0;
+        }
+
+        .toc a {
+            color: #2c3e50;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: block;
+            padding: 8px 12px;
+            border-radius: 8px;
+        }
+
+        .toc a:hover {
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+            transform: translateX(5px);
+        }
+
+        .code-block {
+            background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+            color: #e2e8f0;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+            overflow-x: auto;
+            border-left: 4px solid #667eea;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            line-height: 1.5;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .code-block pre {
+            margin: 0;
+            padding: 0;
+            background: transparent;
+            color: inherit;
+            font-family: inherit;
+            font-size: 14px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .code-block code {
+            background: transparent;
+            color: inherit;
+            font-family: inherit;
+            font-size: inherit;
+            padding: 0;
+            border: none;
+        }
+
+        .code-block::before {
+            content: "Python";
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: rgba(102, 126, 234, 0.2);
+            color: #667eea;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 80px;
+            background: rgba(102, 126, 234, 0.8);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .code-block:hover .copy-btn {
+            opacity: 1;
+        }
+        
+        .copy-btn:hover {
+            background: rgba(102, 126, 234, 1);
+        }
+
+        /* Syntax highlighting for code */
+        .code-block .keyword { color: #ff79c6; }
+        .code-block .string { color: #f1fa8c; }
+        .code-block .comment { color: #6272a4; }
+        .code-block .number { color: #bd93f9; }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .comparison-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-top: 4px solid #667eea;
+        }
+
+        .comparison-card.sync {
+            border-top-color: #ff9a9e;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+        }
+
+        .comparison-card.async {
+            border-top-color: #667eea;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 25px;
+            border-radius: 15px;
+            color: white;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-card h4 {
+            color: white;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .use-case-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .use-case {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-top: 4px solid #667eea;
+            transition: transform 0.3s ease;
+        }
+
+        .use-case:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .use-case h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .benefits-list {
+            background: #f0f8ff;
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 5px solid #667eea;
+            margin: 15px 0;
+        }
+
+        .benefits-list ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .benefits-list li {
+            padding: 8px 0;
+            position: relative;
+            padding-left: 25px;
+        }
+
+        .benefits-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border-left: 5px solid #ff6b6b;
+        }
+
+        .warning-box h4 {
+            color: #c0392b;
+            margin-bottom: 15px;
+        }
+
+        .success-box {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border-left: 5px solid #28a745;
+        }
+
+        .success-box h4 {
+            color: #27ae60;
+            margin-bottom: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background-color: #f8f9ff;
+        }
+
+        .highlight {
+            background: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .emoji {
+            font-size: 1.2em;
+            margin-right: 10px;
+        }
+
+        .performance-stats {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .performance-stats h4 {
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .installation-box {
+            background: #1a1a1a;
+            color: #00ff41;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            border: 1px solid #333;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 2em;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .toc ul {
+                grid-template-columns: 1fr;
+            }
+
+            .comparison-grid,
+            .feature-grid,
+            .use-case-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .section {
+            margin: 40px 0;
+        }
+
+        .nav {
+            position: sticky;
+            top: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .nav a {
+            color: #2c3e50;
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+
+        .nav a:hover {
+            background: #667eea;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+    
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2>🐍 Python Guides</h2>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    🤖 Agentic AI <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../Agentic AI/agentic-ai-guide.html">AI Agents Guide</a>
+                </div>
+            </div>
+            <div class="sidebar-section active">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    ⚡ Async Programming <span>▼</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../2.Async Programming/async-programming-guide.html" class="current">Asyncio & Concurrency</a>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    🎨 Decorators <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../Decorators/decorators-guide.html">Python Decorators</a>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    🚀 FastAPI <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../3.FastAPI/fastapi-guide.html">FastAPI Overview</a>
+                    <a href="../3.FastAPI/1.Basic/fastapi-basics-complete.html">FastAPI Fundamentals</a>
+                    <a href="../3.FastAPI/2.API Development/api-development-guide.html">API Development</a>
+                    <a href="../3.FastAPI/3.Security/security-guide.html">Security & Authentication</a>
+                    <a href="../3.FastAPI/4.Testing/testing-guide.html">Testing Strategies</a>
+                    <a href="../3.FastAPI/5.Advanced Topics/advanced-topics-guide.html">Advanced Topics</a>
+                    <a href="../3.FastAPI/6.Miscellaneous/miscellaneous-guide.html">Tips & Best Practices</a>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    🦜 LangChain <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../LangChain/langchain-documentation.html">LangChain Framework</a>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    📊 LangGraph <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../LangGraph/langgraph-guide.html">Graph-based AI</a>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="container">
+        <h1>🚀 Python Async Programming</h1>
+        
+        <nav class="nav">
+            <ul>
+                <li><a href="#what-is-async">What is Async?</a></li>
+                <li><a href="#under-the-hood">Under the Hood</a></li>
+                <li><a href="#use-cases">Use Cases</a></li>
+                <li><a href="#fastapi">FastAPI</a></li>
+                <li><a href="#best-practices">Best Practices</a></li>
+                <li><a href="#pitfalls">Pitfalls</a></li>
+                <li><a href="#advanced">Advanced</a></li>
+                <li><a href="#performance">Performance</a></li>
+            </ul>
+        </nav>        <nav class="nav">
+            <ul>
+                <li><a href="#what-is-async" class="nav-link">🎯 What is Async?</a></li>
+                <li><a href="#under-the-hood" class="nav-link">⚙️ Under the Hood</a></li>
+                <li><a href="#use-cases" class="nav-link">🌍 Use Cases</a></li>
+                <li><a href="#fastapi" class="nav-link">🚀 FastAPI</a></li>
+                <li><a href="#best-practices" class="nav-link">🎯 Best Practices</a></li>
+                <li><a href="#pitfalls" class="nav-link">⚠️ Pitfalls</a></li>
+                <li><a href="#advanced" class="nav-link">🔬 Advanced</a></li>
+                <li><a href="#performance" class="nav-link">📊 Performance</a></li>
+            </ul>
+        </nav>
+
+        <section id="what-is-async" class="section">
+            <h2><span class="emoji">🎯</span>What is Async Programming in Python?</h2>
+            <p><span class="highlight">Asynchronous programming</span> in Python is a programming paradigm that allows your program to handle multiple tasks concurrently without blocking the execution of other tasks. It's particularly useful for I/O-bound operations like network requests, file operations, or database queries.</p>
+            
+            <h3>🔄 Key Concepts</h3>
+            <div class="comparison-grid">
+                <div class="comparison-card sync">
+                    <h4>🔄 Synchronous</h4>
+                    <p>Tasks are executed one after another, blocking until each completes</p>
+                </div>
+                <div class="comparison-card async">
+                    <h4>⚡ Asynchronous</h4>
+                    <p>Tasks can be paused and resumed, allowing other tasks to run in between</p>
+                </div>
+            </div>
+
+            <h3>🏗️ Core Components</h3>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>🔄 Event Loop</h4>
+                    <p>The heart of async programming that manages and executes async tasks</p>
+                </div>
+                <div class="feature-card">
+                    <h4>🎭 Coroutines</h4>
+                    <p>Special functions defined with <code>async def</code> that can be paused and resumed</p>
+                </div>
+                <div class="feature-card">
+                    <h4>📋 Tasks</h4>
+                    <p>Wrapped coroutines that can be scheduled and executed by the event loop</p>
+                </div>
+                <div class="feature-card">
+                    <h4>⏳ Awaitables</h4>
+                    <p>Objects that can be used with the <code>await</code> keyword</p>
+                </div>
+            </div>
+
+            <h3>📊 How It Works</h3>
+            <div class="code-block">
+                <pre><code>import asyncio
+import time
+
+# Synchronous version
+def sync_task(name, duration):
+    print(f"Task {name} starting...")
+    time.sleep(duration)  # Blocking operation
+    print(f"Task {name} completed!")
+    return f"Result from {name}"
+
+# Asynchronous version
+async def async_task(name, duration):
+    print(f"Task {name} starting...")
+    await asyncio.sleep(duration)  # Non-blocking operation
+    print(f"Task {name} completed!")
+    return f"Result from {name}"
+
+# Running synchronously (takes 6 seconds total)
+def run_sync():
+    start = time.time()
+    sync_task("A", 2)
+    sync_task("B", 2)
+    sync_task("C", 2)
+    print(f"Total time: {time.time() - start:.2f} seconds")
+
+# Running asynchronously (takes ~2 seconds total)
+async def run_async():
+    start = time.time()
+    await asyncio.gather(
+        async_task("A", 2),
+        async_task("B", 2),
+        async_task("C", 2)
+    )
+    print(f"Total time: {time.time() - start:.2f} seconds")
+
+# Execute
+if __name__ == "__main__":
+    print("=== Synchronous Execution ===")
+    run_sync()
+    
+    print("\n=== Asynchronous Execution ===")
+    asyncio.run(run_async())</code></pre>
+            </div>
+        </section>
+
+        <section id="under-the-hood" class="section">
+            <h2><span class="emoji">⚙️</span>Async/Await Syntax Under the Hood</h2>
+            
+            <h3>🔍 What Happens When You Use async/await?</h3>
+            <p>When you use <code>async/await</code>, Python transforms your code using several mechanisms:</p>
+
+            <h4>1. Coroutine Objects</h4>
+            <div class="code-block">
+                <pre><code>async def my_coroutine():
+    await asyncio.sleep(1)
+    return "Hello"
+
+# This creates a coroutine object, not the result
+coro = my_coroutine()
+print(type(coro))  # <class 'coroutine'>
+
+# To get the result, you need to await it or run it
+result = asyncio.run(coro)</code></pre>
+            </div>
+
+            <h4>2. State Machine Generation</h4>
+            <p>Python converts async functions into state machines that can be paused and resumed:</p>
+            <div class="code-block">
+                <pre><code># This async function...
+async def example():
+    print("Step 1")
+    await asyncio.sleep(1)
+    print("Step 2")
+    await asyncio.sleep(1)
+    print("Step 3")
+    return "Done"
+
+# ...is conceptually transformed into a state machine like this:
+class ExampleStateMachine:
+    def __init__(self):
+        self.state = 0
+        
+    def __await__(self):
+        while True:
+            if self.state == 0:
+                print("Step 1")
+                self.state = 1
+                yield from asyncio.sleep(1).__await__()
+            elif self.state == 1:
+                print("Step 2")
+                self.state = 2
+                yield from asyncio.sleep(1).__await__()
+            elif self.state == 2:
+                print("Step 3")
+                return "Done"</code></pre>
+            </div>
+
+            <h4>3. Event Loop Integration</h4>
+            <div class="code-block">
+                <pre><code>import asyncio
+
+async def demonstrate_event_loop():
+    # Get the current event loop
+    loop = asyncio.get_event_loop()
+    print(f"Current loop: {loop}")
+    
+    # Schedule a callback
+    loop.call_later(1, lambda: print("Callback executed!"))
+    
+    # Create and schedule a task
+    task = loop.create_task(asyncio.sleep(0.5))
+    await task
+    
+    # Wait for the callback
+    await asyncio.sleep(1.1)
+
+asyncio.run(demonstrate_event_loop())</code></pre>
+            </div>
+
+            <h3>🔧 Behind the Scenes: await Keyword</h3>
+            <p>When you use <code>await</code>, several things happen:</p>
+            <div class="benefits-list">
+                <ul>
+                    <li><strong>Suspension Point:</strong> The coroutine pauses execution</li>
+                    <li><strong>Control Return:</strong> Control returns to the event loop</li>
+                    <li><strong>Task Scheduling:</strong> The event loop can schedule other tasks</li>
+                    <li><strong>Resumption:</strong> When the awaited operation completes, execution resumes</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="use-cases" class="section">
+            <h2><span class="emoji">🌍</span>Real-World Use Cases</h2>
+
+            <div class="use-case-grid">
+                <div class="use-case">
+                    <h4>🌐 Web Scraping & API Calls</h4>
+                    <ul>
+                        <li>Fetch multiple URLs concurrently</li>
+                        <li>Process API responses in parallel</li>
+                        <li>Handle rate limits efficiently</li>
+                        <li>Reduce overall response time</li>
+                    </ul>
+                </div>
+
+                <div class="use-case">
+                    <h4>🗄️ Database Operations</h4>
+                    <ul>
+                        <li>Concurrent database queries</li>
+                        <li>Batch insert/update operations</li>
+                        <li>Connection pool management</li>
+                        <li>Multi-database synchronization</li>
+                    </ul>
+                </div>
+
+                <div class="use-case">
+                    <h4>📁 File I/O Operations</h4>
+                    <ul>
+                        <li>Process multiple files simultaneously</li>
+                        <li>Stream large file processing</li>
+                        <li>File monitoring and watching</li>
+                        <li>Async file uploads/downloads</li>
+                    </ul>
+                </div>
+
+                <div class="use-case">
+                    <h4>🌐 Real-time Communication</h4>
+                    <ul>
+                        <li>WebSocket servers and clients</li>
+                        <li>Chat applications</li>
+                        <li>Live data streaming</li>
+                        <li>Push notification systems</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>🌐 Web Scraping Example</h3>
+            <div class="code-block">
+                <pre><code>import asyncio
+import aiohttp
+import time
+
+async def fetch_url(session, url):
+    """Fetch a single URL asynchronously"""
+    try:
+        async with session.get(url) as response:
+            return await response.text()
+    except Exception as e:
+        return f"Error fetching {url}: {e}"
+
+async def scrape_multiple_urls():
+    """Scrape multiple URLs concurrently"""
+    urls = [
+        "https://httpbin.org/delay/1",
+        "https://httpbin.org/delay/2",
+        "https://httpbin.org/delay/1",
+        "https://httpbin.org/delay/3",
+        "https://httpbin.org/delay/1"
+    ]
+    
+    start_time = time.time()
+    
+    async with aiohttp.ClientSession() as session:
+        # Fetch all URLs concurrently
+        results = await asyncio.gather(
+            *[fetch_url(session, url) for url in urls]
+        )
+    
+    end_time = time.time()
+    print(f"Fetched {len(urls)} URLs in {end_time - start_time:.2f} seconds")
+    return results
+
+# Run the async version
+asyncio.run(scrape_multiple_urls())</code></pre>
+            </div>
+        </section>
+
+        <section id="fastapi" class="section">
+            <h2><span class="emoji">🚀</span>Implementing Async FastAPI Endpoints</h2>
+            
+            <h3>📊 Handling Long-Running Tasks</h3>
+            <div class="code-block">
+                <pre><code>from fastapi import FastAPI, BackgroundTasks, HTTPException
+import asyncio
+import uuid
+from datetime import datetime
+from typing import Dict
+import time
+
+app = FastAPI(title="Async FastAPI Example")
+
+# In-memory task storage (use Redis in production)
+task_storage: Dict[str, Dict] = {}
+
+class TaskManager:
+    """Manages long-running async tasks"""
+    
+    @staticmethod
+    async def simulate_long_task(task_id: str, duration: int):
+        """Simulate a long-running task"""
+        start_time = time.time()
+        
+        # Update task status
+        task_storage[task_id].update({
+            "status": "running",
+            "started_at": datetime.utcnow().isoformat(),
+            "progress": 0
+        })
+        
+        try:
+            # Simulate work with progress updates
+            for i in range(duration):
+                await asyncio.sleep(1)  # Non-blocking sleep
+                
+                # Update progress
+                progress = int((i + 1) / duration * 100)
+                task_storage[task_id]["progress"] = progress
+                
+            # Task completed
+            task_storage[task_id].update({
+                "status": "completed",
+                "completed_at": datetime.utcnow().isoformat(),
+                "progress": 100,
+                "result": f"Task completed in {time.time() - start_time:.2f} seconds"
+            })
+            
+        except Exception as e:
+            # Task failed
+            task_storage[task_id].update({
+                "status": "failed",
+                "error": str(e),
+                "failed_at": datetime.utcnow().isoformat()
+            })
+
+@app.post("/tasks/start")
+async def start_long_task(duration: int = 10):
+    """Start a long-running task asynchronously"""
+    task_id = str(uuid.uuid4())
+    
+    # Initialize task record
+    task_storage[task_id] = {
+        "id": task_id,
+        "status": "pending",
+        "created_at": datetime.utcnow().isoformat(),
+        "duration": duration
+    }
+    
+    # Start the task in the background
+    asyncio.create_task(TaskManager.simulate_long_task(task_id, duration))
+    
+    return {
+        "task_id": task_id,
+        "status": "started",
+        "message": f"Task started with duration {duration} seconds"
+    }
+
+@app.get("/tasks/{task_id}")
+async def get_task_status(task_id: str):
+    """Get the status of a running task"""
+    if task_id not in task_storage:
+        raise HTTPException(status_code=404, detail="Task not found")
+    
+    return task_storage[task_id]</code></pre>
+            </div>
+
+            <h3>🔄 Concurrent Request Processing</h3>
+            <div class="code-block">
+                <pre><code>@app.post("/process/batch")
+async def process_batch(items: list[str]):
+    """Process multiple items concurrently"""
+    start_time = time.time()
+    
+    async def process_item(item):
+        # Simulate processing time
+        await asyncio.sleep(0.5)
+        return f"Processed: {item}"
+    
+    # Process all items concurrently
+    results = await asyncio.gather(
+        *[process_item(item) for item in items],
+        return_exceptions=True
+    )
+    
+    processing_time = time.time() - start_time
+    
+    return {
+        "results": results,
+        "total_items": len(items),
+        "processing_time": processing_time,
+        "items_per_second": len(items) / processing_time if processing_time > 0 else 0
+    }</code></pre>
+            </div>
+
+            <h3>🌐 WebSocket Support</h3>
+            <div class="code-block">
+                <pre><code>from fastapi import WebSocket, WebSocketDisconnect
+from typing import List
+
+class WebSocketManager:
+    def __init__(self):
+        self.active_connections: List[WebSocket] = []
+    
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections.append(websocket)
+    
+    def disconnect(self, websocket: WebSocket):
+        self.active_connections.remove(websocket)
+    
+    async def broadcast(self, message: str):
+        # Send message to all connected clients concurrently
+        tasks = [
+            connection.send_text(message) 
+            for connection in self.active_connections
+        ]
+        await asyncio.gather(*tasks, return_exceptions=True)
+
+manager = WebSocketManager()
+
+@app.websocket("/ws/{client_id}")
+async def websocket_endpoint(websocket: WebSocket, client_id: int):
+    await manager.connect(websocket)
+    try:
+        while True:
+            # Receive message from client
+            data = await websocket.receive_text()
+            
+            # Broadcast to all other clients
+            await manager.broadcast(f"Client {client_id} says: {data}")
+            
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)
+        await manager.broadcast(f"Client {client_id} left the chat")</code></pre>
+            </div>
+        </section>
+
+        <section id="best-practices" class="section">
+            <h2><span class="emoji">🎯</span>Best Practices</h2>
+
+            <div class="success-box">
+                <h4>✅ Do's</h4>
+                <ul>
+                    <li><strong>Use async for I/O-bound operations:</strong> Database queries, API calls, file operations</li>
+                    <li><strong>Avoid blocking operations:</strong> Use <code>asyncio.sleep()</code> instead of <code>time.sleep()</code></li>
+                    <li><strong>Handle exceptions properly:</strong> Use try-except blocks in async functions</li>
+                    <li><strong>Use connection pooling:</strong> For database and HTTP connections</li>
+                    <li><strong>Limit concurrency:</strong> Use <code>asyncio.Semaphore</code> to prevent overwhelming resources</li>
+                </ul>
+            </div>
+
+            <div class="code-block">
+                <pre><code>import asyncio
+from asyncio import Semaphore
+
+class BestPracticesExample:
+    def __init__(self, max_concurrent=10):
+        self.semaphore = Semaphore(max_concurrent)
+    
+    async def rate_limited_operation(self, item):
+        """Rate-limited async operation"""
+        async with self.semaphore:
+            # Only max_concurrent operations will run simultaneously
+            await self.process_item(item)
+    
+    async def process_item(self, item):
+        """Process a single item"""
+        await asyncio.sleep(1)  # Simulate work
+        return f"Processed {item}"
+    
+    async def process_batch_with_limit(self, items):
+        """Process items with concurrency limit"""
+        tasks = [
+            self.rate_limited_operation(item) 
+            for item in items
+        ]
+        return await asyncio.gather(*tasks)</code></pre>
+            </div>
+        </section>
+
+        <section id="pitfalls" class="section">
+            <h2><span class="emoji">⚠️</span>Common Pitfalls</h2>
+
+            <div class="warning-box">
+                <h4>❌ Don'ts</h4>
+                <ul>
+                    <li><strong>Blocking the Event Loop:</strong> Using <code>time.sleep()</code> or <code>requests.get()</code> in async functions</li>
+                    <li><strong>Forgetting to await:</strong> Creating coroutine objects without executing them</li>
+                    <li><strong>Not handling exceptions:</strong> Unhandled exceptions can crash the event loop</li>
+                    <li><strong>Creating too many tasks:</strong> Overwhelming servers with thousands of concurrent requests</li>
+                </ul>
+            </div>
+
+            <h3>🔄 Blocking the Event Loop</h3>
+            <div class="code-block">
+                <pre><code># ❌ Bad: Blocking operations
+async def blocking_example():
+    time.sleep(2)  # Blocks entire event loop
+    response = requests.get("https://httpbin.org/delay/1")  # Blocking HTTP call
+    with open("large_file.txt", "r") as f:  # Blocking file I/O
+        content = f.read()
+    return content
+
+# ✅ Good: Non-blocking operations
+async def non_blocking_example():
+    await asyncio.sleep(2)  # Non-blocking sleep
+    
+    async with aiohttp.ClientSession() as session:
+        async with session.get("https://httpbin.org/delay/1") as response:
+            data = await response.text()  # Non-blocking HTTP call
+    
+    async with aiofiles.open("large_file.txt", "r") as f:
+        content = await f.read()  # Non-blocking file I/O
+    
+    return content</code></pre>
+            </div>
+
+            <h3>🔧 Not Handling Exceptions</h3>
+            <div class="code-block">
+                <pre><code># ❌ Bad: Unhandled exceptions can crash the event loop
+async def risky_operations():
+    tasks = [
+        risky_async_function(i) 
+        for i in range(10)
+    ]
+    results = await asyncio.gather(*tasks)  # If one fails, all fail
+    return results
+
+# ✅ Good: Handle exceptions properly
+async def safe_operations():
+    tasks = [
+        risky_async_function(i) 
+        for i in range(10)
+    ]
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+    
+    # Process results and exceptions separately
+    successful_results = []
+    errors = []
+    
+    for result in results:
+        if isinstance(result, Exception):
+            errors.append(result)
+        else:
+            successful_results.append(result)
+    
+    return successful_results, errors</code></pre>
+            </div>
+        </section>
+
+        <section id="advanced" class="section">
+            <h2><span class="emoji">🔬</span>Advanced Concepts</h2>
+
+            <h3>🏗️ Custom Async Context Managers</h3>
+            <div class="code-block">
+                <pre><code>class AsyncDatabaseConnection:
+    """Custom async context manager for database connections"""
+    
+    def __init__(self, connection_string):
+        self.connection_string = connection_string
+        self.connection = None
+    
+    async def __aenter__(self):
+        """Async enter method"""
+        print("Connecting to database...")
+        await asyncio.sleep(0.1)  # Simulate connection time
+        self.connection = f"Connected to {self.connection_string}"
+        return self
+    
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        """Async exit method"""
+        print("Closing database connection...")
+        await asyncio.sleep(0.1)  # Simulate cleanup time
+        self.connection = None
+        
+        # Handle exceptions if needed
+        if exc_type:
+            print(f"Exception occurred: {exc_val}")
+        
+        return False  # Don't suppress exceptions
+    
+    async def query(self, sql):
+        """Execute a query"""
+        if not self.connection:
+            raise RuntimeError("Not connected to database")
+        
+        await asyncio.sleep(0.1)  # Simulate query time
+        return f"Result for: {sql}"
+
+# Usage
+async def use_custom_context_manager():
+    async with AsyncDatabaseConnection("postgresql://localhost/mydb") as db:
+        result = await db.query("SELECT * FROM users")
+        print(result)</code></pre>
+            </div>
+
+            <h3>🎭 Async Generators</h3>
+            <div class="code-block">
+                <pre><code>async def async_number_generator(start, end, delay=1):
+    """Generate numbers asynchronously"""
+    for i in range(start, end):
+        await asyncio.sleep(delay)
+        yield i
+
+# Usage
+async def use_async_generators():
+    async for number in async_number_generator(1, 5, 0.5):
+        print(f"Generated: {number}")</code></pre>
+            </div>
+        </section>
+
+        <section id="performance" class="section">
+            <h2><span class="emoji">📊</span>Performance Comparison</h2>
+
+            <div class="performance-stats">
+                <h4>🚀 Performance Benefits</h4>
+                <p>Async programming can provide significant performance improvements for I/O-bound operations:</p>
+                <ul>
+                    <li><strong>5-10x faster</strong> for multiple HTTP requests</li>
+                    <li><strong>3-5x faster</strong> for database operations</li>
+                    <li><strong>2-4x faster</strong> for file I/O operations</li>
+                    <li><strong>Unlimited scalability</strong> for WebSocket connections</li>
+                </ul>
+            </div>
+
+            <h3>🔧 Benchmark Example</h3>
+            <div class="code-block">
+                <pre><code>import asyncio
+import aiohttp
+import requests
+import time
+
+async def benchmark_async_requests(urls, num_iterations=5):
+    """Benchmark async HTTP requests"""
+    times = []
+    
+    for _ in range(num_iterations):
+        start_time = time.time()
+        
+        async with aiohttp.ClientSession() as session:
+            tasks = [session.get(url) for url in urls]
+            responses = await asyncio.gather(*tasks)
+            
+            # Close responses
+            for response in responses:
+                response.close()
+        
+        end_time = time.time()
+        times.append(end_time - start_time)
+    
+    return {
+        "method": "async",
+        "avg_time": sum(times) / len(times),
+        "num_requests": len(urls),
+        "iterations": num_iterations
+    }
+
+def benchmark_sync_requests(urls, num_iterations=5):
+    """Benchmark synchronous HTTP requests"""
+    times = []
+    
+    for _ in range(num_iterations):
+        start_time = time.time()
+        
+        for url in urls:
+            response = requests.get(url)
+            response.close()
+        
+        end_time = time.time()
+        times.append(end_time - start_time)
+    
+    return {
+        "method": "sync",
+        "avg_time": sum(times) / len(times),
+        "num_requests": len(urls),
+        "iterations": num_iterations
+    }</code></pre>
+            </div>
+        </section>
+
+        <section class="section">
+            <h2><span class="emoji">🚀</span>Getting Started</h2>
+            
+            <h3>📦 Installation</h3>
+            <div class="installation-box">
+# Basic async programming
+pip install asyncio
+
+# For HTTP requests
+pip install aiohttp aiofiles
+
+# For FastAPI
+pip install fastapi uvicorn
+
+# For database operations
+pip install asyncpg aiosqlite
+
+# For WebSocket support
+pip install websockets
+            </div>
+
+            <h3>🏃‍♂️ Running Examples</h3>
+            <div class="code-block">
+                <pre><code># Basic async example
+import asyncio
+
+async def main():
+    print("Starting async program...")
+    await asyncio.sleep(1)
+    print("Async program completed!")
+
+# Run the async function
+asyncio.run(main())</code></pre>
+            </div>
+
+            <div class="benefits-list">
+                <h4>🎯 Key Takeaways</h4>
+                <ul>
+                    <li>Use async programming for I/O-bound operations</li>
+                    <li>Understand the event loop and how coroutines work</li>
+                    <li>Always use <code>await</code> with async functions</li>
+                    <li>Handle exceptions properly in async code</li>
+                    <li>Limit concurrency to prevent overwhelming resources</li>
+                    <li>Use proper async libraries (aiohttp, aiofiles, etc.)</li>
+                </ul>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Add copy functionality to code blocks
+        document.addEventListener('DOMContentLoaded', function() {
+            const codeBlocks = document.querySelectorAll('.code-block');
+            
+            codeBlocks.forEach(block => {
+                // Create copy button
+                const copyBtn = document.createElement('button');
+                copyBtn.className = 'copy-btn';
+                copyBtn.textContent = 'Copy';
+                copyBtn.onclick = function() {
+                    const code = block.querySelector('code');
+                    if (code) {
+                        navigator.clipboard.writeText(code.textContent).then(() => {
+                            copyBtn.textContent = 'Copied!';
+                            setTimeout(() => {
+                                copyBtn.textContent = 'Copy';
+                            }, 2000);
+                        }).catch(err => {
+                            console.error('Failed to copy: ', err);
+                            // Fallback for older browsers
+                            const textArea = document.createElement('textarea');
+                            textArea.value = code.textContent;
+                            document.body.appendChild(textArea);
+                            textArea.select();
+                            document.execCommand('copy');
+                            document.body.removeChild(textArea);
+                            copyBtn.textContent = 'Copied!';
+                            setTimeout(() => {
+                                copyBtn.textContent = 'Copy';
+                            }, 2000);
+                        });
+                    }
+                };
+                block.appendChild(copyBtn);
+            });
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Highlight current section in navigation
+        window.addEventListener('scroll', function() {
+            const sections = document.querySelectorAll('.section');
+            const navLinks = document.querySelectorAll('.nav a');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (pageYOffset >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.style.background = '';                link.style.color = '#2c3e50';
+                if (link.getAttribute('href') === '#' + current) {
+                    link.style.background = '#667eea';
+                    link.style.color = 'white';
+                }
+            });
+        });
+
+        // Sidebar functionality
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        function toggleSection(element) {
+            const section = element.parentElement;
+            const isActive = section.classList.contains('active');
+            
+            // Close all sections
+            document.querySelectorAll('.sidebar-section').forEach(sec => {
+                sec.classList.remove('active');
+                const arrow = sec.querySelector('.sidebar-section-title span');
+                if (arrow) arrow.textContent = '▶';
+            });
+            
+            // Open clicked section if it wasn't active
+            if (!isActive) {
+                section.classList.add('active');
+                const arrow = element.querySelector('span');
+                if (arrow) arrow.textContent = '▼';
+            }
+        }        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.querySelector('.sidebar-toggle');
+            
+            if (window.innerWidth <= 768 && 
+                !sidebar.contains(event.target) && 
+                !sidebarToggle.contains(event.target)) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+                
+                // Update active link
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+            });
+        });
+
+        // Update active navigation on scroll
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('section[id]');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.pageYOffset >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').substring(1) === current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+    </div> <!-- End main-content -->
+</body>
+</html>

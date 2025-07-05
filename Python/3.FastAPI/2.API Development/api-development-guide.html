@@ -1,0 +1,1432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastAPI API Development - Complete Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: #2c3e50;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background: #34495e;
+            border-bottom: 1px solid #455a75;
+        }
+
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 1.3em;
+            color: #ecf0f1;
+            border: none;
+            padding: 0;
+        }
+
+        .sidebar-nav {
+            padding: 0;
+        }
+
+        .sidebar-section {
+            border-bottom: 1px solid #455a75;
+        }
+
+        .sidebar-section-title {
+            background: #34495e;
+            color: #ecf0f1;
+            padding: 15px 20px;
+            margin: 0;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-section-title:hover {
+            background: #455a75;
+        }
+
+        .sidebar-links {
+            background: #2c3e50;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .sidebar-section.active .sidebar-links {
+            max-height: 500px;
+        }
+
+        .sidebar-links a {
+            display: block;
+            color: #bdc3c7;
+            text-decoration: none;
+            padding: 12px 25px;
+            border-bottom: 1px solid #34495e;
+            transition: background 0.2s ease;
+        }
+
+        .sidebar-links a:hover {
+            background: #34495e;
+            color: #ecf0f1;
+        }
+
+        .sidebar-links a.current {
+            background: #3498db;
+            color: white;
+            font-weight: 600;
+        }
+
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .sidebar-toggle {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #3498db, #e74c3c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        h2 {
+            color: #27ae60;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-left: 5px solid #27ae60;
+            padding-left: 15px;
+            position: relative;
+        }
+
+        h2::before {
+            content: "✅";
+            position: absolute;
+            left: -30px;
+            top: 0;
+            font-size: 0.8em;
+        }
+
+        h3 {
+            color: #34495e;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        h4 {
+            color: #2c3e50;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        .intro {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 1.1em;
+        }
+
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.4;
+            position: relative;
+            border-left: 4px solid #007acc;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .code-block::before {
+            content: attr(data-lang);
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            color: #888;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            background: #333;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+
+        .code-block.python { border-left-color: #3776ab; }
+        .code-block.bash { border-left-color: #4eaa25; }
+        .code-block.txt { border-left-color: #6c757d; }
+
+        .advantages-list {
+            background: linear-gradient(135deg, #a8edea, #fed6e3);
+            padding: 25px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .advantages-list ol {
+            counter-reset: advantage-counter;
+            list-style: none;
+        }
+
+        .advantages-list li {
+            counter-increment: advantage-counter;
+            margin: 10px 0;
+            padding-left: 40px;
+            position: relative;
+        }
+
+        .advantages-list li::before {
+            content: counter(advantage-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: #667eea;
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .toc {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .toc h3 {
+            color: #495057;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .toc ul {
+            list-style: none;
+        }
+
+        .toc li {
+            margin: 8px 0;
+        }
+
+        .toc a {
+            color: #007bff;
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+
+        .toc a:hover {
+            background: #007bff;
+            color: white;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #ffecd2, #fcb69f);
+            border: 2px solid #ff6b6b;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .highlight-box::before {
+            content: "💡";
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background: #ff6b6b;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9em;
+        }
+
+        .info-section {
+            background: #e8f5e8;
+            border: 2px solid #4caf50;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .warning-section {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .footer {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            border-radius: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                padding: 15px;
+                border-radius: 10px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .code-block {
+                font-size: 0.9em;
+                padding: 15px;
+            }
+        }
+
+        .scroll-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            font-size: 1.2em;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .scroll-to-top:hover {
+            background: #764ba2;
+            transform: translateY(-3px);
+        }
+
+        .copy-button {
+            position: absolute;
+            top: 10px;
+            right: 50px;
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .code-block:hover .copy-button {
+            opacity: 1;
+        }
+
+        .copy-button:hover {
+            background: #005a9e;
+        }
+
+        strong {
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .method-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .method-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }        .method-card h4 {
+            color: white;
+            margin-bottom: 5px;
+        }
+
+        .nav {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+        }
+
+        .nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .nav a {
+            color: #667eea;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav a:hover, .nav a.active {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+      <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2><a href="../../Python.html" style="color: #ecf0f1; text-decoration: none;">🐍 Python Guides</a></h2>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    🐍 Basic Python <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../../1.Basic Python/basic-python-guide.html">Basic Python Hub</a>
+                    <a href="../../1.Basic Python/1.Python Concepts/python-concepts.html">Python Concepts</a>
+                    <a href="../../1.Basic Python/2.Data Structures/python-data-structures.html">Data Structures</a>
+                    <a href="../../1.Basic Python/3.Algorithms & Problem Solving/algorithms-problem-solving.html">Algorithms & Problem Solving</a>
+                    <a href="../../1.Basic Python/4.Testing & Debugging/testing-debugging.html">Testing & Debugging</a>
+                </div>
+            </div>
+            
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    ⚡ Async Programming <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../../2.Async Programming/async-programming-guide.html">Asyncio & Concurrency</a>
+                </div>
+            </div>
+            
+            <div class="sidebar-section active">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    🚀 FastAPI <span>▼</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../fastapi-guide.html">FastAPI Overview</a>
+                    <a href="../1.Basic/fastapi-basics-complete.html">FastAPI Fundamentals</a>
+                    <a href="../2.API Development/api-development-guide.html" class="current">API Development</a>
+                    <a href="../3.Security/security-guide.html">Security & Authentication</a>
+                    <a href="../4.Testing/testing-guide.html">Testing Strategies</a>
+                    <a href="../5.Advanced Topics/advanced-topics-guide.html">Advanced Topics</a>
+                    <a href="../6.Miscellaneous/miscellaneous-guide.html">Tips & Best Practices</a>
+                </div>
+            </div>
+            
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    🦜 LangChain <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../../4.LangChain/langchain-documentation.html">LangChain Framework</a>
+                </div>
+            </div>
+            
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    📊 LangGraph <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../../5.LangGraph/langgraph-guide.html">Graph-based AI</a>
+                </div>
+            </div>
+            
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    🤖 Agentic AI <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../../7.Agentic AI/agentic-ai-guide.html">AI Agents Guide</a>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="container">
+        <h1>🛠️ FastAPI API Development Guide</h1>
+        
+        <div class="intro">
+            Master the art of building robust and scalable APIs with FastAPI. This comprehensive guide covers everything from basic routing to advanced features like file uploads, validation, versioning, and CORS implementation.
+        </div>        <nav class="nav">
+            <ul>
+                <li><a href="#simple-routes" class="nav-link">🛣️ Simple Routes</a></li>
+                <li><a href="#query-parameters" class="nav-link">❓ Query Parameters</a></li>
+                <li><a href="#path-parameters" class="nav-link">🛤️ Path Parameters</a></li>
+                <li><a href="#request-bodies" class="nav-link">📝 Request Bodies</a></li>
+                <li><a href="#pydantic-advantages" class="nav-link">⚡ Pydantic Advantages</a></li>
+                <li><a href="#data-validation" class="nav-link">✅ Data Validation</a></li>
+                <li><a href="#file-uploads" class="nav-link">📁 File Uploads</a></li>
+                <li><a href="#api-versioning" class="nav-link">🔢 API Versioning</a></li>
+                <li><a href="#cors-implementation" class="nav-link">🌐 CORS</a></li>
+            </ul>
+        </nav>
+
+        <h2 id="simple-routes">How do you define a simple route/endpoint in FastAPI?</h2>
+        
+        <div class="method-grid">
+            <div class="method-card">
+                <h4>GET</h4>
+                <p>Retrieve data</p>
+            </div>
+            <div class="method-card">
+                <h4>POST</h4>
+                <p>Create new data</p>
+            </div>
+            <div class="method-card">
+                <h4>PUT</h4>
+                <p>Update data</p>
+            </div>
+            <div class="method-card">
+                <h4>DELETE</h4>
+                <p>Remove data</p>
+            </div>
+        </div>
+
+        <div class="code-block python" data-lang="python">from fastapi import FastAPI
+
+app = FastAPI()
+
+# Basic GET endpoint
+@app.get("/")
+async def root():
+    return {"message": "Hello World"}
+
+# Different HTTP methods
+@app.post("/items/")
+async def create_item():
+    return {"message": "Item created"}
+
+@app.put("/items/{item_id}")
+async def update_item(item_id: int):
+    return {"message": f"Item {item_id} updated"}
+
+@app.delete("/items/{item_id}")
+async def delete_item(item_id: int):
+    return {"message": f"Item {item_id} deleted"}
+
+# Multiple HTTP methods for same endpoint
+@app.api_route("/items/{item_id}", methods=["GET", "POST"])
+async def handle_item(item_id: int):
+    return {"item_id": item_id}
+
+# Route with tags and metadata
+@app.get("/users/", tags=["users"], summary="Get all users")
+async def get_users():
+    """
+    Retrieve all users from the database.
+    
+    This endpoint returns a list of all users with their basic information.
+    """
+    return [{"id": 1, "name": "John"}]</div>
+
+        <h2 id="query-parameters">How do you define query parameters in FastAPI?</h2>
+        
+        <p>Query parameters are the key-value pairs that appear after the <code>?</code> in a URL. FastAPI automatically parses these from the URL.</p>
+
+        <div class="code-block python" data-lang="python">from fastapi import FastAPI, Query
+from typing import Optional, List
+
+app = FastAPI()
+
+# Basic query parameters
+@app.get("/items/")
+async def read_items(skip: int = 0, limit: int = 10):
+    return {"skip": skip, "limit": limit}
+
+# Optional query parameters
+@app.get("/items/search")
+async def search_items(
+    q: Optional[str] = None,
+    category: Optional[str] = None
+):
+    items = {"q": q, "category": category}
+    return items
+
+# Query parameters with validation
+@app.get("/items/")
+async def read_items(
+    q: Optional[str] = Query(None, min_length=3, max_length=50),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(10, ge=1, le=100)
+):
+    return {"q": q, "skip": skip, "limit": limit}
+
+# List query parameters
+@app.get("/items/")
+async def read_items(tags: List[str] = Query([])):
+    return {"tags": tags}
+
+# Query parameters with metadata
+@app.get("/items/")
+async def read_items(
+    q: Optional[str] = Query(
+        None,
+        title="Query string",
+        description="Query string for the items to search",
+        min_length=3,
+        max_length=50,
+        regex="^[a-zA-Z0-9 ]+$"
+    )
+):
+    return {"q": q}
+
+# Boolean query parameters
+@app.get("/items/")
+async def read_items(active: bool = True):
+    return {"active": active}</div>
+
+        <h2 id="path-parameters">How do you define path parameters in FastAPI?</h2>
+        
+        <p>Path parameters are parts of the URL path that are used to capture values from the URL.</p>
+
+        <div class="code-block python" data-lang="python">from fastapi import FastAPI, Path
+from enum import Enum
+
+app = FastAPI()
+
+# Basic path parameters
+@app.get("/items/{item_id}")
+async def read_item(item_id: int):
+    return {"item_id": item_id}
+
+# Multiple path parameters
+@app.get("/users/{user_id}/items/{item_id}")
+async def read_user_item(user_id: int, item_id: int):
+    return {"user_id": user_id, "item_id": item_id}
+
+# Path parameters with validation
+@app.get("/items/{item_id}")
+async def read_item(
+    item_id: int = Path(..., title="The ID of the item", ge=1, le=1000)
+):
+    return {"item_id": item_id}
+
+# String path parameters
+@app.get("/users/{user_name}")
+async def read_user(user_name: str):
+    return {"user_name": user_name}
+
+# Enum path parameters
+class ModelName(str, Enum):
+    alexnet = "alexnet"
+    resnet = "resnet"
+    lenet = "lenet"
+
+@app.get("/models/{model_name}")
+async def get_model(model_name: ModelName):
+    if model_name == ModelName.alexnet:
+        return {"model_name": model_name, "message": "Deep Learning FTW!"}
+    return {"model_name": model_name, "message": "Have some residuals"}
+
+# File path parameters
+@app.get("/files/{file_path:path}")
+async def read_file(file_path: str):
+    return {"file_path": file_path}
+
+# Path parameters with regex
+@app.get("/items/{item_id}")
+async def read_item(
+    item_id: str = Path(..., regex=r"^[a-zA-Z0-9_-]+$")
+):
+    return {"item_id": item_id}</div>
+
+        <h2 id="request-bodies">How do you handle request bodies in FastAPI?</h2>
+        
+        <p>Request bodies are used to send data from the client to your API. FastAPI uses Pydantic models to define the structure of request bodies.</p>
+
+        <div class="code-block python" data-lang="python">from fastapi import FastAPI, Body
+from pydantic import BaseModel
+from typing import Optional, List
+
+app = FastAPI()
+
+# Basic request body with Pydantic model
+class Item(BaseModel):
+    name: str
+    description: Optional[str] = None
+    price: float
+    tax: Optional[float] = None
+
+@app.post("/items/")
+async def create_item(item: Item):
+    return item
+
+# Multiple request bodies
+class User(BaseModel):
+    username: str
+    email: str
+
+@app.put("/items/{item_id}")
+async def update_item(item_id: int, item: Item, user: User):
+    return {"item_id": item_id, "item": item, "user": user}
+
+# Request body with singular values
+@app.put("/items/{item_id}")
+async def update_item(
+    item_id: int,
+    item: Item,
+    importance: int = Body(...)
+):
+    return {"item_id": item_id, "item": item, "importance": importance}
+
+# Nested models
+class Image(BaseModel):
+    url: str
+    name: str
+
+class Item(BaseModel):
+    name: str
+    description: Optional[str] = None
+    price: float
+    tax: Optional[float] = None
+    tags: List[str] = []
+    images: Optional[List[Image]] = None
+
+@app.post("/items/")
+async def create_item(item: Item):
+    return item
+
+# Request body with additional data
+@app.post("/items/")
+async def create_item(
+    item: Item,
+    metadata: dict = Body(...)
+):
+    return {"item": item, "metadata": metadata}
+
+# Embedded single values
+@app.put("/items/{item_id}")
+async def update_item(
+    item_id: int,
+    item: Item = Body(..., embed=True)
+):
+    return {"item_id": item_id, "item": item}</div>
+
+        <h2 id="pydantic-advantages">What are the advantages of using Pydantic models for request and response bodies?</h2>
+        
+        <div class="advantages-list">
+            <ol>
+                <li><strong>Automatic Validation</strong>: Input data is automatically validated</li>
+                <li><strong>Type Safety</strong>: Ensures data types are correct</li>
+                <li><strong>Documentation</strong>: Auto-generates API documentation</li>
+                <li><strong>Serialization</strong>: Automatic JSON serialization/deserialization</li>
+                <li><strong>IDE Support</strong>: Better code completion and error detection</li>
+                <li><strong>Custom Validation</strong>: Custom validators and constraints</li>
+            </ol>
+        </div>
+
+        <div class="code-block python" data-lang="python">from pydantic import BaseModel, validator, Field, EmailStr
+from typing import Optional, List
+from datetime import datetime
+
+class UserCreate(BaseModel):
+    username: str = Field(..., min_length=3, max_length=20)
+    email: EmailStr
+    password: str = Field(..., min_length=8)
+    full_name: Optional[str] = None
+    age: int = Field(..., gt=0, le=120)
+
+    @validator('username')
+    def username_alphanumeric(cls, v):
+        assert v.isalnum(), 'Username must be alphanumeric'
+        return v
+
+    @validator('password')
+    def validate_password(cls, v):
+        if not any(char.isdigit() for char in v):
+            raise ValueError('Password must contain at least one digit')
+        return v
+
+class UserResponse(BaseModel):
+    id: int
+    username: str
+    email: str
+    full_name: Optional[str] = None
+    is_active: bool
+    created_at: datetime
+
+    class Config:
+        from_attributes = True  # For SQLAlchemy integration
+
+# Usage in endpoints
+@app.post("/users/", response_model=UserResponse)
+async def create_user(user: UserCreate):
+    # user is automatically validated
+    # Response is automatically serialized according to UserResponse model
+    db_user = User(**user.dict())
+    # ... save to database
+    return db_user</div>
+
+        <h2 id="data-validation">How do you validate incoming data in FastAPI?</h2>
+        
+        <p>FastAPI provides multiple ways to validate incoming data, from simple type hints to complex custom validators.</p>
+
+        <div class="code-block python" data-lang="python">from fastapi import FastAPI, HTTPException, Body
+from pydantic import BaseModel, validator, Field, ValidationError
+from typing import Optional, List
+import re
+
+app = FastAPI()
+
+class User(BaseModel):
+    username: str = Field(..., min_length=3, max_length=20)
+    email: str = Field(..., regex=r'^[\w\.-]+@[\w\.-]+\.\w+$')
+    age: int = Field(..., gt=0, le=120)
+    password: str = Field(..., min_length=8)
+    confirm_password: str
+
+    @validator('username')
+    def username_alphanumeric(cls, v):
+        if not v.isalnum():
+            raise ValueError('Username must be alphanumeric')
+        return v
+
+    @validator('password')
+    def validate_password(cls, v):
+        if not re.search(r'[A-Z]', v):
+            raise ValueError('Password must contain uppercase letter')
+        if not re.search(r'[a-z]', v):
+            raise ValueError('Password must contain lowercase letter')
+        if not re.search(r'\d', v):
+            raise ValueError('Password must contain digit')
+        return v
+
+    @validator('confirm_password')
+    def passwords_match(cls, v, values):
+        if 'password' in values and v != values['password']:
+            raise ValueError('Passwords do not match')
+        return v
+
+# Custom validation with dependency
+from fastapi import Depends
+
+def validate_user_exists(username: str):
+    # Check if user exists in database
+    if user_exists(username):
+        raise HTTPException(status_code=400, detail="Username already exists")
+    return username
+
+@app.post("/users/")
+async def create_user(
+    user: User,
+    validated_username: str = Depends(validate_user_exists)
+):
+    return {"message": "User created successfully"}
+
+# Manual validation
+@app.post("/items/")
+async def create_item(item_data: dict = Body(...)):
+    try:
+        # Manual validation
+        if "name" not in item_data:
+            raise HTTPException(status_code=422, detail="Name is required")
+        
+        if len(item_data["name"]) < 3:
+            raise HTTPException(status_code=422, detail="Name too short")
+        
+        return {"message": "Item created"}
+    
+    except ValidationError as e:
+        raise HTTPException(status_code=422, detail=str(e))
+
+# Query parameter validation
+from fastapi import Query
+
+@app.get("/items/")
+async def read_items(
+    q: Optional[str] = Query(None, min_length=3, max_length=50),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(10, ge=1, le=100),
+    tags: List[str] = Query([])
+):
+    return {"q": q, "skip": skip, "limit": limit, "tags": tags}</div>
+
+        <h2 id="file-uploads">How do you handle file uploads in FastAPI?</h2>
+        
+        <p>FastAPI provides excellent support for file uploads, including validation, multiple files, and streaming for large files.</p>
+
+        <div class="code-block python" data-lang="python">from fastapi import FastAPI, File, UploadFile, Form, HTTPException
+from typing import List
+import shutil
+import os
+
+app = FastAPI()
+
+# Basic file upload
+@app.post("/upload/")
+async def upload_file(file: UploadFile = File(...)):
+    return {"filename": file.filename, "content_type": file.content_type}
+
+# Multiple file uploads
+@app.post("/upload-multiple/")
+async def upload_multiple_files(files: List[UploadFile] = File(...)):
+    return [{"filename": file.filename} for file in files]
+
+# File upload with form data
+@app.post("/upload-with-form/")
+async def upload_with_form(
+    file: UploadFile = File(...),
+    name: str = Form(...),
+    description: str = Form(...)
+):
+    return {
+        "filename": file.filename,
+        "name": name,
+        "description": description
+    }
+
+# File upload with validation
+@app.post("/upload-image/")
+async def upload_image(file: UploadFile = File(...)):
+    # Validate file type
+    if file.content_type not in ["image/jpeg", "image/png", "image/gif"]:
+        raise HTTPException(status_code=400, detail="Invalid file type")
+    
+    # Validate file size (e.g., max 5MB)
+    if file.size > 5 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="File too large")
+    
+    # Save file
+    file_path = f"uploads/{file.filename}"
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+    
+    return {"filename": file.filename, "size": file.size}
+
+# Streaming file upload for large files
+@app.post("/upload-large/")
+async def upload_large_file(file: UploadFile = File(...)):
+    file_path = f"uploads/{file.filename}"
+    
+    with open(file_path, "wb") as f:
+        while contents := await file.read(1024):  # Read in chunks
+            f.write(contents)
+    
+    return {"filename": file.filename, "message": "Upload successful"}
+
+# File download
+@app.get("/download/{filename}")
+async def download_file(filename: str):
+    file_path = f"uploads/{filename}"
+    
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="File not found")
+    
+    return FileResponse(file_path, filename=filename)
+
+# Advanced file upload with metadata
+from pydantic import BaseModel
+
+class FileMetadata(BaseModel):
+    title: str
+    description: str
+    tags: List[str] = []
+
+@app.post("/upload-advanced/")
+async def upload_with_metadata(
+    file: UploadFile = File(...),
+    metadata: str = Form(...)  # JSON string
+):
+    import json
+    
+    try:
+        metadata_obj = FileMetadata.parse_raw(metadata)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid metadata")
+    
+    # Process file and metadata
+    return {
+        "filename": file.filename,
+        "metadata": metadata_obj.dict()
+    }</div>
+
+        <h2 id="api-versioning">How do you implement API versioning in FastAPI?</h2>
+        
+        <p>API versioning is crucial for maintaining backwards compatibility. FastAPI supports multiple versioning strategies.</p>
+
+        <div class="highlight-box">
+            <h4>Versioning Strategies</h4>
+            <ul>
+                <li><strong>URL Path Versioning</strong>: /api/v1/users, /api/v2/users</li>
+                <li><strong>Header-based</strong>: X-API-Version: 1.0</li>
+                <li><strong>Query Parameter</strong>: /users?version=1.0</li>
+                <li><strong>Separate Applications</strong>: Different FastAPI apps</li>
+            </ul>
+        </div>
+
+        <div class="code-block python" data-lang="python">from fastapi import FastAPI, APIRouter
+
+# Method 1: URL Path Versioning
+app = FastAPI()
+
+# Version 1
+v1_router = APIRouter(prefix="/api/v1", tags=["v1"])
+
+@v1_router.get("/users/")
+async def get_users_v1():
+    return {"version": "1.0", "users": []}
+
+@v1_router.get("/users/{user_id}")
+async def get_user_v1(user_id: int):
+    return {"version": "1.0", "user_id": user_id}
+
+# Version 2
+v2_router = APIRouter(prefix="/api/v2", tags=["v2"])
+
+@v2_router.get("/users/")
+async def get_users_v2():
+    return {"version": "2.0", "users": [], "total_count": 0}
+
+@v2_router.get("/users/{user_id}")
+async def get_user_v2(user_id: int):
+    return {
+        "version": "2.0", 
+        "user": {"id": user_id, "created_at": "2023-01-01"}
+    }
+
+# Include routers
+app.include_router(v1_router)
+app.include_router(v2_router)
+
+# Method 2: Header-based versioning
+from fastapi import Header, HTTPException
+
+async def get_api_version(x_api_version: str = Header("1.0")):
+    if x_api_version not in ["1.0", "2.0"]:
+        raise HTTPException(status_code=400, detail="Unsupported API version")
+    return x_api_version
+
+@app.get("/users/")
+async def get_users(version: str = Depends(get_api_version)):
+    if version == "1.0":
+        return {"version": "1.0", "users": []}
+    elif version == "2.0":
+        return {"version": "2.0", "users": [], "pagination": {}}
+
+# Method 3: Query Parameter Versioning
+@app.get("/users/")
+async def get_users(version: str = "1.0"):
+    if version == "1.0":
+        return {"version": "1.0", "users": []}
+    elif version == "2.0":
+        return {"version": "2.0", "users": [], "metadata": {}}
+    else:
+        raise HTTPException(status_code=400, detail="Unsupported version")
+
+# Method 4: Separate FastAPI apps
+app_v1 = FastAPI(title="API V1", version="1.0.0")
+app_v2 = FastAPI(title="API V2", version="2.0.0")
+
+@app_v1.get("/users/")
+async def get_users_v1():
+    return {"version": "1.0", "users": []}
+
+@app_v2.get("/users/")
+async def get_users_v2():
+    return {"version": "2.0", "users": [], "enhanced_features": True}
+
+# Mount sub-applications
+main_app = FastAPI()
+main_app.mount("/v1", app_v1)
+main_app.mount("/v2", app_v2)
+
+# Method 5: Version-specific models
+from pydantic import BaseModel
+
+class UserV1(BaseModel):
+    id: int
+    name: str
+
+class UserV2(BaseModel):
+    id: int
+    name: str
+    email: str
+    created_at: str
+
+@app.get("/v1/users/{user_id}", response_model=UserV1)
+async def get_user_v1(user_id: int):
+    return UserV1(id=user_id, name="John")
+
+@app.get("/v2/users/{user_id}", response_model=UserV2)
+async def get_user_v2(user_id: int):
+    return UserV2(
+        id=user_id, 
+        name="John", 
+        email="john@example.com",
+        created_at="2023-01-01"
+    )</div>
+
+        <h2 id="cors-implementation">How do you implement CORS in FastAPI?</h2>
+        
+        <p>Cross-Origin Resource Sharing (CORS) allows web applications from different domains to access your API.</p>
+
+        <div class="warning-section">
+            <h4>⚠️ Security Warning</h4>
+            <p>Be careful with CORS settings in production. Using <code>allow_origins=["*"]</code> can be a security risk.</p>
+        </div>
+
+        <div class="code-block python" data-lang="python">from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+app = FastAPI()
+
+# Basic CORS setup
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
+)
+
+# Production CORS setup
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",  # React development server
+        "http://localhost:8080",  # Vue development server
+        "https://myapp.com",      # Production frontend
+        "https://www.myapp.com",  # Production frontend with www
+    ],
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_headers=["*"],
+)
+
+# Environment-based CORS
+import os
+
+origins = []
+
+if os.getenv("ENVIRONMENT") == "development":
+    origins = [
+        "http://localhost:3000",
+        "http://localhost:8080",
+        "http://localhost:3001",
+    ]
+else:
+    origins = [
+        "https://myapp.com",
+        "https://www.myapp.com",
+    ]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["GET", "POST"],
+    allow_headers=["*"],
+)
+
+# Manual CORS handling
+from fastapi import Request
+from fastapi.responses import Response
+
+@app.middleware("http")
+async def cors_handler(request: Request, call_next):
+    response = await call_next(request)
+    
+    origin = request.headers.get("origin")
+    
+    if origin in ["http://localhost:3000", "https://myapp.com"]:
+        response.headers["Access-Control-Allow-Origin"] = origin
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE"
+        response.headers["Access-Control-Allow-Headers"] = "*"
+    
+    return response
+
+# Preflight request handling
+@app.options("/{rest_of_path:path}")
+async def preflight_handler(request: Request, rest_of_path: str):
+    response = Response()
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "POST, GET, DELETE, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "*"
+    return response
+
+@app.get("/")
+async def main():
+    return {"message": "Hello World"}</div>
+
+        <div class="footer">
+            <p>🚀 <strong>FastAPI API Development Guide</strong> - Master the art of building powerful APIs</p>
+            <p>Built with ❤️ for developers who want to create robust and scalable web services</p>
+        </div>
+    </div>
+
+    <button class="scroll-to-top" onclick="scrollToTop()">↑</button>
+
+    <script>
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Scroll to top functionality
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // Show/hide scroll to top button
+        window.addEventListener('scroll', function() {
+            const scrollButton = document.querySelector('.scroll-to-top');
+            if (window.pageYOffset > 300) {
+                scrollButton.style.opacity = '1';
+                scrollButton.style.visibility = 'visible';
+            } else {
+                scrollButton.style.opacity = '0';
+                scrollButton.style.visibility = 'hidden';
+            }
+        });
+
+        // Add copy functionality to code blocks
+        document.addEventListener('DOMContentLoaded', function() {
+            const codeBlocks = document.querySelectorAll('.code-block');
+            
+            codeBlocks.forEach(block => {
+                // Create copy button
+                const copyButton = document.createElement('button');
+                copyButton.textContent = 'Copy';
+                copyButton.className = 'copy-button';
+                
+                block.style.position = 'relative';
+                block.appendChild(copyButton);
+                
+                // Add hover effects
+                block.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px)';
+                    this.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.15)';
+                });
+                
+                block.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = 'none';
+                });
+                
+                // Copy functionality
+                copyButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const text = block.textContent.replace('Copy', '').trim();
+                    navigator.clipboard.writeText(text).then(() => {
+                        copyButton.textContent = 'Copied!';
+                        copyButton.style.background = '#28a745';
+                        setTimeout(() => {
+                            copyButton.textContent = 'Copy';
+                            copyButton.style.background = '#007acc';
+                        }, 2000);                    }).catch(() => {
+                        copyButton.textContent = 'Failed';
+                        setTimeout(() => {
+                            copyButton.textContent = 'Copy';
+                        }, 2000);
+                    });
+                });
+            });
+        });
+
+        // Sidebar functionality
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        function toggleSection(element) {
+            const section = element.parentElement;
+            const isActive = section.classList.contains('active');
+            
+            // Close all sections
+            document.querySelectorAll('.sidebar-section').forEach(sec => {
+                sec.classList.remove('active');
+                const arrow = sec.querySelector('.sidebar-section-title span');
+                if (arrow) arrow.textContent = '▶';
+            });
+            
+            // Open clicked section if it wasn't active
+            if (!isActive) {
+                section.classList.add('active');
+                const arrow = element.querySelector('span');
+                if (arrow) arrow.textContent = '▼';
+            }
+        }        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.querySelector('.sidebar-toggle');
+            
+            if (window.innerWidth <= 768 && 
+                !sidebar.contains(event.target) && 
+                !sidebarToggle.contains(event.target)) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+                
+                // Update active link
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+            });
+        });
+
+        // Update active navigation on scroll
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('[id]');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.pageYOffset >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').substring(1) === current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+    </div> <!-- End main-content -->
+</body>
+</html>

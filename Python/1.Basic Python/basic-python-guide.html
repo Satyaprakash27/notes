@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Python Documentation Hub</title>
+    <title>Basic Python - Complete Guide</title>
     <style>
         * {
             margin: 0;
@@ -76,6 +76,8 @@
             background: #455a75;
         }
 
+
+
         .sidebar-links {
             background: #2c3e50;
             max-height: 0;
@@ -103,51 +105,46 @@
             color: #ecf0f1;
         }
 
-        .sidebar-links a.current {
-            background: #3498db;
-            color: white;
-            font-weight: 600;
-        }
-
         .sidebar-toggle {
             display: none;
             position: fixed;
             top: 20px;
             left: 20px;
-            z-index: 1001;
             background: #3498db;
             color: white;
             border: none;
-            padding: 10px;
+            padding: 10px 15px;
             border-radius: 5px;
             cursor: pointer;
+            z-index: 1001;
+            font-size: 18px;
         }
 
         .main-content {
             margin-left: 280px;
-            flex: 1;
-            min-height: 100vh;
             padding: 20px;
+            flex: 1;
+            width: calc(100% - 280px);
         }
 
         .hero-section {
-            text-align: center;
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border-radius: 20px;
-            padding: 60px 40px;
+            padding: 60px;
+            text-align: center;
             margin-bottom: 40px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
         }
 
         .hero-title {
             font-size: 3.5em;
+            font-weight: bold;
             margin-bottom: 20px;
-            background: linear-gradient(45deg, #667eea, #764ba2);
+            background: linear-gradient(45deg, #3498db, #2c3e50);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            font-weight: bold;
         }
 
         .hero-subtitle {
@@ -206,7 +203,7 @@
         .topic-description {
             color: #666;
             margin-bottom: 15px;
-            line-height: 1.5;
+            line-height: 1.6;
         }
 
         .topic-guides {
@@ -216,10 +213,10 @@
         }
 
         .guide-tag {
-            background: #667eea;
+            background: #3498db;
             color: white;
-            padding: 4px 10px;
-            border-radius: 12px;
+            padding: 4px 12px;
+            border-radius: 20px;
             font-size: 0.8em;
             font-weight: 500;
         }
@@ -227,35 +224,89 @@
         .stats-section {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 40px;
-            margin: 40px auto;
-            max-width: 800px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
             text-align: center;
         }
 
-        .stat-item {
+        .stat-card {
             padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
         }
 
         .stat-number {
             font-size: 2.5em;
             font-weight: bold;
-            color: #667eea;
-            display: block;
+            color: #3498db;
+            margin-bottom: 5px;
         }
 
         .stat-label {
             font-size: 1em;
             color: #666;
             margin-top: 5px;
+        }
+
+        /* Floating Navigation */
+        .nav {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 0.25rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+            position: sticky;
+            top: 10px;
+            z-index: 100;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            max-height: 120px;
+            overflow-y: auto;
+            font-size: 0.8rem;
+        }
+
+        .nav ul {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 0.15rem;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav li {
+            margin: 0;
+        }
+
+        .nav-link {
+            color: #5a67d8;
+            text-decoration: none;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            transition: all 0.15s ease;
+            font-weight: 400;
+            font-size: 0.75rem;
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.2;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: #5a67d8;
+            color: white;
+            transform: none;
+            box-shadow: none;
         }
 
         @media (max-width: 768px) {
@@ -299,64 +350,70 @@
     
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <h2><a href="Python.html" style="color: inherit; text-decoration: none;"></a>🐍 Python Guides</a></h2>
+            <h2><a href="../Python.html" style="color: inherit; text-decoration: none;">🐍 Python Guides</a></h2>
         </div>
-        <nav class="sidebar-nav">            <div class="sidebar-section">
+        <nav class="sidebar-nav">
+            <div class="sidebar-section active">
                 <div class="sidebar-section-title" onclick="toggleSection(this)">
                     🐍 Basic Python <span>▶</span>
                 </div>
                 <div class="sidebar-links">
-                    <a href="1.Basic Python/basic-python-guide.html">Basic Python Hub</a>
-                    <a href="1.Basic Python/1.Python Concepts/python-concepts.html">Python Concepts</a>
-                    <a href="1.Basic Python/2.Data Structures/python-data-structures.html">Data Structures</a>
-                    <a href="1.Basic Python/3.Algorithms & Problem Solving/algorithms-problem-solving.html">Algorithms & Problem Solving</a>
-                    <a href="1.Basic Python/4.Testing & Debugging/testing-debugging.html">Testing & Debugging</a>
+                    <a href="basic-python-guide.html" class="current">Basic Python Hub</a>
+                    <a href="1.Python Concepts/python-concepts.html">Python Concepts</a>
+                    <a href="2.Data Structures/python-data-structures.html">Data Structures</a>
+                    <a href="3.Algorithms & Problem Solving/algorithms-problem-solving.html">Algorithms & Problem Solving</a>
+                    <a href="4.Testing & Debugging/testing-debugging.html">Testing & Debugging</a>
                 </div>
             </div>
+            
             <div class="sidebar-section">
                 <div class="sidebar-section-title" onclick="toggleSection(this)">
                     ⚡ Async Programming <span>▶</span>
                 </div>
                 <div class="sidebar-links">
-                    <a href="2.Async Programming/async-programming-guide.html">Asyncio & Concurrency</a>
+                    <a href="../2.Async Programming/async-programming-guide.html">Asyncio & Concurrency</a>
                 </div>
             </div>
+            
             <div class="sidebar-section">
                 <div class="sidebar-section-title" onclick="toggleSection(this)">
-                    🚀 FastAPI <span>▶</span>
+                    � FastAPI <span>▶</span>
                 </div>
                 <div class="sidebar-links">
-                    <a href="3.FastAPI/fastapi-guide.html">FastAPI Overview</a>
-                    <a href="3.FastAPI/1.Basic/fastapi-basics-complete.html">FastAPI Fundamentals</a>
-                    <a href="3.FastAPI/2.API Development/api-development-guide.html">API Development</a>
-                    <a href="3.FastAPI/3.Security/security-guide.html">Security & Authentication</a>
-                    <a href="3.FastAPI/4.Testing/testing-guide.html">Testing Strategies</a>
-                    <a href="3.FastAPI/5.Advanced Topics/advanced-topics-guide.html">Advanced Topics</a>
-                    <a href="3.FastAPI/6.Miscellaneous/miscellaneous-guide.html">Tips & Best Practices</a>
+                    <a href="../3.FastAPI/fastapi-guide.html">FastAPI Overview</a>
+                    <a href="../3.FastAPI/1.Basic/fastapi-basics-complete.html">FastAPI Fundamentals</a>
+                    <a href="../3.FastAPI/2.API Development/api-development-guide.html">API Development</a>
+                    <a href="../3.FastAPI/3.Security/security-guide.html">Security & Authentication</a>
+                    <a href="../3.FastAPI/4.Testing/testing-guide.html">Testing Strategies</a>
+                    <a href="../3.FastAPI/5.Advanced Topics/advanced-topics-guide.html">Advanced Topics</a>
+                    <a href="../3.FastAPI/6.Miscellaneous/miscellaneous-guide.html">Tips & Best Practices</a>
                 </div>
             </div>
+            
             <div class="sidebar-section">
                 <div class="sidebar-section-title" onclick="toggleSection(this)">
-                    🦜 LangChain <span>▶</span>
+                    � LangChain <span>▶</span>
                 </div>
                 <div class="sidebar-links">
-                    <a href="4.LangChain/langchain-documentation.html">LangChain Framework</a>
+                    <a href="../4.LangChain/langchain-documentation.html">LangChain Framework</a>
                 </div>
             </div>
+            
             <div class="sidebar-section">
                 <div class="sidebar-section-title" onclick="toggleSection(this)">
                     📊 LangGraph <span>▶</span>
                 </div>
                 <div class="sidebar-links">
-                    <a href="5.LangGraph/langgraph-guide.html">Graph-based AI</a>
+                    <a href="../5.LangGraph/langgraph-guide.html">Graph-based AI</a>
                 </div>
             </div>
+            
             <div class="sidebar-section">
                 <div class="sidebar-section-title" onclick="toggleSection(this)">
                     🤖 Agentic AI <span>▶</span>
                 </div>
                 <div class="sidebar-links">
-                    <a href="7.Agentic AI/agentic-ai-guide.html">AI Agents Guide</a>
+                    <a href="../7.Agentic AI/agentic-ai-guide.html">AI Agents Guide</a>
                 </div>
             </div>
         </nav>
@@ -364,117 +421,119 @@
 
     <div class="main-content">
         <div class="hero-section">
-            <h1 class="hero-title">🐍 Python Documentation Hub</h1>
-            <p class="hero-subtitle">Your comprehensive guide to Python development</p>
+            <h1 class="hero-title">🐍 Basic Python</h1>
+            <p class="hero-subtitle">Master the fundamentals of Python programming</p>
             <p class="hero-description">
-                Explore in-depth documentation covering everything from basic Python concepts to advanced 
-                frameworks like FastAPI, LangChain, and cutting-edge AI development techniques.
+                Comprehensive guide covering essential Python concepts, data structures, and programming fundamentals. 
+                Perfect for beginners and those looking to solidify their Python foundation.
             </p>
         </div>
 
-        <div class="stats-section">
+        <nav class="nav">
+            <ul>
+                <li><a href="#stats" class="nav-link">📊 Overview</a></li>
+                <li><a href="#python-concepts" class="nav-link">🧠 Python Concepts</a></li>
+                <li><a href="#data-structures" class="nav-link">🗂️ Data Structures</a></li>
+                <li><a href="#algorithms" class="nav-link">🔧 Algorithms</a></li>
+                <li><a href="#testing" class="nav-link">🧪 Testing</a></li>
+            </ul>
+        </nav>
+
+        <div class="stats-section" id="stats">
             <div class="stats-grid">
-                <div class="stat-item">
-                    <span class="stat-number">18</span>
-                    <div class="stat-label">Documentation Pages</div>
+                <div class="stat-card">
+                    <div class="stat-number">17</div>
+                    <div class="stat-label">Core Concepts</div>
                 </div>
-                <div class="stat-item">
-                    <span class="stat-number">8</span>
-                    <div class="stat-label">Major Topics</div>
+                <div class="stat-card">
+                    <div class="stat-number">9</div>
+                    <div class="stat-label">Data Structures</div>
                 </div>
-                <div class="stat-item">
-                    <span class="stat-number">4</span>
-                    <div class="stat-label">Basic Python Sections</div>
+                <div class="stat-card">
+                    <div class="stat-number">25+</div>
+                    <div class="stat-label">Algorithms</div>
                 </div>
-                <div class="stat-item">
-                    <span class="stat-number">200+</span>
+                <div class="stat-card">
+                    <div class="stat-number">150+</div>
                     <div class="stat-label">Code Examples</div>
                 </div>
+                <div class="stat-card">
+                    <div class="stat-number">100+</div>
+                    <div class="stat-label">Interview Questions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">4</div>
+                    <div class="stat-label">Complete Sections</div>
+                </div>
             </div>
-        </div>        <div class="topics-grid">
-            <a href="1.Basic Python/basic-python-guide.html" class="topic-card">
-                <span class="topic-icon">🐍</span>
-                <h3 class="topic-title">Basic Python</h3>
+        </div>
+
+        <div class="topics-grid" id="topics">
+            <a href="1.Python Concepts/python-concepts.html" class="topic-card" id="python-concepts">
+                <span class="topic-icon">🧠</span>
+                <h3 class="topic-title">Python Concepts</h3>
                 <p class="topic-description">
-                    Master Python fundamentals with comprehensive guides on core concepts, 
-                    data structures, algorithms, testing, and debugging for complete programming proficiency.
+                    Comprehensive coverage of Python fundamentals including variables, data types, control structures, 
+                    functions, OOP, and advanced topics like decorators, generators, and memory management.
                 </p>
                 <div class="topic-guides">
-                    <span class="guide-tag">Core Concepts</span>
-                    <span class="guide-tag">Data Structures</span>
-                    <span class="guide-tag">Algorithms</span>
-                    <span class="guide-tag">Testing & Debugging</span>
+                    <span class="guide-tag">Variables</span>
+                    <span class="guide-tag">Functions</span>
+                    <span class="guide-tag">OOP</span>
+                    <span class="guide-tag">Decorators</span>
+                    <span class="guide-tag">Generators</span>
+                    <span class="guide-tag">Memory Management</span>
                 </div>
             </a>
 
-            <a href="2.Async Programming/async-programming-guide.html" class="topic-card">
-                <span class="topic-icon">⚡</span>
-                <h3 class="topic-title">Async Programming</h3>
+            <a href="2.Data Structures/python-data-structures.html" class="topic-card" id="data-structures">
+                <span class="topic-icon">🗂️</span>
+                <h3 class="topic-title">Data Structures</h3>
                 <p class="topic-description">
-                    Master asynchronous programming with asyncio, concurrent programming patterns, 
-                    and performance optimization techniques.
+                    In-depth guide to Python's built-in data structures including lists, tuples, dictionaries, sets, 
+                    and advanced structures like deques, queues, and arrays with performance analysis.
                 </p>
                 <div class="topic-guides">
-                    <span class="guide-tag">Asyncio</span>
-                    <span class="guide-tag">Concurrency</span>
+                    <span class="guide-tag">Lists</span>
+                    <span class="guide-tag">Dictionaries</span>
+                    <span class="guide-tag">Sets</span>
+                    <span class="guide-tag">Tuples</span>
+                    <span class="guide-tag">Deques</span>
                     <span class="guide-tag">Performance</span>
                 </div>
             </a>
 
-            <a href="3.FastAPI/fastapi-guide.html" class="topic-card">
-                <span class="topic-icon">🚀</span>
-                <h3 class="topic-title">FastAPI Framework</h3>
+            <a href="3.Algorithms & Problem Solving/algorithms-problem-solving.html" class="topic-card" id="algorithms">
+                <span class="topic-icon">🔧</span>
+                <h3 class="topic-title">Algorithms & Problem Solving</h3>
                 <p class="topic-description">
-                    Complete FastAPI documentation covering fundamentals, API development, 
-                    security, testing, and advanced topics.
+                    Essential algorithms, problem-solving techniques, and coding interview preparation 
+                    with Python implementations, complexity analysis, and strategic approaches.
                 </p>
                 <div class="topic-guides">
-                    <span class="guide-tag">7 Guides</span>
-                    <span class="guide-tag">API Development</span>
-                    <span class="guide-tag">Security</span>
-                    <span class="guide-tag">Testing</span>
+                    <span class="guide-tag">Sorting</span>
+                    <span class="guide-tag">Searching</span>
+                    <span class="guide-tag">Recursion</span>
+                    <span class="guide-tag">Dynamic Programming</span>
+                    <span class="guide-tag">Graph Algorithms</span>
+                    <span class="guide-tag">Interview Prep</span>
                 </div>
             </a>
 
-            <a href="4.LangChain/langchain-documentation.html" class="topic-card">
-                <span class="topic-icon">🦜</span>
-                <h3 class="topic-title">LangChain Framework</h3>
+            <a href="4.Testing & Debugging/testing-debugging.html" class="topic-card" id="testing">
+                <span class="topic-icon">🧪</span>
+                <h3 class="topic-title">Testing & Debugging</h3>
                 <p class="topic-description">
-                    Comprehensive guide to LangChain for building applications with large 
-                    language models and AI-powered workflows.
+                    Best practices for testing Python code, debugging techniques, and quality assurance 
+                    methods for reliable software development with comprehensive examples.
                 </p>
                 <div class="topic-guides">
-                    <span class="guide-tag">LLM Apps</span>
-                    <span class="guide-tag">Chains</span>
-                    <span class="guide-tag">Agents</span>
-                </div>
-            </a>
-
-            <a href="5.LangGraph/langgraph-guide.html" class="topic-card">
-                <span class="topic-icon">�</span>
-                <h3 class="topic-title">LangGraph</h3>
-                <p class="topic-description">
-                    Build sophisticated graph-based AI applications with LangGraph for 
-                    complex reasoning and workflow orchestration.
-                </p>
-                <div class="topic-guides">
-                    <span class="guide-tag">Graphs</span>
-                    <span class="guide-tag">Workflows</span>
-                    <span class="guide-tag">AI Reasoning</span>
-                </div>
-            </a>
-
-            <a href="7.Agentic AI/agentic-ai-guide.html" class="topic-card">
-                <span class="topic-icon">�</span>
-                <h3 class="topic-title">Agentic AI</h3>
-                <p class="topic-description">
-                    Build intelligent AI agents with comprehensive guides on agent architecture, 
-                    design patterns, and implementation strategies.
-                </p>
-                <div class="topic-guides">
-                    <span class="guide-tag">AI Agents</span>
-                    <span class="guide-tag">Architecture</span>
-                    <span class="guide-tag">Patterns</span>
+                    <span class="guide-tag">Unit Testing</span>
+                    <span class="guide-tag">pytest</span>
+                    <span class="guide-tag">Debugging</span>
+                    <span class="guide-tag">Code Quality</span>
+                    <span class="guide-tag">TDD</span>
+                    <span class="guide-tag">Performance</span>
                 </div>
             </a>
         </div>
@@ -528,6 +587,59 @@
                         behavior: 'smooth',
                         block: 'start'
                     });
+                }
+            });
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').substring(1);
+                let targetElement = document.getElementById(targetId);
+                
+                // Special case for overview - scroll to stats section
+                if (targetId === 'stats') {
+                    targetElement = document.querySelector('.stats-section');
+                }
+                
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+                
+                // Update active link
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+            });
+        });
+
+        // Update active navigation on scroll
+        window.addEventListener('scroll', () => {
+            const sections = ['stats', 'python-concepts', 'data-structures', 'algorithms', 'testing'];
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            let current = 'stats';
+            sections.forEach(sectionId => {
+                let element = document.getElementById(sectionId);
+                if (!element && sectionId === 'stats') {
+                    element = document.querySelector('.stats-section');
+                }
+                
+                if (element) {
+                    const sectionTop = element.offsetTop;
+                    if (window.pageYOffset >= sectionTop - 200) {
+                        current = sectionId;
+                    }
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').substring(1) === current) {
+                    link.classList.add('active');
                 }
             });
         });

@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LangChain Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+          body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: #2c3e50;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background: #34495e;
+            border-bottom: 1px solid #455a75;
+        }
+
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 1.3em;
+            color: #ecf0f1;
+            border: none;
+            padding: 0;
+        }
+
+        .sidebar-nav {
+            padding: 0;
+        }
+
+        .sidebar-section {
+            border-bottom: 1px solid #455a75;
+        }
+
+        .sidebar-section-title {
+            background: #34495e;
+            color: #ecf0f1;
+            padding: 15px 20px;
+            margin: 0;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-section-title:hover {
+            background: #455a75;
+        }
+
+        .sidebar-links {
+            background: #2c3e50;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .sidebar-section.active .sidebar-links {
+            max-height: 500px;
+        }
+
+        .sidebar-links a {
+            display: block;
+            color: #bdc3c7;
+            text-decoration: none;
+            padding: 12px 25px;
+            border-bottom: 1px solid #34495e;
+            transition: background 0.2s ease;
+        }
+
+        .sidebar-links a:hover {
+            background: #34495e;
+            color: #ecf0f1;
+        }
+
+        .sidebar-links a.current {
+            background: #3498db;
+            color: white;
+            font-weight: 600;
+        }
+
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .sidebar-toggle {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            font-weight: 300;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .nav {
+            background-color: #2c3e50;
+            padding: 20px 40px;
+            border-bottom: 3px solid #3498db;
+        }
+        
+        .nav h3 {
+            color: white;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+        
+        .nav ul {
+            list-style: none;
+        }
+        
+        .nav li {
+            margin-bottom: 8px;
+        }
+        
+        .nav a {
+            color: #ecf0f1;
+            text-decoration: none;
+            padding: 5px 0;
+            display: block;
+            transition: color 0.3s ease;
+        }
+        
+        .nav a:hover {
+            color: #3498db;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin-bottom: 50px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .section:last-child {
+            border-bottom: none;
+        }
+        
+        h2 {
+            color: #2c3e50;
+            font-size: 2em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+        }
+        
+        h3 {
+            color: #34495e;
+            font-size: 1.5em;
+            margin: 25px 0 15px 0;
+        }
+        
+        h4 {
+            color: #34495e;
+            font-size: 1.2em;
+            margin: 20px 0 10px 0;
+        }
+        
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+        
+        .highlight-box {
+            background-color: #e8f4fd;
+            border-left: 4px solid #3498db;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .key-features {
+            background-color: #f1f8e9;
+            border: 1px solid #4caf50;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .key-features h4 {
+            color: #2e7d32;
+            margin-top: 0;
+        }
+        
+        ul, ol {
+            margin-left: 30px;
+            margin-bottom: 15px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        .use-case {
+            background-color: #fff3e0;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #ff9800;
+        }
+        
+        .use-case h4 {
+            color: #e65100;
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+          pre {
+            background-color: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            line-height: 1.4;
+            position: relative;
+        }
+        
+        pre code {
+            background-color: transparent;
+            color: inherit;
+            padding: 0;
+            border: none;
+            font-family: inherit;
+            font-size: 14px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        code {
+            background-color: #f1f3f4;
+            color: #c7254e;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+        }
+        
+        /* Copy button for code blocks */
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(59, 130, 246, 0.8);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        pre:hover .copy-btn {
+            opacity: 1;
+        }
+        
+        .copy-btn:hover {
+            background: rgba(59, 130, 246, 1);
+        }
+        
+        .code-section {
+            margin: 20px 0;
+        }
+        
+        .code-title {
+            background-color: #34495e;
+            color: white;
+            padding: 10px 15px;
+            margin: 0;
+            border-radius: 5px 5px 0 0;
+            font-weight: bold;
+        }
+        
+        .code-title + pre {
+            margin-top: 0;
+            border-radius: 0 0 5px 5px;
+        }
+        
+        .flow-diagram {
+            text-align: center;
+            background-color: #f8f9fa;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+            border: 1px solid #dee2e6;
+            font-family: monospace;
+            font-size: 1.1em;
+            color: #495057;
+        }
+        
+        .best-practices {
+            background-color: #e8f5e8;
+            border: 1px solid #4caf50;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .best-practices h4 {
+            color: #2e7d32;
+            margin-top: 0;
+        }
+        
+        .resources {
+            background-color: #f3e5f5;
+            border: 1px solid #9c27b0;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .resources h4 {
+            color: #7b1fa2;
+            margin-top: 0;
+        }
+        
+        .resources a {
+            color: #7b1fa2;
+            text-decoration: none;
+        }
+        
+        .resources a:hover {
+            text-decoration: underline;
+        }
+        
+        .footer {
+            background-color: #34495e;
+            color: white;
+            text-align: center;
+            padding: 30px;
+            margin-top: 40px;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header, .nav, .content {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            h2 {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+    
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2><a href="../Python.html" style="color: #ecf0f1; text-decoration: none;">🐍 Python Guides</a></h2>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    🐍 Basic Python <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../1.Basic Python/basic-python-guide.html">Python Fundamentals</a>
+                    <a href="../1.Basic Python/1.Python Concepts/python-concepts.html">Core Concepts</a>
+                    <a href="../1.Basic Python/2.Data Structures/python-data-structures.html">Data Structures</a>
+                    <a href="../1.Basic Python/3.Algorithms & Problem Solving/algorithms-problem-solving.html">Algorithms & Problem Solving</a>
+                    <a href="../1.Basic Python/4.Testing & Debugging/testing-debugging.html">Testing & Debugging</a>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    ⚡ Async Programming <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../2.Async Programming/async-programming-guide.html">Asyncio & Concurrency</a>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    🚀 FastAPI <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../3.FastAPI/fastapi-guide.html">FastAPI Overview</a>
+                    <a href="../3.FastAPI/1.Basic/fastapi-basics-complete.html">FastAPI Fundamentals</a>
+                    <a href="../3.FastAPI/2.API Development/api-development-guide.html">API Development</a>
+                    <a href="../3.FastAPI/3.Security/security-guide.html">Security & Authentication</a>
+                    <a href="../3.FastAPI/4.Testing/testing-guide.html">Testing Strategies</a>
+                    <a href="../3.FastAPI/5.Advanced Topics/advanced-topics-guide.html">Advanced Topics</a>
+                    <a href="../3.FastAPI/6.Miscellaneous/miscellaneous-guide.html">Tips & Best Practices</a>
+                </div>
+            </div>
+            <div class="sidebar-section active">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    🦜 LangChain <span>▼</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../4.LangChain/langchain-documentation.html" class="current">LangChain Framework</a>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    📊 LangGraph <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../5.LangGraph/langgraph-guide.html">Graph-based AI</a>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    🤖 Agentic AI <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../7.Agentic AI/agentic-ai-guide.html">AI Agents Guide</a>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="container">
+        <div class="header">
+            <h1>LangChain Documentation</h1>
+            <p>Comprehensive Guide to Building LLM Applications</p>
+        </div>
+          <nav class="nav">
+            <ul>
+                <li><a href="#what-is-langchain" class="nav-link">🦜 What is LangChain?</a></li>
+                <li><a href="#what-does-langchain-do" class="nav-link">⚙️ What does it do?</a></li>
+                <li><a href="#major-use-cases" class="nav-link">💼 Use Cases</a></li>
+                <li><a href="#creating-simple-llmchain" class="nav-link">🚀 Simple LLMChain</a></li>
+                <li><a href="#additional-resources" class="nav-link">📚 Resources</a></li>
+            </ul>
+        </nav>
+        
+        <div class="content">
+            <section id="what-is-langchain" class="section">
+                <h2>What is LangChain? What is LLM Chain?</h2>
+                
+                <h3>What is LangChain?</h3>
+                <div class="highlight-box">
+                    <p><strong>LangChain</strong> is an open-source framework designed to simplify the development of applications powered by Large Language Models (LLMs). It provides a comprehensive suite of tools, components, and abstractions that enable developers to build sophisticated AI applications with minimal complexity.</p>
+                </div>
+                
+                <div class="key-features">
+                    <h4>Key characteristics of LangChain:</h4>
+                    <ul>
+                        <li><strong>Modular Architecture</strong>: Provides reusable components for common LLM application patterns</li>
+                        <li><strong>Chain-based Approach</strong>: Allows sequential composition of different operations</li>
+                        <li><strong>Multi-model Support</strong>: Works with various LLM providers (OpenAI, Anthropic, Hugging Face, etc.)</li>
+                        <li><strong>Memory Management</strong>: Built-in support for conversation memory and context handling</li>
+                        <li><strong>Integration Ecosystem</strong>: Extensive integrations with databases, APIs, and external tools</li>
+                    </ul>
+                </div>
+                
+                <h3>What is LLM Chain?</h3>
+                <p>An <strong>LLM Chain</strong> is a fundamental concept in LangChain that represents a sequence of operations involving a Language Model. It's a structured way to combine:</p>
+                
+                <ol>
+                    <li><strong>Prompt Templates</strong>: Formatted inputs to the LLM</li>
+                    <li><strong>Language Model</strong>: The actual LLM (GPT-4, Claude, etc.)</li>
+                    <li><strong>Output Parsers</strong>: Components that process and format the LLM's response</li>
+                </ol>
+                
+                <div class="flow-diagram">
+                    Input → Prompt Template → LLM → Output Parser → Final Output
+                </div>
+                
+                <p>An LLM Chain ensures that data flows through these components in a predictable, reusable manner, making it easier to build complex applications.</p>
+            </section>
+            
+            <section id="what-does-langchain-do" class="section">
+                <h2>What does LangChain do in an LLM application?</h2>
+                <p>LangChain serves as the <strong>orchestration layer</strong> in LLM applications, providing several critical functions:</p>
+                
+                <h3>1. Prompt Management</h3>
+                <ul>
+                    <li><strong>Template Creation</strong>: Standardized prompt formats with variables</li>
+                    <li><strong>Prompt Optimization</strong>: Tools for testing and refining prompts</li>
+                    <li><strong>Dynamic Prompting</strong>: Context-aware prompt generation</li>
+                </ul>
+                
+                <h3>2. Model Abstraction</h3>
+                <ul>
+                    <li><strong>Provider Agnostic</strong>: Switch between different LLM providers seamlessly</li>
+                    <li><strong>Consistent Interface</strong>: Unified API regardless of the underlying model</li>
+                    <li><strong>Model Chaining</strong>: Combine multiple models in a single workflow</li>
+                </ul>
+                
+                <h3>3. Memory and Context Management</h3>
+                <ul>
+                    <li><strong>Conversation Memory</strong>: Maintain context across multiple interactions</li>
+                    <li><strong>Document Memory</strong>: Store and retrieve relevant information</li>
+                    <li><strong>Session Management</strong>: Handle user sessions and state</li>
+                </ul>
+                
+                <h3>4. Data Integration</h3>
+                <ul>
+                    <li><strong>Vector Databases</strong>: Integration with Pinecone, Chroma, FAISS</li>
+                    <li><strong>Document Loaders</strong>: Support for PDFs, CSVs, web pages, APIs</li>
+                    <li><strong>Text Splitters</strong>: Intelligent document chunking</li>
+                </ul>
+                
+                <h3>5. Agent and Tool Integration</h3>
+                <ul>
+                    <li><strong>Tool Calling</strong>: Enable LLMs to use external tools and APIs</li>
+                    <li><strong>Agent Frameworks</strong>: Build autonomous agents that can reason and act</li>
+                    <li><strong>Custom Tools</strong>: Create domain-specific tools for your application</li>
+                </ul>
+                
+                <h3>6. Output Processing</h3>
+                <ul>
+                    <li><strong>Response Parsing</strong>: Structure LLM outputs into usable formats</li>
+                    <li><strong>Validation</strong>: Ensure outputs meet specific criteria</li>
+                    <li><strong>Post-processing</strong>: Clean and format responses</li>
+                </ul>
+            </section>
+            
+            <section id="major-use-cases" class="section">
+                <h2>Major use cases of LangChain</h2>
+                
+                <div class="use-case">
+                    <h4>1. Question Answering Systems</h4>
+                    <ul>
+                        <li>Build chatbots that can answer questions about specific documents</li>
+                        <li>Create customer support systems with knowledge base integration</li>
+                        <li>Develop educational Q&A platforms</li>
+                    </ul>
+                </div>
+                
+                <div class="use-case">
+                    <h4>2. Document Analysis and Summarization</h4>
+                    <ul>
+                        <li>Summarize large documents or research papers</li>
+                        <li>Extract key information from legal documents</li>
+                        <li>Generate executive summaries from reports</li>
+                    </ul>
+                </div>
+                
+                <div class="use-case">
+                    <h4>3. Conversational AI</h4>
+                    <ul>
+                        <li>Create intelligent chatbots with memory</li>
+                        <li>Build virtual assistants for specific domains</li>
+                        <li>Develop interactive storytelling applications</li>
+                    </ul>
+                </div>
+                
+                <div class="use-case">
+                    <h4>4. Code Generation and Analysis</h4>
+                    <ul>
+                        <li>Build coding assistants that understand context</li>
+                        <li>Create automated code review systems</li>
+                        <li>Develop documentation generation tools</li>
+                    </ul>
+                </div>
+                
+                <div class="use-case">
+                    <h4>5. Content Generation</h4>
+                    <ul>
+                        <li>Automated blog post and article writing</li>
+                        <li>Marketing content creation</li>
+                        <li>Product description generation</li>
+                    </ul>
+                </div>
+                
+                <div class="use-case">
+                    <h4>6. Data Analysis and Insights</h4>
+                    <ul>
+                        <li>Natural language queries to databases</li>
+                        <li>Automated report generation</li>
+                        <li>Business intelligence chatbots</li>
+                    </ul>
+                </div>
+                
+                <div class="use-case">
+                    <h4>7. Retrieval Augmented Generation (RAG)</h4>
+                    <ul>
+                        <li>Knowledge bases with real-time information retrieval</li>
+                        <li>Document search and synthesis</li>
+                        <li>Personalized recommendation systems</li>
+                    </ul>
+                </div>
+                
+                <div class="use-case">
+                    <h4>8. Agent-based Applications</h4>
+                    <ul>
+                        <li>Research assistants that can browse and analyze information</li>
+                        <li>Task automation agents</li>
+                        <li>Multi-step workflow orchestration</li>
+                    </ul>
+                </div>
+            </section>
+            
+            <section id="creating-simple-llmchain" class="section">
+                <h2>Creating a simple LLMChain in Python</h2>
+                <p>Here's a step-by-step guide to create a basic LLMChain using Python:</p>
+                
+                <h3>Prerequisites</h3>
+                <p>First, install the required packages:</p>
+                  <div class="code-section">
+                    <div class="code-title">Terminal Command</div>
+                    <pre><code>pip install langchain openai python-dotenv</code></pre>
+                </div>
+                
+                <h3>Step 1: Setup Environment</h3>
+                <p>Create a <code>.env</code> file to store your API keys:</p>
+                  <div class="code-section">
+                    <div class="code-title">.env</div>
+                    <pre><code>OPENAI_API_KEY=your_openai_api_key_here</code></pre>
+                </div>
+                
+                <h3>Step 2: Basic LLMChain Implementation</h3>
+                  <div class="code-section">
+                    <div class="code-title">basic_llmchain.py</div>
+                    <pre><code>import os
+from dotenv import load_dotenv
+from langchain.llms import OpenAI
+from langchain.prompts import PromptTemplate
+from langchain.chains import LLMChain
+
+# Load environment variables
+load_dotenv()
+
+# Initialize the LLM
+llm = OpenAI(
+    temperature=0.7,  # Controls randomness (0.0 = deterministic, 1.0 = very random)
+    openai_api_key=os.getenv("OPENAI_API_KEY")
+)
+
+# Create a prompt template
+prompt_template = PromptTemplate(
+    input_variables=["topic"],
+    template="""
+    You are a helpful assistant. Please provide a brief explanation about {topic}.
+    Make sure your response is informative and easy to understand.
+    
+    Topic: {topic}
+    
+    Explanation:
+    """
+)
+
+# Create the LLMChain
+chain = LLMChain(
+    llm=llm,
+    prompt=prompt_template,
+    verbose=True  # Shows the prompt being sent to the LLM
+)
+
+# Use the chain
+if __name__ == "__main__":
+    topic = "machine learning"
+    result = chain.run(topic=topic)
+    print(f"Result: {result}")</code></pre>
+                </div>
+                
+                <h3>Step 3: Advanced LLMChain with Memory</h3>
+                  <div class="code-section">
+                    <div class="code-title">llmchain_with_memory.py</div>
+                    <pre><code>from langchain.memory import ConversationBufferMemory
+from langchain.chains import ConversationChain
+
+# Initialize memory
+memory = ConversationBufferMemory()
+
+# Create a conversation chain with memory
+conversation = ConversationChain(
+    llm=llm,
+    memory=memory,
+    verbose=True
+)
+
+# Have a conversation
+print("=== Conversation with Memory ===")
+response1 = conversation.predict(input="Hi, my name is Alice. What's machine learning?")
+print(f"Response 1: {response1}")
+
+response2 = conversation.predict(input="What did I just ask you about?")
+print(f"Response 2: {response2}")
+
+response3 = conversation.predict(input="What's my name?")
+print(f"Response 3: {response3}")</code></pre>
+                </div>
+                
+                <h3>Step 4: Custom Output Parser</h3>
+                  <div class="code-section">
+                    <div class="code-title">structured_output.py</div>
+                    <pre><code>from langchain.output_parsers import PydanticOutputParser
+from langchain.schema import OutputParserException
+from pydantic import BaseModel, Field
+from typing import List
+
+# Define the output structure
+class TopicSummary(BaseModel):
+    main_points: List[str] = Field(description="List of main points about the topic")
+    complexity_level: str = Field(description="Beginner, Intermediate, or Advanced")
+    related_topics: List[str] = Field(description="List of related topics")
+
+# Create output parser
+parser = PydanticOutputParser(pydantic_object=TopicSummary)
+
+# Create prompt with format instructions
+structured_prompt = PromptTemplate(
+    template="""
+    Analyze the following topic and provide a structured summary.
+    
+    {format_instructions}
+    
+    Topic: {topic}
+    """,
+    input_variables=["topic"],
+    partial_variables={"format_instructions": parser.get_format_instructions()}
+)
+
+# Create chain with structured output
+structured_chain = LLMChain(
+    llm=llm,
+    prompt=structured_prompt,
+    output_parser=parser
+)
+
+# Use the structured chain
+try:
+    result = structured_chain.run(topic="artificial intelligence")
+    print(f"Structured Result: {result}")
+    print(f"Main Points: {result.main_points}")
+    print(f"Complexity: {result.complexity_level}")
+    print(f"Related Topics: {result.related_topics}")
+except OutputParserException as e:
+    print(f"Failed to parse output: {e}")</code></pre>
+                </div>
+                
+                <h3>Step 5: Sequential Chain Example</h3>
+                  <div class="code-section">
+                    <div class="code-title">sequential_chain.py</div>
+                    <pre><code>from langchain.chains import SequentialChain
+
+# First chain: Generate a story outline
+outline_prompt = PromptTemplate(
+    input_variables=["genre", "length"],
+    template="Create a {length} story outline for a {genre} story. Include main characters and plot points."
+)
+
+outline_chain = LLMChain(
+    llm=llm,
+    prompt=outline_prompt,
+    output_key="outline"
+)
+
+# Second chain: Write the actual story
+story_prompt = PromptTemplate(
+    input_variables=["outline"],
+    template="Based on this outline, write a compelling short story:\n\n{outline}\n\nStory:"
+)
+
+story_chain = LLMChain(
+    llm=llm,
+    prompt=story_prompt,
+    output_key="story"
+)
+
+# Combine chains sequentially
+sequential_chain = SequentialChain(
+    chains=[outline_chain, story_chain],
+    input_variables=["genre", "length"],
+    output_variables=["outline", "story"],
+    verbose=True
+)
+
+# Generate a complete story
+story_result = sequential_chain({
+    "genre": "science fiction",
+    "length": "short"
+})
+
+print("=== Generated Outline ===")
+print(story_result["outline"])
+print("\n=== Generated Story ===")
+print(story_result["story"])</code></pre>
+                </div>
+                
+                <h3>Key Concepts Demonstrated</h3>
+                <ol>
+                    <li><strong>Basic LLMChain</strong>: Simple prompt → LLM → response flow</li>
+                    <li><strong>Memory Integration</strong>: Maintaining conversation context</li>
+                    <li><strong>Structured Output</strong>: Using Pydantic models for consistent responses</li>
+                    <li><strong>Sequential Chains</strong>: Combining multiple operations in sequence</li>
+                    <li><strong>Error Handling</strong>: Managing parsing and execution errors</li>
+                </ol>
+                
+                <div class="best-practices">
+                    <h4>Best Practices</h4>
+                    <ul>
+                        <li><strong>Environment Management</strong>: Always use environment variables for API keys</li>
+                        <li><strong>Temperature Control</strong>: Adjust temperature based on your use case</li>
+                        <li><strong>Prompt Engineering</strong>: Craft clear, specific prompts for better results</li>
+                        <li><strong>Error Handling</strong>: Implement proper exception handling</li>
+                        <li><strong>Validation</strong>: Use output parsers to ensure consistent response formats</li>
+                        <li><strong>Testing</strong>: Test your chains with various inputs to ensure reliability</li>
+                    </ul>
+                </div>
+            </section>
+            
+            <section id="additional-resources" class="section">
+                <div class="resources">
+                    <h4>Additional Resources</h4>
+                    <ul>
+                        <li><a href="https://docs.langchain.com/" target="_blank">LangChain Official Documentation</a></li>
+                        <li><a href="https://github.com/langchain-ai/langchain" target="_blank">LangChain GitHub Repository</a></li>
+                        <li><a href="https://api.python.langchain.com/" target="_blank">LangChain Python API Reference</a></li>
+                        <li><a href="https://github.com/langchain-ai/langchain/discussions" target="_blank">LangChain Community</a></li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+          <div class="footer">
+            <p><em>This documentation provides a comprehensive overview of LangChain and practical examples for getting started. For more advanced use cases and detailed API documentation, refer to the official LangChain documentation.</em></p>
+            <p>Created: June 2025</p>
+        </div>
+    </div>
+
+    <script>
+        // Add copy functionality to code blocks
+        document.addEventListener('DOMContentLoaded', function() {
+            const codeBlocks = document.querySelectorAll('pre');
+            
+            codeBlocks.forEach(block => {
+                // Create copy button
+                const copyBtn = document.createElement('button');
+                copyBtn.className = 'copy-btn';
+                copyBtn.textContent = 'Copy';
+                copyBtn.onclick = function() {
+                    const code = block.querySelector('code');
+                    if (code) {
+                        navigator.clipboard.writeText(code.textContent).then(() => {
+                            copyBtn.textContent = 'Copied!';
+                            setTimeout(() => {
+                                copyBtn.textContent = 'Copy';
+                            }, 2000);
+                        }).catch(err => {
+                            console.error('Failed to copy: ', err);
+                            // Fallback for older browsers
+                            const textArea = document.createElement('textarea');
+                            textArea.value = code.textContent;
+                            document.body.appendChild(textArea);
+                            textArea.select();
+                            document.execCommand('copy');
+                            document.body.removeChild(textArea);
+                            copyBtn.textContent = 'Copied!';
+                            setTimeout(() => {
+                                copyBtn.textContent = 'Copy';
+                            }, 2000);
+                        });
+                    }
+                };
+                block.appendChild(copyBtn);
+            });
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Highlight current section in navigation
+        window.addEventListener('scroll', function() {
+            const sections = document.querySelectorAll('.section');
+            const navLinks = document.querySelectorAll('.nav a');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (pageYOffset >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.style.color = '#ecf0f1';
+                if (link.getAttribute('href') === '#' + current) {
+                    link.style.color = '#3498db';
+                }
+            });        });
+    </script>
+    
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+                
+                // Update active link
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+            });
+        });
+
+        // Update active navigation on scroll
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('section[id]');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.pageYOffset >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').substring(1) === current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+
+    <script>
+        // Sidebar functionality
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        function toggleSection(element) {
+            const section = element.parentElement;
+            const isActive = section.classList.contains('active');
+            
+            // Close all sections
+            document.querySelectorAll('.sidebar-section').forEach(sec => {
+                sec.classList.remove('active');
+                const arrow = sec.querySelector('.sidebar-section-title span');
+                if (arrow) arrow.textContent = '▶';
+            });
+            
+            // Open clicked section if it wasn't active
+            if (!isActive) {
+                section.classList.add('active');
+                const arrow = element.querySelector('span');
+                if (arrow) arrow.textContent = '▼';
+            }
+        }
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.querySelector('.sidebar-toggle');
+            
+            if (window.innerWidth <= 768 && 
+                !sidebar.contains(event.target) && 
+                !sidebarToggle.contains(event.target)) {
+                sidebar.classList.remove('active');
+            }
+        });
+    </script>
+    </div> <!-- End main-content -->
+</body>
+</html>

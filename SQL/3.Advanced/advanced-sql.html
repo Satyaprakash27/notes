@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔵 Advanced SQL Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: #2c3e50;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background: #34495e;
+            border-bottom: 1px solid #455a75;
+        }
+
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 1.3em;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #ecf0f1;
+            border: none;
+            padding: 0;
+        }
+
+        .sidebar-nav {
+            padding: 0;
+        }
+
+        .sidebar-link {
+            display: block;
+            color: #bdc3c7;
+            text-decoration: none;
+            padding: 15px 20px;
+            border-bottom: 1px solid #455a75;
+            transition: background 0.2s ease;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 1.1em;
+            font-weight: 500;
+        }
+
+        .sidebar-link:hover {
+            background: #34495e;
+            color: #ecf0f1;
+        }
+
+        .sidebar-link.current {
+            background: #3498db;
+            color: white;
+            font-weight: 600;
+        }
+
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #34495e;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+            margin-top: 30px;
+            font-size: 1.8em;
+        }
+        h3 {
+            color: #3498db;
+            margin-top: 25px;
+            font-size: 1.4em;
+        }
+        h4 {
+            color: #2980b9;
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+        .toc {
+            background: rgba(52, 152, 219, 0.15);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(52, 152, 219, 0.3);
+        }
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-evenly;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .toc li {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex: 0 1 calc(18% - 0.5rem);
+            min-width: 140px;
+        }
+        /* Create natural line break after 5 items */
+        .toc li:nth-child(n+6) {
+            flex: 0 1 calc(22% - 0.5rem);
+        }
+        .toc a {
+            color: #2c3e50;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            white-space: nowrap;
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(52, 152, 219, 0.3);
+            min-height: 40px;
+            width: 100%;
+        }
+        .toc a:hover, .toc a.active {
+            background: linear-gradient(45deg, #3498db, #5dade2);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+        
+        pre {
+            background: #000000;
+            color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        code {
+            background: #000000;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #ffffff;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        th, td {
+            border: 1px solid #e9ecef;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #3498db;
+            color: white;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        tr:hover {
+            background: #e8f4f8;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .warning::before {
+            content: "⚠️ ";
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .tip {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .tip::before {
+            content: "💡 ";
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .example {
+            background: #f8f9fa;
+            border-left: 4px solid #17a2b8;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .example h5 {
+            margin-top: 0;
+            color: #17a2b8;
+            font-size: 1.1em;
+        }
+        .syntax {
+            background: #e9ecef;
+            border-left: 4px solid #6c757d;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .syntax h5 {
+            margin-top: 0;
+            color: #6c757d;
+            font-size: 1.1em;
+        }
+        .benefits {
+            background: #e8f5e8;
+            border: 1px solid #3498db;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .benefits ul {
+            margin: 10px 0;
+        }
+        .benefits li {
+            margin: 5px 0;
+        }
+
+        @media (max-width: 1024px) {
+            .toc ul {
+                justify-content: center;
+                gap: 0.75rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .sidebar-toggle {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            h2 {
+                font-size: 1.5em;
+            }
+
+            table {
+                font-size: 0.9em;
+            }
+
+            .toc {
+                position: static;
+                margin: 20px 0;
+            }
+
+            .toc ul {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+    
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2><a href="../SQL.html" style="color: inherit; text-decoration: none;">🗃️ SQL Guides</a></h2>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="../1.Beginner/beginner-sql.html" class="sidebar-link">
+                🟢 Beginner SQL
+            </a>
+            <a href="../2.Intermediate/intermediate-sql.html" class="sidebar-link">
+                🟡 Intermediate SQL
+            </a>
+            <a href="../3.Advanced/advanced-sql.html" class="sidebar-link current">
+                🔵 Advanced SQL
+            </a>
+            <a href="../4.Database Design & Modeling/database-design-modeling.html" class="sidebar-link">
+                🟣 Database Design & Modeling
+            </a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="container">
+        <h1>🔵 Advanced SQL Guide</h1>
+        
+        <div class="toc" id="toc">
+            <ul>
+                <li><a href="#window-functions">Window Functions</a></li>
+                <li><a href="#ctes">CTEs</a></li>
+                <li><a href="#indexes">Indexes</a></li>
+                <li><a href="#stored-procedures">Stored Procedures</a></li>
+                <li><a href="#triggers">Triggers</a></li>
+                <li><a href="#transactions">Transactions</a></li>
+                <li><a href="#locks-concurrency">Locks & Concurrency</a></li>
+                <li><a href="#performance-tuning">Performance Tuning</a></li>
+                <li><a href="#partitioning">Partitioning</a></li>
+            </ul>
+        </div>
+
+        <h2 id="window-functions">Window Functions</h2>
+        <p>Window functions perform calculations across a set of table rows that are related to the current row. Unlike aggregate functions, window functions don't cause rows to be grouped into a single output row.</p>
+
+        <h3>Sample Data for Window Function Examples</h3>
+        <h4>sales table:</h4>
+        <table>
+            <tr>
+                <th>id</th>
+                <th>salesperson</th>
+                <th>region</th>
+                <th>product</th>
+                <th>amount</th>
+                <th>sale_date</th>
+            </tr>
+            <tr><td>1</td><td>John</td><td>North</td><td>Laptop</td><td>1500</td><td>2023-01-15</td></tr>
+            <tr><td>2</td><td>Jane</td><td>South</td><td>Phone</td><td>800</td><td>2023-01-20</td></tr>
+            <tr><td>3</td><td>Mike</td><td>North</td><td>Tablet</td><td>1200</td><td>2023-01-25</td></tr>
+            <tr><td>4</td><td>Sarah</td><td>East</td><td>Laptop</td><td>1600</td><td>2023-02-01</td></tr>
+            <tr><td>5</td><td>John</td><td>North</td><td>Phone</td><td>700</td><td>2023-02-05</td></tr>
+            <tr><td>6</td><td>Jane</td><td>South</td><td>Laptop</td><td>1550</td><td>2023-02-10</td></tr>
+            <tr><td>7</td><td>Mike</td><td>North</td><td>Phone</td><td>750</td><td>2023-02-15</td></tr>
+            <tr><td>8</td><td>Sarah</td><td>East</td><td>Tablet</td><td>1300</td><td>2023-02-20</td></tr>
+            <tr><td>9</td><td>John</td><td>North</td><td>Laptop</td><td>1650</td><td>2023-02-25</td></tr>
+            <tr><td>10</td><td>Jane</td><td>South</td><td>Tablet</td><td>1100</td><td>2023-03-01</td></tr>
+        </table>
+
+        <h3>ROW_NUMBER()</h3>
+        <p>Assigns a unique sequential integer to each row within a partition.</p>
+
+        <div class="syntax">
+            <h5>Syntax:</h5>
+            <pre><code>ROW_NUMBER() OVER (
+    [PARTITION BY column1, column2, ...]
+    [ORDER BY column3, column4, ...]
+)</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Number all sales:</h5>
+            <pre><code>SELECT 
+    salesperson,
+    product,
+    amount,
+    ROW_NUMBER() OVER (ORDER BY amount DESC) as overall_rank
+FROM sales;</code></pre>
+        </div>
+
+        <h4>Output:</h4>
+        <table>
+            <tr>
+                <th>salesperson</th>
+                <th>product</th>
+                <th>amount</th>
+                <th>overall_rank</th>
+            </tr>
+            <tr><td>John</td><td>Laptop</td><td>1650</td><td>1</td></tr>
+            <tr><td>Sarah</td><td>Laptop</td><td>1600</td><td>2</td></tr>
+            <tr><td>Jane</td><td>Laptop</td><td>1550</td><td>3</td></tr>
+            <tr><td>John</td><td>Laptop</td><td>1500</td><td>4</td></tr>
+            <tr><td>Sarah</td><td>Tablet</td><td>1300</td><td>5</td></tr>
+            <tr><td>Mike</td><td>Tablet</td><td>1200</td><td>6</td></tr>
+            <tr><td>Jane</td><td>Tablet</td><td>1100</td><td>7</td></tr>
+            <tr><td>Jane</td><td>Phone</td><td>800</td><td>8</td></tr>
+            <tr><td>Mike</td><td>Phone</td><td>750</td><td>9</td></tr>
+            <tr><td>John</td><td>Phone</td><td>700</td><td>10</td></tr>
+        </table>
+
+        <div class="example">
+            <h5>Number sales by salesperson:</h5>
+            <pre><code>SELECT 
+    salesperson,
+    product,
+    amount,
+    sale_date,
+    ROW_NUMBER() OVER (PARTITION BY salesperson ORDER BY sale_date) as sale_sequence
+FROM sales;</code></pre>
+        </div>
+
+        <h4>Output:</h4>
+        <table>
+            <tr>
+                <th>salesperson</th>
+                <th>product</th>
+                <th>amount</th>
+                <th>sale_date</th>
+                <th>sale_sequence</th>
+            </tr>
+            <tr><td>Jane</td><td>Phone</td><td>800</td><td>2023-01-20</td><td>1</td></tr>
+            <tr><td>Jane</td><td>Laptop</td><td>1550</td><td>2023-02-10</td><td>2</td></tr>
+            <tr><td>Jane</td><td>Tablet</td><td>1100</td><td>2023-03-01</td><td>3</td></tr>
+            <tr><td>John</td><td>Laptop</td><td>1500</td><td>2023-01-15</td><td>1</td></tr>
+            <tr><td>John</td><td>Phone</td><td>700</td><td>2023-02-05</td><td>2</td></tr>
+            <tr><td>John</td><td>Laptop</td><td>1650</td><td>2023-02-25</td><td>3</td></tr>
+            <tr><td>Mike</td><td>Tablet</td><td>1200</td><td>2023-01-25</td><td>1</td></tr>
+            <tr><td>Mike</td><td>Phone</td><td>750</td><td>2023-02-15</td><td>2</td></tr>
+            <tr><td>Sarah</td><td>Laptop</td><td>1600</td><td>2023-02-01</td><td>1</td></tr>
+            <tr><td>Sarah</td><td>Tablet</td><td>1300</td><td>2023-02-20</td><td>2</td></tr>
+        </table>
+
+        <h3>RANK() and DENSE_RANK()</h3>
+        <p>RANK() assigns a rank to each row within a partition, with gaps in ranking for ties. DENSE_RANK() assigns a rank without gaps.</p>
+
+        <div class="example">
+            <h5>Rank sales by amount:</h5>
+            <pre><code>SELECT 
+    salesperson,
+    product,
+    amount,
+    RANK() OVER (ORDER BY amount DESC) as rank_position,
+    DENSE_RANK() OVER (ORDER BY amount DESC) as dense_rank_position
+FROM sales;</code></pre>
+        </div>
+
+        <h3>LEAD() and LAG()</h3>
+        <p>LEAD() provides access to a row at a given physical offset that follows the current row. LAG() provides access to a row that precedes the current row.</p>
+
+        <div class="syntax">
+            <h5>Syntax:</h5>
+            <pre><code>LEAD(column, offset, default_value) OVER (
+    [PARTITION BY column1, column2, ...]
+    ORDER BY column3, column4, ...
+)</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Compare current sale with next sale:</h5>
+            <pre><code>SELECT 
+    salesperson,
+    sale_date,
+    amount,
+    LEAD(amount, 1, 0) OVER (PARTITION BY salesperson ORDER BY sale_date) as next_sale_amount,
+    amount - LEAD(amount, 1, 0) OVER (PARTITION BY salesperson ORDER BY sale_date) as difference
+FROM sales;</code></pre>
+        </div>
+
+        <h3>NTILE()</h3>
+        <p>Distributes rows into a specified number of roughly equal groups.</p>
+
+        <div class="example">
+            <h5>Divide sales into quartiles:</h5>
+            <pre><code>SELECT 
+    salesperson,
+    amount,
+    NTILE(4) OVER (ORDER BY amount DESC) as quartile
+FROM sales;</code></pre>
+        </div>
+
+        <h3>Running Totals and Moving Averages</h3>
+        <div class="example">
+            <h5>Running total by salesperson:</h5>
+            <pre><code>SELECT 
+    salesperson,
+    sale_date,
+    amount,
+    SUM(amount) OVER (PARTITION BY salesperson ORDER BY sale_date) as running_total,
+    AVG(amount) OVER (PARTITION BY salesperson ORDER BY sale_date 
+                      ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) as moving_avg_3
+FROM sales;</code></pre>
+        </div>
+
+        <h2 id="ctes">CTEs (Common Table Expressions)</h2>
+        <p>CTEs provide a way to define temporary named result sets that can be referenced within a SELECT, INSERT, UPDATE, or DELETE statement.</p>
+
+        <h3>WITH Clause</h3>
+        <div class="syntax">
+            <h5>Basic Syntax:</h5>
+            <pre><code>WITH cte_name AS (
+    SELECT columns
+    FROM table
+    WHERE condition
+)
+SELECT columns
+FROM cte_name;</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Sales summary CTE:</h5>
+            <pre><code>WITH sales_summary AS (
+    SELECT 
+        salesperson,
+        COUNT(*) as total_sales,
+        SUM(amount) as total_amount,
+        AVG(amount) as avg_amount
+    FROM sales
+    GROUP BY salesperson
+),
+top_performers AS (
+    SELECT *
+    FROM sales_summary
+    WHERE total_amount > 2000
+)
+SELECT 
+    salesperson,
+    total_sales,
+    total_amount,
+    ROUND(avg_amount, 2) as avg_amount
+FROM top_performers
+ORDER BY total_amount DESC;</code></pre>
+        </div>
+
+        <h4>Output:</h4>
+        <table>
+            <tr>
+                <th>salesperson</th>
+                <th>total_sales</th>
+                <th>total_amount</th>
+                <th>avg_amount</th>
+            </tr>
+            <tr><td>John</td><td>3</td><td>3850</td><td>1283.33</td></tr>
+            <tr><td>Jane</td><td>3</td><td>3450</td><td>1150.00</td></tr>
+            <tr><td>Sarah</td><td>2</td><td>2900</td><td>1450.00</td></tr>
+        </table>
+
+        <h3>Recursive CTEs</h3>
+        <p>Recursive CTEs are useful for hierarchical data structures like organizational charts or tree structures.</p>
+
+        <h4>Sample Data - employees hierarchy:</h4>
+        <table>
+            <tr>
+                <th>employee_id</th>
+                <th>name</th>
+                <th>manager_id</th>
+                <th>title</th>
+            </tr>
+            <tr><td>1</td><td>John CEO</td><td>NULL</td><td>CEO</td></tr>
+            <tr><td>2</td><td>Jane VP</td><td>1</td><td>VP Sales</td></tr>
+            <tr><td>3</td><td>Mike VP</td><td>1</td><td>VP Engineering</td></tr>
+            <tr><td>4</td><td>Sarah Manager</td><td>2</td><td>Sales Manager</td></tr>
+            <tr><td>5</td><td>David Manager</td><td>3</td><td>Engineering Manager</td></tr>
+            <tr><td>6</td><td>Lisa Rep</td><td>4</td><td>Sales Rep</td></tr>
+            <tr><td>7</td><td>Tom Dev</td><td>5</td><td>Developer</td></tr>
+            <tr><td>8</td><td>Anna Dev</td><td>5</td><td>Developer</td></tr>
+        </table>
+
+        <div class="example">
+            <h5>Organizational hierarchy:</h5>
+            <pre><code>WITH RECURSIVE org_hierarchy AS (
+    -- Base case: Top-level managers (no manager_id)
+    SELECT 
+        employee_id,
+        name,
+        manager_id,
+        title,
+        0 as level,
+        CAST(name AS VARCHAR(1000)) as hierarchy_path
+    FROM employees
+    WHERE manager_id IS NULL
+    
+    UNION ALL
+    
+    -- Recursive case: Employees with managers
+    SELECT 
+        e.employee_id,
+        e.name,
+        e.manager_id,
+        e.title,
+        oh.level + 1,
+        CONCAT(oh.hierarchy_path, ' -> ', e.name)
+    FROM employees e
+    INNER JOIN org_hierarchy oh ON e.manager_id = oh.employee_id
+)
+SELECT 
+    employee_id,
+    name,
+    title,
+    level,
+    hierarchy_path
+FROM org_hierarchy
+ORDER BY level, name;</code></pre>
+        </div>
+
+        <h2 id="indexes">Indexes</h2>
+        <p>Indexes are database objects that improve query performance by providing faster access paths to data.</p>
+
+        <h3>Clustered vs Non-Clustered Indexes</h3>
+
+        <h4>Clustered Index</h4>
+        <ul>
+            <li>Physically reorders table data</li>
+            <li>One per table (typically on primary key)</li>
+            <li>Leaf level contains actual data rows</li>
+        </ul>
+
+        <div class="example">
+            <h5>Create clustered index:</h5>
+            <pre><code>CREATE CLUSTERED INDEX IX_Sales_SaleDate 
+ON sales(sale_date);</code></pre>
+        </div>
+
+        <h4>Non-Clustered Index</h4>
+        <ul>
+            <li>Separate structure that points to data rows</li>
+            <li>Multiple per table allowed</li>
+            <li>Leaf level contains key values and row locators</li>
+        </ul>
+
+        <div class="example">
+            <h5>Create non-clustered index:</h5>
+            <pre><code>CREATE NONCLUSTERED INDEX IX_Sales_Salesperson 
+ON sales(salesperson);</code></pre>
+        </div>
+
+        <h3>Composite Indexes</h3>
+        <div class="example">
+            <h5>Multi-column index:</h5>
+            <pre><code>CREATE INDEX IX_Sales_Region_Product 
+ON sales(region, product);</code></pre>
+        </div>
+
+        <h3>Index Performance Metrics</h3>
+        <table>
+            <tr>
+                <th>Index Type</th>
+                <th>Seek Time</th>
+                <th>Storage Overhead</th>
+                <th>Update Cost</th>
+            </tr>
+            <tr><td>Clustered</td><td>Very Fast</td><td>Low</td><td>Medium</td></tr>
+            <tr><td>Non-Clustered</td><td>Fast</td><td>Medium</td><td>High</td></tr>
+            <tr><td>Composite</td><td>Fast (if used correctly)</td><td>Medium</td><td>High</td></tr>
+        </table>
+
+        <h2 id="stored-procedures">Stored Procedures & Functions</h2>
+        <p>Stored procedures and functions are precompiled SQL code stored in the database.</p>
+
+        <h3>Create Stored Procedures</h3>
+        <div class="syntax">
+            <h5>Syntax:</h5>
+            <pre><code>CREATE PROCEDURE procedure_name
+    @parameter1 datatype,
+    @parameter2 datatype
+AS
+BEGIN
+    -- SQL statements
+END</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Simple procedure:</h5>
+            <pre><code>CREATE PROCEDURE GetSalesByPerson
+    @salesperson VARCHAR(50)
+AS
+BEGIN
+    SELECT 
+        product,
+        amount,
+        sale_date
+    FROM sales
+    WHERE salesperson = @salesperson
+    ORDER BY sale_date;
+END</code></pre>
+        </div>
+
+        <h3>Execute Stored Procedures</h3>
+        <div class="example">
+            <h5>Execute procedure:</h5>
+            <pre><code>EXEC GetSalesByPerson @salesperson = 'John';</code></pre>
+        </div>
+
+        <h3>Create Functions</h3>
+        <div class="example">
+            <h5>Scalar Function:</h5>
+            <pre><code>CREATE FUNCTION CalculateCommission(@amount DECIMAL(10,2))
+RETURNS DECIMAL(10,2)
+AS
+BEGIN
+    DECLARE @commission DECIMAL(10,2);
+    
+    IF @amount > 1500
+        SET @commission = @amount * 0.10;
+    ELSE IF @amount > 1000
+        SET @commission = @amount * 0.08;
+    ELSE
+        SET @commission = @amount * 0.05;
+    
+    RETURN @commission;
+END</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Table-Valued Function:</h5>
+            <pre><code>CREATE FUNCTION GetTopSalesByRegion(@region VARCHAR(50), @top_n INT)
+RETURNS TABLE
+AS
+RETURN (
+    SELECT TOP (@top_n)
+        salesperson,
+        product,
+        amount,
+        sale_date
+    FROM sales
+    WHERE region = @region
+    ORDER BY amount DESC
+);</code></pre>
+        </div>
+
+        <h2 id="triggers">Triggers</h2>
+        <p>Triggers are special stored procedures that automatically execute in response to specific database events.</p>
+
+        <h3>AFTER Triggers</h3>
+        <p>Execute after the triggering event completes.</p>
+
+        <div class="example">
+            <h5>Audit trigger:</h5>
+            <pre><code>CREATE TABLE sales_audit (
+    audit_id INT IDENTITY(1,1) PRIMARY KEY,
+    sale_id INT,
+    action VARCHAR(10),
+    old_amount DECIMAL(10,2),
+    new_amount DECIMAL(10,2),
+    changed_by VARCHAR(50),
+    changed_date DATETIME
+);
+
+CREATE TRIGGER tr_sales_audit
+ON sales
+AFTER UPDATE
+AS
+BEGIN
+    INSERT INTO sales_audit (
+        sale_id,
+        action,
+        old_amount,
+        new_amount,
+        changed_by,
+        changed_date
+    )
+    SELECT 
+        d.id,
+        'UPDATE',
+        d.amount,
+        i.amount,
+        SYSTEM_USER,
+        GETDATE()
+    FROM deleted d
+    INNER JOIN inserted i ON d.id = i.id;
+END</code></pre>
+        </div>
+
+        <h3>BEFORE Triggers (MySQL)</h3>
+        <p>Execute before the triggering event.</p>
+
+        <div class="example">
+            <h5>Validation trigger:</h5>
+            <pre><code>DELIMITER //
+CREATE TRIGGER tr_validate_sale
+BEFORE INSERT ON sales
+FOR EACH ROW
+BEGIN
+    IF NEW.amount <= 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Sale amount must be positive';
+    END IF;
+    
+    IF NEW.sale_date > CURDATE() THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Sale date cannot be in the future';
+    END IF;
+END //
+DELIMITER ;</code></pre>
+        </div>
+
+        <h2 id="transactions">Transactions</h2>
+        <p>Transactions ensure data consistency by grouping multiple operations into a single unit of work.</p>
+
+        <h3>BEGIN, COMMIT, ROLLBACK</h3>
+        <div class="syntax">
+            <h5>Basic Transaction Syntax:</h5>
+            <pre><code>BEGIN TRANSACTION;
+-- SQL statements
+COMMIT; -- or ROLLBACK;</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Transfer money between accounts:</h5>
+            <pre><code>BEGIN TRANSACTION;
+
+DECLARE @source_balance DECIMAL(10,2);
+DECLARE @transfer_amount DECIMAL(10,2) = 500.00;
+
+-- Check source account balance
+SELECT @source_balance = balance 
+FROM accounts 
+WHERE account_id = 1;
+
+IF @source_balance >= @transfer_amount
+BEGIN
+    -- Deduct from source account
+    UPDATE accounts 
+    SET balance = balance - @transfer_amount 
+    WHERE account_id = 1;
+    
+    -- Add to destination account
+    UPDATE accounts 
+    SET balance = balance + @transfer_amount 
+    WHERE account_id = 2;
+    
+    COMMIT;
+    PRINT 'Transfer completed successfully';
+END
+ELSE
+BEGIN
+    ROLLBACK;
+    PRINT 'Insufficient funds';
+END</code></pre>
+        </div>
+
+        <h3>ACID Properties</h3>
+        <table>
+            <tr>
+                <th>Property</th>
+                <th>Description</th>
+                <th>Example</th>
+            </tr>
+            <tr><td><strong>Atomicity</strong></td><td>All operations succeed or all fail</td><td>Bank transfer: both debit and credit must succeed</td></tr>
+            <tr><td><strong>Consistency</strong></td><td>Database remains in valid state</td><td>Foreign key constraints maintained</td></tr>
+            <tr><td><strong>Isolation</strong></td><td>Concurrent transactions don't interfere</td><td>Read committed isolation level</td></tr>
+            <tr><td><strong>Durability</strong></td><td>Committed changes persist</td><td>Data survives system crashes</td></tr>
+        </table>
+
+        <h2 id="locks-concurrency">Locks and Concurrency</h2>
+        <p>Database locks control concurrent access to data to maintain consistency.</p>
+
+        <h3>Lock Types</h3>
+        <h4>Shared Locks (S)</h4>
+        <ul>
+            <li>Multiple transactions can hold shared locks on the same resource</li>
+            <li>Prevent modifications but allow reads</li>
+        </ul>
+
+        <h4>Exclusive Locks (X)</h4>
+        <ul>
+            <li>Only one transaction can hold an exclusive lock</li>
+            <li>Prevent both reads and modifications by other transactions</li>
+        </ul>
+
+        <h3>Lock Granularity</h3>
+        <table>
+            <tr>
+                <th>Lock Level</th>
+                <th>Description</th>
+                <th>Use Case</th>
+            </tr>
+            <tr><td><strong>Row Level</strong></td><td>Locks individual rows</td><td>High concurrency, OLTP systems</td></tr>
+            <tr><td><strong>Page Level</strong></td><td>Locks data pages</td><td>Balanced approach</td></tr>
+            <tr><td><strong>Table Level</strong></td><td>Locks entire table</td><td>Bulk operations, low concurrency</td></tr>
+        </table>
+
+        <h3>Isolation Levels</h3>
+        <table>
+            <tr>
+                <th>Level</th>
+                <th>Description</th>
+                <th>Dirty Read</th>
+                <th>Non-Repeatable Read</th>
+                <th>Phantom Read</th>
+            </tr>
+            <tr><td><strong>READ UNCOMMITTED</strong></td><td>No isolation</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+            <tr><td><strong>READ COMMITTED</strong></td><td>Prevent dirty reads</td><td>No</td><td>Yes</td><td>Yes</td></tr>
+            <tr><td><strong>REPEATABLE READ</strong></td><td>Consistent reads</td><td>No</td><td>No</td><td>Yes</td></tr>
+            <tr><td><strong>SERIALIZABLE</strong></td><td>Full isolation</td><td>No</td><td>No</td><td>No</td></tr>
+        </table>
+
+        <h2 id="performance-tuning">Performance Tuning</h2>
+        <p>Performance tuning involves optimizing queries and database design for better performance.</p>
+
+        <h3>EXPLAIN and ANALYZE</h3>
+        <div class="example">
+            <h5>Query execution plan:</h5>
+            <pre><code>-- SQL Server
+SET SHOWPLAN_ALL ON;
+SELECT s.salesperson, s.amount, r.region_name
+FROM sales s
+JOIN regions r ON s.region = r.region_code;
+
+-- PostgreSQL
+EXPLAIN ANALYZE
+SELECT s.salesperson, s.amount, r.region_name
+FROM sales s
+JOIN regions r ON s.region = r.region_code;
+
+-- MySQL
+EXPLAIN FORMAT=JSON
+SELECT s.salesperson, s.amount, r.region_name
+FROM sales s
+JOIN regions r ON s.region = r.region_code;</code></pre>
+        </div>
+
+        <h3>Query Optimization Techniques</h3>
+        <h4>1. Index Usage</h4>
+        <div class="example">
+            <h5>Good vs Bad query examples:</h5>
+            <pre><code>-- Bad: Full table scan
+SELECT * FROM sales WHERE YEAR(sale_date) = 2023;
+
+-- Good: Index seek
+SELECT * FROM sales WHERE sale_date >= '2023-01-01' AND sale_date < '2024-01-01';</code></pre>
+        </div>
+
+        <h4>2. Subquery vs EXISTS</h4>
+        <div class="example">
+            <h5>Efficient EXISTS usage:</h5>
+            <pre><code>-- Bad: Correlated subquery
+SELECT * FROM customers c
+WHERE customer_id IN (
+    SELECT customer_id FROM sales WHERE amount > 1000
+);
+
+-- Good: EXISTS (often more efficient)
+SELECT * FROM customers c
+WHERE EXISTS (
+    SELECT 1 FROM sales s 
+    WHERE s.customer_id = c.customer_id AND s.amount > 1000
+);</code></pre>
+        </div>
+
+        <h3>Common Performance Issues</h3>
+        <table>
+            <tr>
+                <th>Issue</th>
+                <th>Symptom</th>
+                <th>Solution</th>
+            </tr>
+            <tr><td><strong>Missing Index</strong></td><td>Table scans</td><td>Create appropriate indexes</td></tr>
+            <tr><td><strong>Outdated Statistics</strong></td><td>Poor execution plans</td><td>Update statistics</td></tr>
+            <tr><td><strong>Parameter Sniffing</strong></td><td>Inconsistent performance</td><td>Use query hints or plan guides</td></tr>
+            <tr><td><strong>Blocking/Deadlocks</strong></td><td>Slow queries</td><td>Optimize transaction scope</td></tr>
+        </table>
+
+        <h2 id="partitioning">Partitioning</h2>
+        <p>Partitioning divides large tables into smaller, more manageable pieces.</p>
+
+        <h3>Horizontal Partitioning</h3>
+        <p>Splits rows based on values in one or more columns.</p>
+
+        <div class="example">
+            <h5>Range partitioning by date:</h5>
+            <pre><code>-- Create partition function
+CREATE PARTITION FUNCTION sales_date_pf (DATE)
+AS RANGE RIGHT FOR VALUES 
+('2023-01-01', '2023-02-01', '2023-03-01', '2023-04-01');
+
+-- Create partition scheme
+CREATE PARTITION SCHEME sales_date_ps
+AS PARTITION sales_date_pf
+TO (FileGroup1, FileGroup2, FileGroup3, FileGroup4, FileGroup5);
+
+-- Create partitioned table
+CREATE TABLE sales_partitioned (
+    id INT IDENTITY(1,1),
+    salesperson VARCHAR(50),
+    region VARCHAR(50),
+    product VARCHAR(50),
+    amount DECIMAL(10,2),
+    sale_date DATE
+) ON sales_date_ps (sale_date);</code></pre>
+        </div>
+
+        <h3>Vertical Partitioning</h3>
+        <p>Splits columns into separate tables.</p>
+
+        <div class="example">
+            <h5>Separate frequently vs rarely accessed columns:</h5>
+            <pre><code>-- Frequently accessed columns
+CREATE TABLE customer_core (
+    customer_id INT PRIMARY KEY,
+    customer_name VARCHAR(100),
+    email VARCHAR(100),
+    phone VARCHAR(20)
+);
+
+-- Rarely accessed columns
+CREATE TABLE customer_details (
+    customer_id INT PRIMARY KEY,
+    address VARCHAR(200),
+    date_of_birth DATE,
+    notes TEXT,
+    FOREIGN KEY (customer_id) REFERENCES customer_core(customer_id)
+);</code></pre>
+        </div>
+
+        <h3>Partitioning Benefits</h3>
+        <table>
+            <tr>
+                <th>Benefit</th>
+                <th>Description</th>
+                <th>Example</th>
+            </tr>
+            <tr><td><strong>Performance</strong></td><td>Faster queries on large tables</td><td>Query only current year's data</td></tr>
+            <tr><td><strong>Maintenance</strong></td><td>Easier backup/restore</td><td>Backup only recent partitions</td></tr>
+            <tr><td><strong>Scalability</strong></td><td>Distribute across multiple disks</td><td>Each partition on different drive</td></tr>
+            <tr><td><strong>Archiving</strong></td><td>Easy data lifecycle management</td><td>Drop old partitions</td></tr>
+        </table>
+
+        <h2>Summary</h2>
+        <p>This advanced SQL guide covered sophisticated database concepts and techniques:</p>
+        
+        <div class="benefits">
+            <ul>
+                <li><strong>Window Functions</strong> - Powerful analytical functions for complex calculations across row sets</li>
+                <li><strong>CTEs</strong> - Improved query readability and recursive data processing</li>
+                <li><strong>Indexes</strong> - Performance optimization through efficient data access paths</li>
+                <li><strong>Stored Procedures & Functions</strong> - Reusable, compiled database code</li>
+                <li><strong>Triggers</strong> - Automatic responses to database events</li>
+                <li><strong>Transactions</strong> - Data consistency through ACID properties</li>
+                <li><strong>Locks and Concurrency</strong> - Managing concurrent access to data</li>
+                <li><strong>Performance Tuning</strong> - Optimization techniques and monitoring</li>
+                <li><strong>Partitioning</strong> - Scaling large tables through data distribution</li>
+            </ul>
+        </div>
+
+        <h3>Best Practices</h3>
+        <div class="tip">
+            <ol>
+                <li><strong>Design First</strong> - Plan your database schema and indexes before implementation</li>
+                <li><strong>Monitor Performance</strong> - Regularly analyze query execution plans</li>
+                <li><strong>Test Thoroughly</strong> - Validate all stored procedures and triggers</li>
+                <li><strong>Backup Strategy</strong> - Implement comprehensive backup and recovery procedures</li>
+                <li><strong>Security</strong> - Use appropriate access controls and audit mechanisms</li>
+            </ol>
+        </div>
+
+        <h3>Advanced Topics to Explore Next</h3>
+        <ul>
+            <li><strong>Data Warehousing</strong> - Star schema, ETL processes, OLAP cubes</li>
+            <li><strong>Replication</strong> - Master-slave, master-master configurations</li>
+            <li><strong>Sharding</strong> - Horizontal scaling across multiple servers</li>
+            <li><strong>NoSQL Integration</strong> - Hybrid relational/document database solutions</li>
+            <li><strong>Cloud Database Services</strong> - AWS RDS, Azure SQL, Google Cloud SQL</li>
+        </ul>
+
+        <p style="text-align: center; font-size: 1.2em; color: #3498db; margin-top: 30px;">
+            <strong>Mastering these advanced SQL concepts will enable you to design, implement, and optimize complex database solutions for enterprise applications. 🚀</strong>
+        </p>
+
+        </div>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.querySelector('.sidebar-toggle');
+            
+            if (window.innerWidth <= 768 && 
+                !sidebar.contains(event.target) && 
+                !toggle.contains(event.target) && 
+                sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    // Calculate offset to account for sticky TOC
+                    const tocHeight = document.querySelector('.toc').offsetHeight;
+                    const offset = tocHeight + 40; // Extra 40px for better spacing
+                    
+                    const targetPosition = target.offsetTop - offset;
+                    
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Update active link in TOC
+                    document.querySelectorAll('.toc a').forEach(link => {
+                        link.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                }
+            });
+        });
+
+        // Highlight current section in TOC on scroll
+        window.addEventListener('scroll', function() {
+            const sections = document.querySelectorAll('h2[id]');
+            const tocLinks = document.querySelectorAll('.toc a');
+            const tocHeight = document.querySelector('.toc').offsetHeight;
+            const offset = tocHeight + 40; // Same offset as smooth scrolling
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.offsetHeight;
+                if (window.scrollY >= sectionTop - offset) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            tocLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
