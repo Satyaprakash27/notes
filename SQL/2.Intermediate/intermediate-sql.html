@@ -1,0 +1,1607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🟡 Intermediate SQL Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: #2c3e50;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background: #34495e;
+            border-bottom: 1px solid #455a75;
+        }
+
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 1.3em;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #ecf0f1;
+            border: none;
+            padding: 0;
+        }
+
+        .sidebar-nav {
+            padding: 0;
+        }
+
+        .sidebar-link {
+            display: block;
+            color: #bdc3c7;
+            text-decoration: none;
+            padding: 15px 20px;
+            border-bottom: 1px solid #455a75;
+            transition: background 0.2s ease;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 1.1em;
+            font-weight: 500;
+        }
+
+        .sidebar-link:hover {
+            background: #34495e;
+            color: #ecf0f1;
+        }
+
+        .sidebar-link.current {
+            background: #3498db;
+            color: white;
+            font-weight: 600;
+        }
+
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #34495e;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+            margin-top: 30px;
+            font-size: 1.8em;
+        }
+        h3 {
+            color: #2980b9;
+            margin-top: 25px;
+            font-size: 1.4em;
+        }
+        h4 {
+            color: #16a085;
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+        .toc {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(52, 152, 219, 0.2);
+        }
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+            margin: 0;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.5rem;
+            justify-items: center;
+        }
+        .toc li {
+            margin: 0;
+        }
+        .toc a {
+            color: #667eea;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 0.9em;
+            display: block;
+        }
+        .toc a:hover, .toc a.active {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        pre {
+            background: #000000;
+            color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        code {
+            background: #000000;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #ffffff;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        th, td {
+            border: 1px solid #e9ecef;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #3498db;
+            color: white;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        tr:hover {
+            background: #e8f4f8;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .warning::before {
+            content: "⚠️ ";
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .tip {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .tip::before {
+            content: "💡 ";
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .example {
+            background: #f8f9fa;
+            border-left: 4px solid #17a2b8;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .example h5 {
+            margin-top: 0;
+            color: #17a2b8;
+            font-size: 1.1em;
+        }
+        .syntax {
+            background: #e9ecef;
+            border-left: 4px solid #6c757d;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .syntax h5 {
+            margin-top: 0;
+            color: #6c757d;
+            font-size: 1.1em;
+        }
+
+        @media (max-width: 1024px) {
+            .toc ul {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .sidebar-toggle {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            h2 {
+                font-size: 1.5em;
+            }
+
+            table {
+                font-size: 0.9em;
+            }
+
+            .toc {
+                position: static;
+                margin: 20px 0;
+            }
+
+            .toc ul {
+                grid-template-columns: 1fr;
+                gap: 0.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+    
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2><a href="../SQL.html" style="color: inherit; text-decoration: none;">🗃️ SQL Guides</a></h2>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="../1.Beginner/beginner-sql.html" class="sidebar-link">
+                🟢 Beginner SQL
+            </a>
+            <a href="../2.Intermediate/intermediate-sql.html" class="sidebar-link current">
+                🟡 Intermediate SQL
+            </a>
+            <a href="../3.Advanced/advanced-sql.html" class="sidebar-link">
+                🔵 Advanced SQL
+            </a>
+            <a href="../4.Database Design & Modeling/database-design-modeling.html" class="sidebar-link">
+                🟣 Database Design & Modeling
+            </a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="container">
+        <h1>🟡 Intermediate SQL Guide</h1>
+        
+        <div class="toc" id="toc">
+            <ul>
+                <li><a href="#joins">1. Joins</a></li>
+                <li><a href="#set-operations">2. Set Operations</a></li>
+                <li><a href="#grouping-aggregation">3. Grouping & Aggregation</a></li>
+                <li><a href="#subqueries">4. Subqueries</a></li>
+                <li><a href="#views">5. Views</a></li>
+                <li><a href="#case-statements">6. CASE Statements</a></li>
+                <li><a href="#null-handling">7. NULL Handling</a></li>
+                <li><a href="#constraints">8. Constraints</a></li>
+            </ul>
+        </div>
+
+        <h2 id="joins">1. Joins</h2>
+        <p>Joins combine rows from two or more tables based on a related column. They are essential for working with normalized relational databases.</p>
+
+        <h3>Sample Data for Join Examples</h3>
+        
+        <h4>employees table:</h4>
+        <table>
+            <tr>
+                <th>employee_id</th>
+                <th>name</th>
+                <th>department_id</th>
+                <th>salary</th>
+                <th>hire_date</th>
+            </tr>
+            <tr><td>1</td><td>John Doe</td><td>1</td><td>75000</td><td>2023-01-15</td></tr>
+            <tr><td>2</td><td>Jane Smith</td><td>2</td><td>65000</td><td>2023-02-20</td></tr>
+            <tr><td>3</td><td>Mike Johnson</td><td>1</td><td>80000</td><td>2023-01-10</td></tr>
+            <tr><td>4</td><td>Sarah Wilson</td><td>3</td><td>70000</td><td>2023-03-05</td></tr>
+            <tr><td>5</td><td>David Brown</td><td>NULL</td><td>72000</td><td>2023-02-28</td></tr>
+        </table>
+
+        <h4>departments table:</h4>
+        <table>
+            <tr>
+                <th>department_id</th>
+                <th>department_name</th>
+                <th>location</th>
+                <th>manager_id</th>
+            </tr>
+            <tr><td>1</td><td>IT</td><td>New York</td><td>3</td></tr>
+            <tr><td>2</td><td>HR</td><td>Chicago</td><td>2</td></tr>
+            <tr><td>3</td><td>Finance</td><td>Boston</td><td>4</td></tr>
+            <tr><td>4</td><td>Marketing</td><td>Los Angeles</td><td>NULL</td></tr>
+        </table>
+
+        <h3>INNER JOIN</h3>
+        <p>Returns only the rows that have matching values in both tables.</p>
+        
+        <div class="syntax">
+            <h5>Syntax:</h5>
+            <pre><code>SELECT columns
+FROM table1
+INNER JOIN table2 ON table1.column = table2.column;</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Example:</h5>
+            <pre><code>SELECT e.name, e.salary, d.department_name, d.location
+FROM employees e
+INNER JOIN departments d ON e.department_id = d.department_id;</code></pre>
+        </div>
+
+        <h4>Output:</h4>
+        <table>
+            <tr>
+                <th>name</th>
+                <th>salary</th>
+                <th>department_name</th>
+                <th>location</th>
+            </tr>
+            <tr><td>John Doe</td><td>75000</td><td>IT</td><td>New York</td></tr>
+            <tr><td>Jane Smith</td><td>65000</td><td>HR</td><td>Chicago</td></tr>
+            <tr><td>Mike Johnson</td><td>80000</td><td>IT</td><td>New York</td></tr>
+            <tr><td>Sarah Wilson</td><td>70000</td><td>Finance</td><td>Boston</td></tr>
+        </table>
+
+        <div class="tip">
+            <strong>Note:</strong> David Brown is excluded because he has no department (NULL), and Marketing department is excluded because it has no employees.
+        </div>
+
+        <h3>LEFT JOIN (LEFT OUTER JOIN)</h3>
+        <p>Returns all rows from the left table and matching rows from the right table. If no match, NULL values are returned for right table columns.</p>
+        
+        <div class="syntax">
+            <h5>Syntax:</h5>
+            <pre><code>SELECT columns
+FROM table1
+LEFT JOIN table2 ON table1.column = table2.column;</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Example:</h5>
+            <pre><code>SELECT e.name, e.salary, d.department_name, d.location
+FROM employees e
+LEFT JOIN departments d ON e.department_id = d.department_id;</code></pre>
+        </div>
+
+        <h4>Output:</h4>
+        <table>
+            <tr>
+                <th>name</th>
+                <th>salary</th>
+                <th>department_name</th>
+                <th>location</th>
+            </tr>
+            <tr><td>John Doe</td><td>75000</td><td>IT</td><td>New York</td></tr>
+            <tr><td>Jane Smith</td><td>65000</td><td>HR</td><td>Chicago</td></tr>
+            <tr><td>Mike Johnson</td><td>80000</td><td>IT</td><td>New York</td></tr>
+            <tr><td>Sarah Wilson</td><td>70000</td><td>Finance</td><td>Boston</td></tr>
+            <tr><td>David Brown</td><td>72000</td><td>NULL</td><td>NULL</td></tr>
+        </table>
+
+        <h3>RIGHT JOIN (RIGHT OUTER JOIN)</h3>
+        <p>Returns all rows from the right table and matching rows from the left table. If no match, NULL values are returned for left table columns.</p>
+        
+        <div class="syntax">
+            <h5>Syntax:</h5>
+            <pre><code>SELECT columns
+FROM table1
+RIGHT JOIN table2 ON table1.column = table2.column;</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Example:</h5>
+            <pre><code>SELECT e.name, e.salary, d.department_name, d.location
+FROM employees e
+RIGHT JOIN departments d ON e.department_id = d.department_id;</code></pre>
+        </div>
+
+        <h4>Output:</h4>
+        <table>
+            <tr>
+                <th>name</th>
+                <th>salary</th>
+                <th>department_name</th>
+                <th>location</th>
+            </tr>
+            <tr><td>John Doe</td><td>75000</td><td>IT</td><td>New York</td></tr>
+            <tr><td>Mike Johnson</td><td>80000</td><td>IT</td><td>New York</td></tr>
+            <tr><td>Jane Smith</td><td>65000</td><td>HR</td><td>Chicago</td></tr>
+            <tr><td>Sarah Wilson</td><td>70000</td><td>Finance</td><td>Boston</td></tr>
+            <tr><td>NULL</td><td>NULL</td><td>Marketing</td><td>Los Angeles</td></tr>
+        </table>
+
+        <h3>FULL OUTER JOIN</h3>
+        <p>Returns all rows from both tables. If there's no match, NULL values are returned for the missing side.</p>
+        
+        <div class="syntax">
+            <h5>Syntax:</h5>
+            <pre><code>SELECT columns
+FROM table1
+FULL OUTER JOIN table2 ON table1.column = table2.column;</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Example:</h5>
+            <pre><code>SELECT e.name, e.salary, d.department_name, d.location
+FROM employees e
+FULL OUTER JOIN departments d ON e.department_id = d.department_id;</code></pre>
+        </div>
+
+        <h4>Output:</h4>
+        <table>
+            <tr>
+                <th>name</th>
+                <th>salary</th>
+                <th>department_name</th>
+                <th>location</th>
+            </tr>
+            <tr><td>John Doe</td><td>75000</td><td>IT</td><td>New York</td></tr>
+            <tr><td>Jane Smith</td><td>65000</td><td>HR</td><td>Chicago</td></tr>
+            <tr><td>Mike Johnson</td><td>80000</td><td>IT</td><td>New York</td></tr>
+            <tr><td>Sarah Wilson</td><td>70000</td><td>Finance</td><td>Boston</td></tr>
+            <tr><td>David Brown</td><td>72000</td><td>NULL</td><td>NULL</td></tr>
+            <tr><td>NULL</td><td>NULL</td><td>Marketing</td><td>Los Angeles</td></tr>
+        </table>
+
+        <h3>SELF JOIN</h3>
+        <p>A self join is when a table is joined with itself. Useful for hierarchical data or comparing rows within the same table.</p>
+        
+        <div class="example">
+            <h5>Example - Find employees and their managers:</h5>
+            <pre><code>SELECT e.name AS employee_name, m.name AS manager_name
+FROM employees e
+LEFT JOIN employees m ON e.manager_id = m.employee_id;</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Example - Find employees in the same department:</h5>
+            <pre><code>SELECT e1.name AS employee1, e2.name AS employee2, e1.department_id
+FROM employees e1
+JOIN employees e2 ON e1.department_id = e2.department_id
+WHERE e1.employee_id < e2.employee_id;</code></pre>
+        </div>
+
+        <h4>Output (same department):</h4>
+        <table>
+            <tr>
+                <th>employee1</th>
+                <th>employee2</th>
+                <th>department_id</th>
+            </tr>
+            <tr><td>John Doe</td><td>Mike Johnson</td><td>1</td></tr>
+        </table>
+
+        <h3>CROSS JOIN</h3>
+        <p>Returns the Cartesian product of both tables - every row from the first table combined with every row from the second table.</p>
+        
+        <div class="syntax">
+            <h5>Syntax:</h5>
+            <pre><code>SELECT columns
+FROM table1
+CROSS JOIN table2;</code></pre>
+        </div>
+
+        <div class="warning">
+            <strong>Warning:</strong> CROSS JOIN can produce very large result sets. Use with caution!
+        </div>
+
+        <div class="example">
+            <h5>Example:</h5>
+            <pre><code>SELECT e.name, d.department_name
+FROM employees e
+CROSS JOIN departments d;</code></pre>
+        </div>
+
+        <p>This would return 5 × 4 = 20 rows, with each employee paired with each department.</p>
+
+        <h2 id="set-operations">2. Set Operations</h2>
+        <p>Set operations combine results from multiple SELECT statements.</p>
+
+        <h3>Sample Data for Set Operations</h3>
+        
+        <h4>current_employees table:</h4>
+        <table>
+            <tr>
+                <th>employee_id</th>
+                <th>name</th>
+                <th>department</th>
+            </tr>
+            <tr><td>1</td><td>John Doe</td><td>IT</td></tr>
+            <tr><td>2</td><td>Jane Smith</td><td>HR</td></tr>
+            <tr><td>3</td><td>Mike Johnson</td><td>IT</td></tr>
+            <tr><td>4</td><td>Sarah Wilson</td><td>Finance</td></tr>
+        </table>
+
+        <h4>former_employees table:</h4>
+        <table>
+            <tr>
+                <th>employee_id</th>
+                <th>name</th>
+                <th>department</th>
+            </tr>
+            <tr><td>3</td><td>Mike Johnson</td><td>IT</td></tr>
+            <tr><td>5</td><td>David Brown</td><td>Sales</td></tr>
+            <tr><td>6</td><td>Lisa Anderson</td><td>Marketing</td></tr>
+            <tr><td>7</td><td>Tom Wilson</td><td>IT</td></tr>
+        </table>
+
+        <h3>UNION</h3>
+        <p>Combines results from multiple SELECT statements, removing duplicate rows.</p>
+        
+        <div class="syntax">
+            <h5>Syntax:</h5>
+            <pre><code>SELECT columns FROM table1
+UNION
+SELECT columns FROM table2;</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Example:</h5>
+            <pre><code>SELECT name, department FROM current_employees
+UNION
+SELECT name, department FROM former_employees;</code></pre>
+        </div>
+
+        <h4>Output:</h4>
+        <table>
+            <tr>
+                <th>name</th>
+                <th>department</th>
+            </tr>
+            <tr><td>John Doe</td><td>IT</td></tr>
+            <tr><td>Jane Smith</td><td>HR</td></tr>
+            <tr><td>Mike Johnson</td><td>IT</td></tr>
+            <tr><td>Sarah Wilson</td><td>Finance</td></tr>
+            <tr><td>David Brown</td><td>Sales</td></tr>
+            <tr><td>Lisa Anderson</td><td>Marketing</td></tr>
+            <tr><td>Tom Wilson</td><td>IT</td></tr>
+        </table>
+
+        <h3>UNION ALL</h3>
+        <p>Combines results from multiple SELECT statements, keeping all rows including duplicates.</p>
+        
+        <div class="example">
+            <h5>Example:</h5>
+            <pre><code>SELECT name, department FROM current_employees
+UNION ALL
+SELECT name, department FROM former_employees;</code></pre>
+        </div>
+
+        <h4>Output:</h4>
+        <table>
+            <tr>
+                <th>name</th>
+                <th>department</th>
+            </tr>
+            <tr><td>John Doe</td><td>IT</td></tr>
+            <tr><td>Jane Smith</td><td>HR</td></tr>
+            <tr><td>Mike Johnson</td><td>IT</td></tr>
+            <tr><td>Sarah Wilson</td><td>Finance</td></tr>
+            <tr><td>Mike Johnson</td><td>IT</td></tr>
+            <tr><td>David Brown</td><td>Sales</td></tr>
+            <tr><td>Lisa Anderson</td><td>Marketing</td></tr>
+            <tr><td>Tom Wilson</td><td>IT</td></tr>
+        </table>
+
+        <h3>INTERSECT</h3>
+        <p>Returns only the rows that appear in both result sets.</p>
+        
+        <div class="syntax">
+            <h5>Syntax:</h5>
+            <pre><code>SELECT columns FROM table1
+INTERSECT
+SELECT columns FROM table2;</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Example:</h5>
+            <pre><code>SELECT name, department FROM current_employees
+INTERSECT
+SELECT name, department FROM former_employees;</code></pre>
+        </div>
+
+        <h4>Output:</h4>
+        <table>
+            <tr>
+                <th>name</th>
+                <th>department</th>
+            </tr>
+            <tr><td>Mike Johnson</td><td>IT</td></tr>
+        </table>
+
+        <h3>EXCEPT (MINUS)</h3>
+        <p>Returns rows from the first result set that are not in the second result set.</p>
+        
+        <div class="syntax">
+            <h5>Syntax:</h5>
+            <pre><code>SELECT columns FROM table1
+EXCEPT
+SELECT columns FROM table2;</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Example:</h5>
+            <pre><code>SELECT name, department FROM current_employees
+EXCEPT
+SELECT name, department FROM former_employees;</code></pre>
+        </div>
+
+        <h4>Output:</h4>
+        <table>
+            <tr>
+                <th>name</th>
+                <th>department</th>
+            </tr>
+            <tr><td>John Doe</td><td>IT</td></tr>
+            <tr><td>Jane Smith</td><td>HR</td></tr>
+            <tr><td>Sarah Wilson</td><td>Finance</td></tr>
+        </table>
+
+        <h2 id="grouping-aggregation">3. Grouping and Aggregation</h2>
+        <p>Grouping allows you to perform calculations on groups of rows that share common values.</p>
+
+        <h3>Sample Data for Grouping Examples</h3>
+        
+        <h4>sales table:</h4>
+        <table>
+            <tr>
+                <th>id</th>
+                <th>salesperson</th>
+                <th>region</th>
+                <th>product_category</th>
+                <th>amount</th>
+                <th>sale_date</th>
+            </tr>
+            <tr><td>1</td><td>John</td><td>North</td><td>Electronics</td><td>1500</td><td>2023-01-15</td></tr>
+            <tr><td>2</td><td>Jane</td><td>South</td><td>Electronics</td><td>2000</td><td>2023-01-20</td></tr>
+            <tr><td>3</td><td>Mike</td><td>North</td><td>Clothing</td><td>800</td><td>2023-01-25</td></tr>
+            <tr><td>4</td><td>Sarah</td><td>East</td><td>Electronics</td><td>1200</td><td>2023-02-01</td></tr>
+            <tr><td>5</td><td>John</td><td>North</td><td>Electronics</td><td>1800</td><td>2023-02-05</td></tr>
+            <tr><td>6</td><td>Jane</td><td>South</td><td>Clothing</td><td>600</td><td>2023-02-10</td></tr>
+            <tr><td>7</td><td>Mike</td><td>North</td><td>Electronics</td><td>2200</td><td>2023-02-15</td></tr>
+            <tr><td>8</td><td>Sarah</td><td>East</td><td>Clothing</td><td>900</td><td>2023-02-20</td></tr>
+        </table>
+
+        <h3>GROUP BY</h3>
+        <p>Groups rows that have the same values in specified columns.</p>
+        
+        <div class="syntax">
+            <h5>Syntax:</h5>
+            <pre><code>SELECT column1, aggregate_function(column2)
+FROM table_name
+GROUP BY column1;</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Example - Sales by region:</h5>
+            <pre><code>SELECT region, SUM(amount) as total_sales, COUNT(*) as num_sales
+FROM sales
+GROUP BY region;</code></pre>
+        </div>
+
+        <h4>Output:</h4>
+        <table>
+            <tr>
+                <th>region</th>
+                <th>total_sales</th>
+                <th>num_sales</th>
+            </tr>
+            <tr><td>North</td><td>5300</td><td>3</td></tr>
+            <tr><td>South</td><td>2600</td><td>2</td></tr>
+            <tr><td>East</td><td>2100</td><td>2</td></tr>
+        </table>
+
+        <h3>HAVING</h3>
+        <p>Filters groups based on aggregate conditions. Use HAVING instead of WHERE with aggregate functions.</p>
+        
+        <div class="syntax">
+            <h5>Syntax:</h5>
+            <pre><code>SELECT column1, aggregate_function(column2)
+FROM table_name
+GROUP BY column1
+HAVING aggregate_condition;</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Example - Regions with total sales > 2500:</h5>
+            <pre><code>SELECT region, SUM(amount) as total_sales, COUNT(*) as num_sales
+FROM sales
+GROUP BY region
+HAVING SUM(amount) > 2500;</code></pre>
+        </div>
+
+        <h4>Output:</h4>
+        <table>
+            <tr>
+                <th>region</th>
+                <th>total_sales</th>
+                <th>num_sales</th>
+            </tr>
+            <tr><td>North</td><td>5300</td><td>3</td></tr>
+            <tr><td>South</td><td>2600</td><td>2</td></tr>
+        </table>
+
+        <h3>Aggregate Functions</h3>
+        
+        <h4>SUM</h4>
+        <p>Calculates the sum of numeric values.</p>
+        
+        <div class="example">
+            <h5>Example:</h5>
+            <pre><code>SELECT product_category, SUM(amount) as total_sales
+FROM sales
+GROUP BY product_category;</code></pre>
+        </div>
+
+        <h4>Output:</h4>
+        <table>
+            <tr>
+                <th>product_category</th>
+                <th>total_sales</th>
+            </tr>
+            <tr><td>Electronics</td><td>8700</td></tr>
+            <tr><td>Clothing</td><td>2300</td></tr>
+        </table>
+
+        <h4>AVG</h4>
+        <p>Calculates the average of numeric values.</p>
+        
+        <div class="example">
+            <h5>Example:</h5>
+            <pre><code>SELECT product_category, AVG(amount) as avg_sale_amount
+FROM sales
+GROUP BY product_category;</code></pre>
+        </div>
+
+        <h4>Output:</h4>
+        <table>
+            <tr>
+                <th>product_category</th>
+                <th>avg_sale_amount</th>
+            </tr>
+            <tr><td>Electronics</td><td>1740</td></tr>
+            <tr><td>Clothing</td><td>766.67</td></tr>
+        </table>
+
+        <h4>COUNT</h4>
+        <p>Counts the number of rows or non-NULL values.</p>
+        
+        <div class="example">
+            <h5>Example:</h5>
+            <pre><code>SELECT salesperson, COUNT(*) as total_sales, COUNT(DISTINCT product_category) as categories_sold
+FROM sales
+GROUP BY salesperson;</code></pre>
+        </div>
+
+        <h4>Output:</h4>
+        <table>
+            <tr>
+                <th>salesperson</th>
+                <th>total_sales</th>
+                <th>categories_sold</th>
+            </tr>
+            <tr><td>John</td><td>2</td><td>1</td></tr>
+            <tr><td>Jane</td><td>2</td><td>2</td></tr>
+            <tr><td>Mike</td><td>2</td><td>2</td></tr>
+            <tr><td>Sarah</td><td>2</td><td>2</td></tr>
+        </table>
+
+        <h4>MIN and MAX</h4>
+        <p>Find the minimum and maximum values.</p>
+        
+        <div class="example">
+            <h5>Example:</h5>
+            <pre><code>SELECT region, MIN(amount) as min_sale, MAX(amount) as max_sale
+FROM sales
+GROUP BY region;</code></pre>
+        </div>
+
+        <h4>Output:</h4>
+        <table>
+            <tr>
+                <th>region</th>
+                <th>min_sale</th>
+                <th>max_sale</th>
+            </tr>
+            <tr><td>North</td><td>800</td><td>2200</td></tr>
+            <tr><td>South</td><td>600</td><td>2000</td></tr>
+            <tr><td>East</td><td>900</td><td>1200</td></tr>
+        </table>
+
+        <h2 id="subqueries">4. Subqueries</h2>
+        <p>A subquery is a query nested inside another query. They can be used in SELECT, FROM, WHERE, and HAVING clauses.</p>
+
+        <h3>Sample Data for Subquery Examples</h3>
+        
+        <h4>employees table:</h4>
+        <table>
+            <tr>
+                <th>employee_id</th>
+                <th>name</th>
+                <th>department_id</th>
+                <th>salary</th>
+                <th>manager_id</th>
+            </tr>
+            <tr><td>1</td><td>John Doe</td><td>1</td><td>75000</td><td>3</td></tr>
+            <tr><td>2</td><td>Jane Smith</td><td>2</td><td>65000</td><td>4</td></tr>
+            <tr><td>3</td><td>Mike Johnson</td><td>1</td><td>85000</td><td>NULL</td></tr>
+            <tr><td>4</td><td>Sarah Wilson</td><td>2</td><td>78000</td><td>NULL</td></tr>
+            <tr><td>5</td><td>David Brown</td><td>1</td><td>72000</td><td>3</td></tr>
+            <tr><td>6</td><td>Lisa Anderson</td><td>3</td><td>68000</td><td>7</td></tr>
+            <tr><td>7</td><td>Tom Wilson</td><td>3</td><td>82000</td><td>NULL</td></tr>
+        </table>
+
+        <h3>Scalar Subqueries</h3>
+        <p>Returns a single value (one row, one column).</p>
+        
+        <div class="example">
+            <h5>Example - Find employees earning more than average:</h5>
+            <pre><code>SELECT name, salary
+FROM employees
+WHERE salary > (SELECT AVG(salary) FROM employees);</code></pre>
+        </div>
+
+        <h4>Output:</h4>
+        <table>
+            <tr>
+                <th>name</th>
+                <th>salary</th>
+            </tr>
+            <tr><td>Mike Johnson</td><td>85000</td></tr>
+            <tr><td>Sarah Wilson</td><td>78000</td></tr>
+            <tr><td>Tom Wilson</td><td>82000</td></tr>
+        </table>
+
+        <h3>Correlated Subqueries</h3>
+        <p>References columns from the outer query. Executed once for each row in the outer query.</p>
+        
+        <div class="example">
+            <h5>Example - Find employees earning more than their department average:</h5>
+            <pre><code>SELECT e1.name, e1.salary, e1.department_id
+FROM employees e1
+WHERE e1.salary > (
+    SELECT AVG(e2.salary)
+    FROM employees e2
+    WHERE e2.department_id = e1.department_id
+);</code></pre>
+        </div>
+
+        <h4>Output:</h4>
+        <table>
+            <tr>
+                <th>name</th>
+                <th>salary</th>
+                <th>department_id</th>
+            </tr>
+            <tr><td>Mike Johnson</td><td>85000</td><td>1</td></tr>
+            <tr><td>Sarah Wilson</td><td>78000</td><td>2</td></tr>
+            <tr><td>Tom Wilson</td><td>82000</td><td>3</td></tr>
+        </table>
+
+        <h3>Nested Subqueries</h3>
+        <p>Subqueries that return multiple rows, used with IN, ANY, ALL operators.</p>
+        
+        <div class="example">
+            <h5>Example - Find employees in departments with more than 2 employees:</h5>
+            <pre><code>SELECT name, department_id
+FROM employees
+WHERE department_id IN (
+    SELECT department_id
+    FROM employees
+    GROUP BY department_id
+    HAVING COUNT(*) > 2
+);</code></pre>
+        </div>
+
+        <h4>Output:</h4>
+        <table>
+            <tr>
+                <th>name</th>
+                <th>department_id</th>
+            </tr>
+            <tr><td>John Doe</td><td>1</td></tr>
+            <tr><td>Mike Johnson</td><td>1</td></tr>
+            <tr><td>David Brown</td><td>1</td></tr>
+        </table>
+
+        <div class="example">
+            <h5>Example - Using ANY operator:</h5>
+            <pre><code>SELECT name, salary
+FROM employees
+WHERE salary > ANY (
+    SELECT salary
+    FROM employees
+    WHERE department_id = 2
+);</code></pre>
+        </div>
+
+        <h4>Output (salary > any HR salary):</h4>
+        <table>
+            <tr>
+                <th>name</th>
+                <th>salary</th>
+            </tr>
+            <tr><td>John Doe</td><td>75000</td></tr>
+            <tr><td>Mike Johnson</td><td>85000</td></tr>
+            <tr><td>Sarah Wilson</td><td>78000</td></tr>
+            <tr><td>David Brown</td><td>72000</td></tr>
+            <tr><td>Lisa Anderson</td><td>68000</td></tr>
+            <tr><td>Tom Wilson</td><td>82000</td></tr>
+        </table>
+
+        <h2 id="views">5. Views</h2>
+        <p>A view is a virtual table based on the result of a SELECT statement. It provides a way to simplify complex queries and enhance security.</p>
+
+        <h3>Create Views</h3>
+        
+        <div class="syntax">
+            <h5>Syntax:</h5>
+            <pre><code>CREATE VIEW view_name AS
+SELECT column1, column2, ...
+FROM table_name
+WHERE condition;</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Example - Create a view for IT department employees:</h5>
+            <pre><code>CREATE VIEW it_employees AS
+SELECT employee_id, name, salary, hire_date
+FROM employees e
+JOIN departments d ON e.department_id = d.department_id
+WHERE d.department_name = 'IT';</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Example - Create a view for employee summary:</h5>
+            <pre><code>CREATE VIEW employee_summary AS
+SELECT 
+    e.name,
+    e.salary,
+    d.department_name,
+    CASE 
+        WHEN e.salary >= 80000 THEN 'High'
+        WHEN e.salary >= 70000 THEN 'Medium'
+        ELSE 'Low'
+    END as salary_grade
+FROM employees e
+LEFT JOIN departments d ON e.department_id = d.department_id;</code></pre>
+        </div>
+
+        <h3>Using Views</h3>
+        <p>Once created, views can be used like regular tables:</p>
+        
+        <div class="example">
+            <h5>Example:</h5>
+            <pre><code>SELECT * FROM employee_summary
+WHERE salary_grade = 'High';</code></pre>
+        </div>
+
+        <h4>Output:</h4>
+        <table>
+            <tr>
+                <th>name</th>
+                <th>salary</th>
+                <th>department_name</th>
+                <th>salary_grade</th>
+            </tr>
+            <tr><td>Mike Johnson</td><td>85000</td><td>IT</td><td>High</td></tr>
+            <tr><td>Tom Wilson</td><td>82000</td><td>Finance</td><td>High</td></tr>
+        </table>
+
+        <h3>Update Views</h3>
+        
+        <div class="syntax">
+            <h5>Syntax:</h5>
+            <pre><code>CREATE OR REPLACE VIEW view_name AS
+SELECT column1, column2, ...
+FROM table_name
+WHERE condition;</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Example:</h5>
+            <pre><code>CREATE OR REPLACE VIEW it_employees AS
+SELECT employee_id, name, salary, hire_date, manager_id
+FROM employees e
+JOIN departments d ON e.department_id = d.department_id
+WHERE d.department_name = 'IT';</code></pre>
+        </div>
+
+        <h3>Drop Views</h3>
+        
+        <div class="syntax">
+            <h5>Syntax:</h5>
+            <pre><code>DROP VIEW view_name;</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Example:</h5>
+            <pre><code>DROP VIEW it_employees;</code></pre>
+        </div>
+
+        <div class="tip">
+            <strong>Benefits of Views:</strong>
+            <ul>
+                <li>Simplify complex queries</li>
+                <li>Enhance security by restricting access to specific columns</li>
+                <li>Provide data abstraction</li>
+                <li>Maintain backward compatibility</li>
+            </ul>
+        </div>
+
+        <h2 id="case-statements">6. CASE Statements</h2>
+        <p>CASE statements provide conditional logic in SQL queries, similar to if-else statements in programming languages.</p>
+
+        <h3>Simple CASE</h3>
+        
+        <div class="syntax">
+            <h5>Syntax:</h5>
+            <pre><code>CASE column_name
+    WHEN value1 THEN result1
+    WHEN value2 THEN result2
+    ...
+    ELSE default_result
+END</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Example - Department names:</h5>
+            <pre><code>SELECT name, salary,
+    CASE department_id
+        WHEN 1 THEN 'Information Technology'
+        WHEN 2 THEN 'Human Resources'
+        WHEN 3 THEN 'Finance'
+        ELSE 'Other'
+    END as department_full_name
+FROM employees;</code></pre>
+        </div>
+
+        <h4>Output:</h4>
+        <table>
+            <tr>
+                <th>name</th>
+                <th>salary</th>
+                <th>department_full_name</th>
+            </tr>
+            <tr><td>John Doe</td><td>75000</td><td>Information Technology</td></tr>
+            <tr><td>Jane Smith</td><td>65000</td><td>Human Resources</td></tr>
+            <tr><td>Mike Johnson</td><td>85000</td><td>Information Technology</td></tr>
+            <tr><td>Sarah Wilson</td><td>78000</td><td>Human Resources</td></tr>
+            <tr><td>David Brown</td><td>72000</td><td>Information Technology</td></tr>
+            <tr><td>Lisa Anderson</td><td>68000</td><td>Finance</td></tr>
+            <tr><td>Tom Wilson</td><td>82000</td><td>Finance</td></tr>
+        </table>
+
+        <h3>Searched CASE</h3>
+        
+        <div class="syntax">
+            <h5>Syntax:</h5>
+            <pre><code>CASE
+    WHEN condition1 THEN result1
+    WHEN condition2 THEN result2
+    ...
+    ELSE default_result
+END</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Example - Salary categories:</h5>
+            <pre><code>SELECT name, salary,
+    CASE
+        WHEN salary >= 80000 THEN 'High Salary'
+        WHEN salary >= 70000 THEN 'Medium Salary'
+        WHEN salary >= 60000 THEN 'Low Salary'
+        ELSE 'Very Low Salary'
+    END as salary_category
+FROM employees
+ORDER BY salary DESC;</code></pre>
+        </div>
+
+        <h4>Output:</h4>
+        <table>
+            <tr>
+                <th>name</th>
+                <th>salary</th>
+                <th>salary_category</th>
+            </tr>
+            <tr><td>Mike Johnson</td><td>85000</td><td>High Salary</td></tr>
+            <tr><td>Tom Wilson</td><td>82000</td><td>High Salary</td></tr>
+            <tr><td>Sarah Wilson</td><td>78000</td><td>Medium Salary</td></tr>
+            <tr><td>John Doe</td><td>75000</td><td>Medium Salary</td></tr>
+            <tr><td>David Brown</td><td>72000</td><td>Medium Salary</td></tr>
+            <tr><td>Lisa Anderson</td><td>68000</td><td>Low Salary</td></tr>
+            <tr><td>Jane Smith</td><td>65000</td><td>Low Salary</td></tr>
+        </table>
+
+        <h3>CASE in Aggregations</h3>
+        
+        <div class="example">
+            <h5>Example - Count employees by salary range:</h5>
+            <pre><code>SELECT 
+    COUNT(CASE WHEN salary >= 80000 THEN 1 END) as high_salary_count,
+    COUNT(CASE WHEN salary >= 70000 AND salary < 80000 THEN 1 END) as medium_salary_count,
+    COUNT(CASE WHEN salary < 70000 THEN 1 END) as low_salary_count
+FROM employees;</code></pre>
+        </div>
+
+        <h4>Output:</h4>
+        <table>
+            <tr>
+                <th>high_salary_count</th>
+                <th>medium_salary_count</th>
+                <th>low_salary_count</th>
+            </tr>
+            <tr><td>2</td><td>3</td><td>2</td></tr>
+        </table>
+
+        <h2 id="null-handling">7. NULL Handling</h2>
+        <p>NULL represents missing or unknown data. Special functions are needed to handle NULL values properly.</p>
+
+        <h3>Sample Data with NULLs</h3>
+        
+        <h4>customers table:</h4>
+        <table>
+            <tr>
+                <th>customer_id</th>
+                <th>name</th>
+                <th>email</th>
+                <th>phone</th>
+                <th>address</th>
+            </tr>
+            <tr><td>1</td><td>John Doe</td><td>john@email.com</td><td>555-1234</td><td>123 Main St</td></tr>
+            <tr><td>2</td><td>Jane Smith</td><td>jane@email.com</td><td>NULL</td><td>456 Oak Ave</td></tr>
+            <tr><td>3</td><td>Mike Johnson</td><td>NULL</td><td>555-5678</td><td>NULL</td></tr>
+            <tr><td>4</td><td>Sarah Wilson</td><td>sarah@email.com</td><td>NULL</td><td>NULL</td></tr>
+        </table>
+
+        <h3>IS NULL / IS NOT NULL</h3>
+        
+        <div class="example">
+            <h5>Example - Find customers without phone numbers:</h5>
+            <pre><code>SELECT name, email, phone
+FROM customers
+WHERE phone IS NULL;</code></pre>
+        </div>
+
+        <h4>Output:</h4>
+        <table>
+            <tr>
+                <th>name</th>
+                <th>email</th>
+                <th>phone</th>
+            </tr>
+            <tr><td>Jane Smith</td><td>jane@email.com</td><td>NULL</td></tr>
+            <tr><td>Sarah Wilson</td><td>sarah@email.com</td><td>NULL</td></tr>
+        </table>
+
+        <div class="example">
+            <h5>Example - Find customers with complete contact info:</h5>
+            <pre><code>SELECT name, email, phone, address
+FROM customers
+WHERE phone IS NOT NULL AND email IS NOT NULL AND address IS NOT NULL;</code></pre>
+        </div>
+
+        <h4>Output:</h4>
+        <table>
+            <tr>
+                <th>name</th>
+                <th>email</th>
+                <th>phone</th>
+                <th>address</th>
+            </tr>
+            <tr><td>John Doe</td><td>john@email.com</td><td>555-1234</td><td>123 Main St</td></tr>
+        </table>
+
+        <h3>COALESCE</h3>
+        <p>Returns the first non-NULL value from a list of expressions.</p>
+        
+        <div class="syntax">
+            <h5>Syntax:</h5>
+            <pre><code>COALESCE(value1, value2, value3, ...)</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Example - Provide default values:</h5>
+            <pre><code>SELECT name,
+    COALESCE(email, 'No email provided') as email,
+    COALESCE(phone, 'No phone provided') as phone,
+    COALESCE(address, 'No address provided') as address
+FROM customers;</code></pre>
+        </div>
+
+        <h4>Output:</h4>
+        <table>
+            <tr>
+                <th>name</th>
+                <th>email</th>
+                <th>phone</th>
+                <th>address</th>
+            </tr>
+            <tr><td>John Doe</td><td>john@email.com</td><td>555-1234</td><td>123 Main St</td></tr>
+            <tr><td>Jane Smith</td><td>jane@email.com</td><td>No phone provided</td><td>456 Oak Ave</td></tr>
+            <tr><td>Mike Johnson</td><td>No email provided</td><td>555-5678</td><td>No address provided</td></tr>
+            <tr><td>Sarah Wilson</td><td>sarah@email.com</td><td>No phone provided</td><td>No address provided</td></tr>
+        </table>
+
+        <h3>IFNULL (MySQL) / ISNULL (SQL Server)</h3>
+        <p>Returns an alternative value if the expression is NULL.</p>
+        
+        <div class="syntax">
+            <h5>Syntax:</h5>
+            <pre><code>IFNULL(expression, alternative_value)  -- MySQL
+ISNULL(expression, alternative_value)  -- SQL Server</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Example:</h5>
+            <pre><code>SELECT name,
+    IFNULL(phone, 'Not provided') as phone_number
+FROM customers;</code></pre>
+        </div>
+
+        <h4>Output:</h4>
+        <table>
+            <tr>
+                <th>name</th>
+                <th>phone_number</th>
+            </tr>
+            <tr><td>John Doe</td><td>555-1234</td></tr>
+            <tr><td>Jane Smith</td><td>Not provided</td></tr>
+            <tr><td>Mike Johnson</td><td>555-5678</td></tr>
+            <tr><td>Sarah Wilson</td><td>Not provided</td></tr>
+        </table>
+
+        <h3>NULLIF</h3>
+        <p>Returns NULL if two expressions are equal; otherwise returns the first expression.</p>
+        
+        <div class="syntax">
+            <h5>Syntax:</h5>
+            <pre><code>NULLIF(expression1, expression2)</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Example - Convert empty strings to NULL:</h5>
+            <pre><code>SELECT name,
+    NULLIF(email, '') as email,
+    NULLIF(phone, '') as phone
+FROM customers;</code></pre>
+        </div>
+
+        <h2 id="constraints">8. Constraints</h2>
+        <p>Constraints are rules enforced on data columns to ensure data integrity and accuracy.</p>
+
+        <h3>PRIMARY KEY</h3>
+        <p>Uniquely identifies each row in a table. Cannot contain NULL values.</p>
+        
+        <div class="syntax">
+            <h5>Syntax:</h5>
+            <pre><code>CREATE TABLE table_name (
+    column1 datatype PRIMARY KEY,
+    column2 datatype,
+    ...
+);</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Example:</h5>
+            <pre><code>CREATE TABLE products (
+    product_id INT PRIMARY KEY,
+    product_name VARCHAR(100) NOT NULL,
+    price DECIMAL(10,2)
+);</code></pre>
+        </div>
+
+        <h3>FOREIGN KEY</h3>
+        <p>Links two tables together and enforces referential integrity.</p>
+        
+        <div class="syntax">
+            <h5>Syntax:</h5>
+            <pre><code>CREATE TABLE child_table (
+    column1 datatype,
+    column2 datatype,
+    FOREIGN KEY (column1) REFERENCES parent_table(column1)
+);</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Example:</h5>
+            <pre><code>CREATE TABLE orders (
+    order_id INT PRIMARY KEY,
+    customer_id INT,
+    order_date DATE,
+    FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+);</code></pre>
+        </div>
+
+        <h3>UNIQUE</h3>
+        <p>Ensures all values in a column are different.</p>
+        
+        <div class="example">
+            <h5>Example:</h5>
+            <pre><code>CREATE TABLE users (
+    user_id INT PRIMARY KEY,
+    username VARCHAR(50) UNIQUE,
+    email VARCHAR(100) UNIQUE,
+    password VARCHAR(255) NOT NULL
+);</code></pre>
+        </div>
+
+        <h3>CHECK</h3>
+        <p>Ensures that all values in a column satisfy a specific condition.</p>
+        
+        <div class="example">
+            <h5>Example:</h5>
+            <pre><code>CREATE TABLE employees (
+    employee_id INT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    age INT CHECK (age >= 18 AND age <= 65),
+    salary DECIMAL(10,2) CHECK (salary > 0)
+);</code></pre>
+        </div>
+
+        <h3>DEFAULT</h3>
+        <p>Sets a default value for a column when no value is specified.</p>
+        
+        <div class="example">
+            <h5>Example:</h5>
+            <pre><code>CREATE TABLE orders (
+    order_id INT PRIMARY KEY,
+    order_date DATE DEFAULT CURRENT_DATE,
+    status VARCHAR(20) DEFAULT 'Pending',
+    customer_id INT NOT NULL
+);</code></pre>
+        </div>
+
+        <h3>NOT NULL</h3>
+        <p>Ensures that a column cannot have a NULL value.</p>
+        
+        <div class="example">
+            <h5>Example:</h5>
+            <pre><code>CREATE TABLE customers (
+    customer_id INT PRIMARY KEY,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    email VARCHAR(100) UNIQUE,
+    phone VARCHAR(20)
+);</code></pre>
+        </div>
+
+        <h3>Adding Constraints to Existing Tables</h3>
+        
+        <div class="example">
+            <h5>Example - Add PRIMARY KEY:</h5>
+            <pre><code>ALTER TABLE table_name
+ADD CONSTRAINT pk_constraint_name PRIMARY KEY (column_name);</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Example - Add FOREIGN KEY:</h5>
+            <pre><code>ALTER TABLE orders
+ADD CONSTRAINT fk_customer
+FOREIGN KEY (customer_id) REFERENCES customers(customer_id);</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Example - Add CHECK constraint:</h5>
+            <pre><code>ALTER TABLE employees
+ADD CONSTRAINT chk_salary CHECK (salary > 0);</code></pre>
+        </div>
+
+        <h3>Dropping Constraints</h3>
+        
+        <div class="example">
+            <h5>Example:</h5>
+            <pre><code>ALTER TABLE table_name
+DROP CONSTRAINT constraint_name;</code></pre>
+        </div>
+
+        <div class="tip">
+            <strong>Best Practices for Constraints:</strong>
+            <ul>
+                <li>Always define PRIMARY KEY for each table</li>
+                <li>Use FOREIGN KEY to maintain referential integrity</li>
+                <li>Add CHECK constraints to validate business rules</li>
+                <li>Use NOT NULL for required fields</li>
+                <li>Consider performance impact of constraints</li>
+            </ul>
+        </div>
+
+        <h2>Summary</h2>
+        <p>This intermediate SQL guide covered essential concepts for working with relational databases:</p>
+        
+        <ul>
+            <li><strong>Joins</strong> - Combine data from multiple tables using INNER, LEFT, RIGHT, FULL OUTER, SELF, and CROSS joins</li>
+            <li><strong>Set Operations</strong> - Combine query results using UNION, INTERSECT, and EXCEPT</li>
+            <li><strong>Grouping & Aggregation</strong> - Group data and perform calculations with GROUP BY, HAVING, and aggregate functions</li>
+            <li><strong>Subqueries</strong> - Nest queries for complex data retrieval scenarios</li>
+            <li><strong>Views</strong> - Create virtual tables for simplified querying and security</li>
+            <li><strong>CASE Statements</strong> - Add conditional logic to your queries</li>
+            <li><strong>NULL Handling</strong> - Work with missing data using specialized functions</li>
+            <li><strong>Constraints</strong> - Enforce data integrity rules at the database level</li>
+        </ul>
+
+        <div class="tip">
+            <strong>Next Steps:</strong>
+            <br>After mastering these intermediate concepts, you can advance to:
+            <ul>
+                <li>Window Functions and Analytics</li>
+                <li>Common Table Expressions (CTEs)</li>
+                <li>Stored Procedures and Functions</li>
+                <li>Indexes and Query Optimization</li>
+                <li>Advanced Database Design</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Sidebar functionality
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.querySelector('.sidebar-toggle');
+            
+            if (window.innerWidth <= 768 && 
+                !sidebar.contains(event.target) && 
+                !sidebarToggle.contains(event.target)) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // Add smooth scrolling for better UX
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    // Calculate offset to account for sticky TOC
+                    const tocElement = document.querySelector('.toc');
+                    const tocHeight = tocElement ? tocElement.offsetHeight : 0;
+                    const offset = tocHeight + 40; // Extra 40px for better spacing
+                    
+                    const targetPosition = target.offsetTop - offset;
+                    
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Active section highlighting
+        function updateActiveSection() {
+            const sections = document.querySelectorAll('h2[id]');
+            const tocLinks = document.querySelectorAll('.toc a');
+            
+            let currentSection = '';
+            const tocElement = document.querySelector('.toc');
+            const tocHeight = tocElement ? tocElement.offsetHeight : 0;
+            const offset = tocHeight + 50; // Same offset as smooth scrolling
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (window.scrollY >= sectionTop - offset) {
+                    currentSection = section.id;
+                }
+            });
+            
+            tocLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + currentSection) {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        // Update active section on scroll
+        window.addEventListener('scroll', updateActiveSection);
+
+        // Add entrance animations
+        window.addEventListener('load', function() {
+            const sections = document.querySelectorAll('h2, .example, .syntax, .tip, .warning');
+            sections.forEach((section, index) => {
+                setTimeout(() => {
+                    section.style.opacity = '0';
+                    section.style.transform = 'translateY(20px)';
+                    section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                    
+                    setTimeout(() => {
+                        section.style.opacity = '1';
+                        section.style.transform = 'translateY(0)';
+                    }, 100);
+                }, index * 50);
+            });
+            
+            // Initial active section update
+            updateActiveSection();
+        });
+    </script>
+</body>
+</html>

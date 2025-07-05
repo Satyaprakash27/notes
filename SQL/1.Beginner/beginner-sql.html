@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🟢 Beginner SQL Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: #2c3e50;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background: #34495e;
+            border-bottom: 1px solid #455a75;
+        }
+
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 1.3em;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #ecf0f1;
+            border: none;
+            padding: 0;
+        }
+
+        .sidebar-nav {
+            padding: 0;
+        }
+
+        .sidebar-link {
+            display: block;
+            color: #bdc3c7;
+            text-decoration: none;
+            padding: 15px 20px;
+            border-bottom: 1px solid #455a75;
+            transition: background 0.2s ease;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 1.1em;
+            font-weight: 500;
+        }
+
+        .sidebar-link:hover {
+            background: #34495e;
+            color: #ecf0f1;
+        }
+
+        .sidebar-link.current {
+            background: #27ae60;
+            color: white;
+            font-weight: 600;
+        }
+
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            border-bottom: 3px solid #27ae60;
+            padding-bottom: 10px;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #34495e;
+            border-left: 4px solid #27ae60;
+            padding-left: 15px;
+            margin-top: 30px;
+            font-size: 1.8em;
+        }
+        h3 {
+            color: #27ae60;
+            margin-top: 25px;
+            font-size: 1.4em;
+        }
+        h4 {
+            color: #16a085;
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+        .toc {
+            background: rgba(39, 174, 96, 0.15);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(39, 174, 96, 0.3);
+        }
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: space-evenly;
+            align-items: center;
+        }
+        .toc li {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .toc a {
+            color: #2c3e50;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            white-space: nowrap;
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(39, 174, 96, 0.3);
+            min-height: 40px;
+            width: 100%;
+        }
+        .toc a:hover, .toc a.active {
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
+        }
+        
+        pre {
+            background: #000000;
+            color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        code {
+            background: #000000;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #ffffff;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        th, td {
+            border: 1px solid #e9ecef;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #27ae60;
+            color: white;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        tr:hover {
+            background: #e8f4f8;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .warning::before {
+            content: "⚠️ ";
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .tip {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .tip::before {
+            content: "💡 ";
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .example {
+            background: #f8f9fa;
+            border-left: 4px solid #17a2b8;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .example h5 {
+            margin-top: 0;
+            color: #17a2b8;
+            font-size: 1.1em;
+        }
+        .syntax {
+            background: #e9ecef;
+            border-left: 4px solid #6c757d;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .syntax h5 {
+            margin-top: 0;
+            color: #6c757d;
+            font-size: 1.1em;
+        }
+        .benefits {
+            background: #e8f5e8;
+            border: 1px solid #27ae60;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .benefits ul {
+            margin: 10px 0;
+        }
+        .benefits li {
+            margin: 5px 0;
+        }
+
+        @media (max-width: 1024px) {
+            .toc ul {
+                justify-content: center;
+                gap: 0.75rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .sidebar-toggle {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            h2 {
+                font-size: 1.5em;
+            }
+
+            table {
+                font-size: 0.9em;
+            }
+
+            .toc {
+                position: static;
+                margin: 20px 0;
+            }
+
+            .toc ul {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+    
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2><a href="../SQL.html" style="color: inherit; text-decoration: none;">🗃️ SQL Guides</a></h2>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="../1.Beginner/beginner-sql.html" class="sidebar-link current">
+                🟢 Beginner SQL
+            </a>
+            <a href="../2.Intermediate/intermediate-sql.html" class="sidebar-link">
+                🟡 Intermediate SQL
+            </a>
+            <a href="../3.Advanced/advanced-sql.html" class="sidebar-link">
+                🔵 Advanced SQL
+            </a>
+            <a href="../4.Database Design & Modeling/database-design-modeling.html" class="sidebar-link">
+                🟣 Database Design & Modeling
+            </a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="container">
+        <h1>🟢 Beginner SQL Guide</h1>
+        
+        <div class="toc" id="toc">
+            <ul>
+                <li><a href="#introduction">Introduction</a></li>
+                <li><a href="#what-is-sql">What is SQL</a></li>
+                <li><a href="#types-of-sql">Types of SQL</a></li>
+                <li><a href="#basic-commands">Basic Commands</a></li>
+                <li><a href="#data-types">Data Types</a></li>
+                <li><a href="#filtering">Filtering Data</a></li>
+                <li><a href="#sorting">Sorting</a></li>
+                <li><a href="#aliases">Aliases</a></li>
+                <li><a href="#functions">Functions</a></li>
+            </ul>
+        </div>
+
+        <h2 id="introduction">Introduction to SQL</h2>
+        <p>SQL (Structured Query Language) is the standard language for managing and manipulating relational databases. It allows you to store, retrieve, update, and delete data from databases efficiently.</p>
+
+        <div class="benefits">
+            <h3>Key Benefits:</h3>
+            <ul>
+                <li><strong>Standardized:</strong> Works across different database systems</li>
+                <li><strong>Declarative:</strong> You specify what you want, not how to get it</li>
+                <li><strong>Powerful:</strong> Can handle complex data operations</li>
+                <li><strong>Efficient:</strong> Optimized for data retrieval and manipulation</li>
+            </ul>
+        </div>
+
+        <h2 id="what-is-sql">What is SQL</h2>
+        <p>SQL is a domain-specific language designed for managing data held in a relational database management system (RDBMS). It consists of various types of statements that allow you to:</p>
+        
+        <ul>
+            <li><strong>Query data</strong> from tables</li>
+            <li><strong>Insert new records</strong> into tables</li>
+            <li><strong>Update existing records</strong> in tables</li>
+            <li><strong>Delete records</strong> from tables</li>
+            <li><strong>Create and modify</strong> database structures</li>
+        </ul>
+
+        <h3>SQL Standards:</h3>
+        <ul>
+            <li><strong>ANSI SQL</strong> (American National Standards Institute)</li>
+            <li><strong>ISO SQL</strong> (International Organization for Standardization)</li>
+            <li>Popular databases like MySQL, PostgreSQL, SQL Server, Oracle follow these standards with some variations</li>
+        </ul>
+
+        <h2 id="types-of-sql">Types of SQL</h2>
+        <p>SQL commands are categorized into four main types:</p>
+
+        <h3>1. DDL (Data Definition Language)</h3>
+        <p>Controls the structure of the database and its objects.</p>
+        
+        <div class="syntax">
+            <h5>Commands:</h5>
+            <ul>
+                <li><code>CREATE</code> - Creates database objects (tables, indexes, etc.)</li>
+                <li><code>ALTER</code> - Modifies existing database objects</li>
+                <li><code>DROP</code> - Deletes database objects</li>
+                <li><code>TRUNCATE</code> - Removes all records from a table</li>
+            </ul>
+        </div>
+
+        <div class="example">
+            <h5>Example:</h5>
+            <pre><code>CREATE TABLE employees (
+    id INT PRIMARY KEY,
+    name VARCHAR(50),
+    department VARCHAR(30)
+);</code></pre>
+        </div>
+
+        <h3>2. DML (Data Manipulation Language)</h3>
+        <p>Deals with data manipulation within tables.</p>
+        
+        <div class="syntax">
+            <h5>Commands:</h5>
+            <ul>
+                <li><code>SELECT</code> - Retrieves data from tables</li>
+                <li><code>INSERT</code> - Adds new records to tables</li>
+                <li><code>UPDATE</code> - Modifies existing records</li>
+                <li><code>DELETE</code> - Removes records from tables</li>
+            </ul>
+        </div>
+
+        <div class="example">
+            <h5>Example:</h5>
+            <pre><code>INSERT INTO employees (id, name, department) 
+VALUES (1, 'John Doe', 'IT');</code></pre>
+        </div>
+
+        <h3>3. DCL (Data Control Language)</h3>
+        <p>Controls access permissions and security.</p>
+        
+        <div class="syntax">
+            <h5>Commands:</h5>
+            <ul>
+                <li><code>GRANT</code> - Gives user access privileges</li>
+                <li><code>REVOKE</code> - Removes user access privileges</li>
+            </ul>
+        </div>
+
+        <div class="example">
+            <h5>Example:</h5>
+            <pre><code>GRANT SELECT ON employees TO user1;</code></pre>
+        </div>
+
+        <h3>4. TCL (Transaction Control Language)</h3>
+        <p>Manages database transactions.</p>
+        
+        <div class="syntax">
+            <h5>Commands:</h5>
+            <ul>
+                <li><code>COMMIT</code> - Saves all changes made in the current transaction</li>
+                <li><code>ROLLBACK</code> - Undoes changes made in the current transaction</li>
+                <li><code>SAVEPOINT</code> - Sets a point within a transaction to rollback to</li>
+            </ul>
+        </div>
+
+        <div class="example">
+            <h5>Example:</h5>
+            <pre><code>BEGIN TRANSACTION;
+UPDATE employees SET department = 'HR' WHERE id = 1;
+COMMIT;</code></pre>
+        </div>
+
+        <h2 id="basic-commands">Basic SQL Commands</h2>
+        <p>Let's explore the fundamental SQL commands with detailed examples using sample tables.</p>
+
+        <h3>Sample Data Setup</h3>
+        <h4>employees table:</h4>
+        <table>
+            <tr>
+                <th>id</th>
+                <th>name</th>
+                <th>department</th>
+                <th>salary</th>
+                <th>hire_date</th>
+            </tr>
+            <tr><td>1</td><td>John Doe</td><td>IT</td><td>75000</td><td>2023-01-15</td></tr>
+            <tr><td>2</td><td>Jane Smith</td><td>HR</td><td>65000</td><td>2023-02-20</td></tr>
+            <tr><td>3</td><td>Mike Johnson</td><td>IT</td><td>80000</td><td>2023-01-10</td></tr>
+            <tr><td>4</td><td>Sarah Wilson</td><td>Finance</td><td>70000</td><td>2023-03-05</td></tr>
+            <tr><td>5</td><td>David Brown</td><td>IT</td><td>72000</td><td>2023-02-28</td></tr>
+        </table>
+
+        <h3>1. SELECT Command</h3>
+        <p>Retrieves data from one or more tables.</p>
+        
+        <div class="syntax">
+            <h5>Basic Syntax:</h5>
+            <pre><code>SELECT column1, column2, ...
+FROM table_name;</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Select all columns:</h5>
+            <pre><code>SELECT * FROM employees;</code></pre>
+        </div>
+
+        <h4>Output:</h4>
+        <table>
+            <tr>
+                <th>id</th>
+                <th>name</th>
+                <th>department</th>
+                <th>salary</th>
+                <th>hire_date</th>
+            </tr>
+            <tr><td>1</td><td>John Doe</td><td>IT</td><td>75000</td><td>2023-01-15</td></tr>
+            <tr><td>2</td><td>Jane Smith</td><td>HR</td><td>65000</td><td>2023-02-20</td></tr>
+            <tr><td>3</td><td>Mike Johnson</td><td>IT</td><td>80000</td><td>2023-01-10</td></tr>
+            <tr><td>4</td><td>Sarah Wilson</td><td>Finance</td><td>70000</td><td>2023-03-05</td></tr>
+            <tr><td>5</td><td>David Brown</td><td>IT</td><td>72000</td><td>2023-02-28</td></tr>
+        </table>
+
+        <div class="example">
+            <h5>Select specific columns:</h5>
+            <pre><code>SELECT name, department, salary FROM employees;</code></pre>
+        </div>
+
+        <h4>Output:</h4>
+        <table>
+            <tr>
+                <th>name</th>
+                <th>department</th>
+                <th>salary</th>
+            </tr>
+            <tr><td>John Doe</td><td>IT</td><td>75000</td></tr>
+            <tr><td>Jane Smith</td><td>HR</td><td>65000</td></tr>
+            <tr><td>Mike Johnson</td><td>IT</td><td>80000</td></tr>
+            <tr><td>Sarah Wilson</td><td>Finance</td><td>70000</td></tr>
+            <tr><td>David Brown</td><td>IT</td><td>72000</td></tr>
+        </table>
+
+        <h3>2. INSERT Command</h3>
+        <p>Adds new records to a table.</p>
+        
+        <div class="syntax">
+            <h5>Basic Syntax:</h5>
+            <pre><code>INSERT INTO table_name (column1, column2, ...)
+VALUES (value1, value2, ...);</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Insert a single record:</h5>
+            <pre><code>INSERT INTO employees (id, name, department, salary, hire_date)
+VALUES (6, 'Lisa Anderson', 'Marketing', 68000, '2023-04-01');</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Insert multiple records:</h5>
+            <pre><code>INSERT INTO employees (id, name, department, salary, hire_date)
+VALUES 
+    (7, 'Tom Wilson', 'Sales', 62000, '2023-04-15'),
+    (8, 'Anna Davis', 'IT', 78000, '2023-04-20');</code></pre>
+        </div>
+
+        <h3>3. UPDATE Command</h3>
+        <p>Modifies existing records in a table.</p>
+        
+        <div class="syntax">
+            <h5>Basic Syntax:</h5>
+            <pre><code>UPDATE table_name
+SET column1 = value1, column2 = value2, ...
+WHERE condition;</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Update a single record:</h5>
+            <pre><code>UPDATE employees
+SET salary = 77000
+WHERE id = 1;</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Update multiple records:</h5>
+            <pre><code>UPDATE employees
+SET salary = salary * 1.1
+WHERE department = 'IT';</code></pre>
+        </div>
+
+        <div class="warning">
+            <strong>Warning:</strong> Always use a WHERE clause with UPDATE to avoid updating all rows in the table.
+        </div>
+
+        <h3>4. DELETE Command</h3>
+        <p>Removes records from a table.</p>
+        
+        <div class="syntax">
+            <h5>Basic Syntax:</h5>
+            <pre><code>DELETE FROM table_name
+WHERE condition;</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Delete a specific record:</h5>
+            <pre><code>DELETE FROM employees
+WHERE id = 8;</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Delete multiple records:</h5>
+            <pre><code>DELETE FROM employees
+WHERE department = 'Marketing';</code></pre>
+        </div>
+
+        <div class="warning">
+            <strong>Warning:</strong> Always use a WHERE clause with DELETE to avoid deleting all rows in the table.
+        </div>
+
+        <h2 id="data-types">Data Types</h2>
+        <p>SQL supports various data types to store different kinds of information.</p>
+
+        <h3>1. Numeric Data Types</h3>
+        <table>
+            <tr>
+                <th>Type</th>
+                <th>Description</th>
+                <th>Range</th>
+            </tr>
+            <tr><td>INT</td><td>Integer numbers</td><td>-2,147,483,648 to 2,147,483,647</td></tr>
+            <tr><td>BIGINT</td><td>Large integer numbers</td><td>-9,223,372,036,854,775,808 to 9,223,372,036,854,775,807</td></tr>
+            <tr><td>DECIMAL(p,s)</td><td>Fixed-point numbers</td><td>Precision p, Scale s</td></tr>
+            <tr><td>FLOAT</td><td>Floating-point numbers</td><td>Approximate numeric</td></tr>
+            <tr><td>REAL</td><td>Single precision floating-point</td><td>Approximate numeric</td></tr>
+        </table>
+
+        <div class="example">
+            <h5>Example:</h5>
+            <pre><code>CREATE TABLE products (
+    id INT,
+    price DECIMAL(10,2),
+    weight FLOAT,
+    quantity BIGINT
+);</code></pre>
+        </div>
+
+        <h3>2. String Data Types</h3>
+        <table>
+            <tr>
+                <th>Type</th>
+                <th>Description</th>
+                <th>Example</th>
+            </tr>
+            <tr><td>CHAR(n)</td><td>Fixed-length string</td><td>CHAR(10)</td></tr>
+            <tr><td>VARCHAR(n)</td><td>Variable-length string</td><td>VARCHAR(255)</td></tr>
+            <tr><td>TEXT</td><td>Large text data</td><td>TEXT</td></tr>
+            <tr><td>NCHAR(n)</td><td>Fixed-length Unicode string</td><td>NCHAR(10)</td></tr>
+            <tr><td>NVARCHAR(n)</td><td>Variable-length Unicode string</td><td>NVARCHAR(255)</td></tr>
+        </table>
+
+        <div class="example">
+            <h5>Example:</h5>
+            <pre><code>CREATE TABLE customers (
+    id INT,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    country_code CHAR(2),
+    description TEXT
+);</code></pre>
+        </div>
+
+        <h3>3. Date/Time Data Types</h3>
+        <table>
+            <tr>
+                <th>Type</th>
+                <th>Description</th>
+                <th>Example</th>
+            </tr>
+            <tr><td>DATE</td><td>Date only</td><td>2023-12-25</td></tr>
+            <tr><td>TIME</td><td>Time only</td><td>14:30:00</td></tr>
+            <tr><td>DATETIME</td><td>Date and time</td><td>2023-12-25 14:30:00</td></tr>
+            <tr><td>TIMESTAMP</td><td>Date and time with timezone</td><td>2023-12-25 14:30:00 UTC</td></tr>
+        </table>
+
+        <div class="example">
+            <h5>Example:</h5>
+            <pre><code>CREATE TABLE orders (
+    id INT,
+    order_date DATE,
+    order_time TIME,
+    created_at TIMESTAMP
+);</code></pre>
+        </div>
+
+        <h2 id="filtering">Filtering Data</h2>
+        <p>Filtering allows you to retrieve specific records based on conditions.</p>
+
+        <h3>Sample Data for Filtering Examples</h3>
+        <h4>products table:</h4>
+        <table>
+            <tr>
+                <th>id</th>
+                <th>name</th>
+                <th>category</th>
+                <th>price</th>
+                <th>stock</th>
+                <th>supplier_id</th>
+            </tr>
+            <tr><td>1</td><td>Laptop</td><td>Electronics</td><td>999.99</td><td>50</td><td>1</td></tr>
+            <tr><td>2</td><td>Mouse</td><td>Electronics</td><td>25.99</td><td>100</td><td>1</td></tr>
+            <tr><td>3</td><td>Desk Chair</td><td>Furniture</td><td>199.99</td><td>25</td><td>2</td></tr>
+            <tr><td>4</td><td>Notebook</td><td>Stationery</td><td>5.99</td><td>200</td><td>3</td></tr>
+            <tr><td>5</td><td>Tablet</td><td>Electronics</td><td>399.99</td><td>30</td><td>1</td></tr>
+            <tr><td>6</td><td>Pen</td><td>Stationery</td><td>1.99</td><td>500</td><td>3</td></tr>
+            <tr><td>7</td><td>Monitor</td><td>Electronics</td><td>299.99</td><td>40</td><td>1</td></tr>
+        </table>
+
+        <h3>1. WHERE Clause</h3>
+        <p>Filters records based on specified conditions.</p>
+        
+        <div class="syntax">
+            <h5>Basic Syntax:</h5>
+            <pre><code>SELECT column1, column2, ...
+FROM table_name
+WHERE condition;</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Filter by category:</h5>
+            <pre><code>SELECT * FROM products
+WHERE category = 'Electronics';</code></pre>
+        </div>
+
+        <h4>Output:</h4>
+        <table>
+            <tr>
+                <th>id</th>
+                <th>name</th>
+                <th>category</th>
+                <th>price</th>
+                <th>stock</th>
+                <th>supplier_id</th>
+            </tr>
+            <tr><td>1</td><td>Laptop</td><td>Electronics</td><td>999.99</td><td>50</td><td>1</td></tr>
+            <tr><td>2</td><td>Mouse</td><td>Electronics</td><td>25.99</td><td>100</td><td>1</td></tr>
+            <tr><td>5</td><td>Tablet</td><td>Electronics</td><td>399.99</td><td>30</td><td>1</td></tr>
+            <tr><td>7</td><td>Monitor</td><td>Electronics</td><td>299.99</td><td>40</td><td>1</td></tr>
+        </table>
+
+        <div class="example">
+            <h5>Filter by price range:</h5>
+            <pre><code>SELECT name, price FROM products
+WHERE price > 100;</code></pre>
+        </div>
+
+        <h4>Output:</h4>
+        <table>
+            <tr>
+                <th>name</th>
+                <th>price</th>
+            </tr>
+            <tr><td>Laptop</td><td>999.99</td></tr>
+            <tr><td>Desk Chair</td><td>199.99</td></tr>
+            <tr><td>Tablet</td><td>399.99</td></tr>
+            <tr><td>Monitor</td><td>299.99</td></tr>
+        </table>
+
+        <h3>2. AND, OR, NOT Operators</h3>
+        <p>Combine multiple conditions.</p>
+
+        <div class="example">
+            <h5>AND Operator:</h5>
+            <pre><code>SELECT * FROM products
+WHERE category = 'Electronics' AND price < 300;</code></pre>
+        </div>
+
+        <h4>Output:</h4>
+        <table>
+            <tr>
+                <th>id</th>
+                <th>name</th>
+                <th>category</th>
+                <th>price</th>
+                <th>stock</th>
+                <th>supplier_id</th>
+            </tr>
+            <tr><td>2</td><td>Mouse</td><td>Electronics</td><td>25.99</td><td>100</td><td>1</td></tr>
+            <tr><td>7</td><td>Monitor</td><td>Electronics</td><td>299.99</td><td>40</td><td>1</td></tr>
+        </table>
+
+        <div class="example">
+            <h5>OR Operator:</h5>
+            <pre><code>SELECT * FROM products
+WHERE category = 'Furniture' OR category = 'Stationery';</code></pre>
+        </div>
+
+        <h4>Output:</h4>
+        <table>
+            <tr>
+                <th>id</th>
+                <th>name</th>
+                <th>category</th>
+                <th>price</th>
+                <th>stock</th>
+                <th>supplier_id</th>
+            </tr>
+            <tr><td>3</td><td>Desk Chair</td><td>Furniture</td><td>199.99</td><td>25</td><td>2</td></tr>
+            <tr><td>4</td><td>Notebook</td><td>Stationery</td><td>5.99</td><td>200</td><td>3</td></tr>
+            <tr><td>6</td><td>Pen</td><td>Stationery</td><td>1.99</td><td>500</td><td>3</td></tr>
+        </table>
+
+        <div class="example">
+            <h5>NOT Operator:</h5>
+            <pre><code>SELECT * FROM products
+WHERE NOT category = 'Electronics';</code></pre>
+        </div>
+
+        <h3>3. BETWEEN Operator</h3>
+        <p>Selects values within a range.</p>
+        
+        <div class="syntax">
+            <h5>Syntax:</h5>
+            <pre><code>SELECT column1, column2, ...
+FROM table_name
+WHERE column_name BETWEEN value1 AND value2;</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Price range:</h5>
+            <pre><code>SELECT name, price FROM products
+WHERE price BETWEEN 100 AND 400;</code></pre>
+        </div>
+
+        <h4>Output:</h4>
+        <table>
+            <tr>
+                <th>name</th>
+                <th>price</th>
+            </tr>
+            <tr><td>Desk Chair</td><td>199.99</td></tr>
+            <tr><td>Tablet</td><td>399.99</td></tr>
+            <tr><td>Monitor</td><td>299.99</td></tr>
+        </table>
+
+        <h3>4. IN Operator</h3>
+        <p>Matches any value in a list.</p>
+        
+        <div class="syntax">
+            <h5>Syntax:</h5>
+            <pre><code>SELECT column1, column2, ...
+FROM table_name
+WHERE column_name IN (value1, value2, ...);</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Multiple categories:</h5>
+            <pre><code>SELECT * FROM products
+WHERE category IN ('Electronics', 'Furniture');</code></pre>
+        </div>
+
+        <h3>5. LIKE Operator</h3>
+        <p>Searches for a pattern in a column.</p>
+        
+        <div class="syntax">
+            <h5>Wildcards:</h5>
+            <ul>
+                <li><code>%</code> - Represents zero or more characters</li>
+                <li><code>_</code> - Represents a single character</li>
+            </ul>
+        </div>
+
+        <div class="example">
+            <h5>Names starting with 'L':</h5>
+            <pre><code>SELECT * FROM products
+WHERE name LIKE 'L%';</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Names containing 'ook':</h5>
+            <pre><code>SELECT * FROM products
+WHERE name LIKE '%ook%';</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Names with exactly 3 characters:</h5>
+            <pre><code>SELECT * FROM products
+WHERE name LIKE '___';</code></pre>
+        </div>
+
+        <h3>6. IS NULL / IS NOT NULL</h3>
+        <p>Checks for NULL values.</p>
+
+        <div class="example">
+            <h5>Find products without description:</h5>
+            <pre><code>SELECT name, description FROM products
+WHERE description IS NULL;</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Find products with description:</h5>
+            <pre><code>SELECT name, description FROM products
+WHERE description IS NOT NULL;</code></pre>
+        </div>
+
+        <h2 id="sorting">Sorting</h2>
+        <p>Sorting arranges query results in a specific order.</p>
+
+        <h3>ORDER BY Clause</h3>
+        <div class="syntax">
+            <h5>Basic Syntax:</h5>
+            <pre><code>SELECT column1, column2, ...
+FROM table_name
+ORDER BY column1 [ASC|DESC], column2 [ASC|DESC], ...;</code></pre>
+        </div>
+
+        <div class="tip">
+            <strong>Sort Options:</strong>
+            <ul>
+                <li><code>ASC</code> - Ascending order (default)</li>
+                <li><code>DESC</code> - Descending order</li>
+            </ul>
+        </div>
+
+        <div class="example">
+            <h5>Sort by price (ascending):</h5>
+            <pre><code>SELECT name, price FROM products
+ORDER BY price;</code></pre>
+        </div>
+
+        <h4>Output:</h4>
+        <table>
+            <tr>
+                <th>name</th>
+                <th>price</th>
+            </tr>
+            <tr><td>Pen</td><td>1.99</td></tr>
+            <tr><td>Notebook</td><td>5.99</td></tr>
+            <tr><td>Mouse</td><td>25.99</td></tr>
+            <tr><td>Desk Chair</td><td>199.99</td></tr>
+            <tr><td>Monitor</td><td>299.99</td></tr>
+            <tr><td>Tablet</td><td>399.99</td></tr>
+            <tr><td>Laptop</td><td>999.99</td></tr>
+        </table>
+
+        <div class="example">
+            <h5>Sort by price (descending):</h5>
+            <pre><code>SELECT name, price FROM products
+ORDER BY price DESC;</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Sort by multiple columns:</h5>
+            <pre><code>SELECT name, category, price FROM products
+ORDER BY category ASC, price DESC;</code></pre>
+        </div>
+
+        <h2 id="aliases">Aliases</h2>
+        <p>Aliases provide temporary names for tables or columns in a query.</p>
+
+        <h3>Column Aliases</h3>
+        <div class="syntax">
+            <h5>Basic Syntax:</h5>
+            <pre><code>SELECT column_name AS alias_name
+FROM table_name;</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Single column alias:</h5>
+            <pre><code>SELECT name AS product_name, price AS cost
+FROM products;</code></pre>
+        </div>
+
+        <h4>Output:</h4>
+        <table>
+            <tr>
+                <th>product_name</th>
+                <th>cost</th>
+            </tr>
+            <tr><td>Laptop</td><td>999.99</td></tr>
+            <tr><td>Mouse</td><td>25.99</td></tr>
+            <tr><td>Desk Chair</td><td>199.99</td></tr>
+            <tr><td>Notebook</td><td>5.99</td></tr>
+            <tr><td>Tablet</td><td>399.99</td></tr>
+            <tr><td>Pen</td><td>1.99</td></tr>
+            <tr><td>Monitor</td><td>299.99</td></tr>
+        </table>
+
+        <div class="example">
+            <h5>Alias with spaces (use quotes):</h5>
+            <pre><code>SELECT name AS "Product Name", price AS "Unit Price"
+FROM products;</code></pre>
+        </div>
+
+        <h3>Table Aliases</h3>
+        <div class="syntax">
+            <h5>Basic Syntax:</h5>
+            <pre><code>SELECT column_name
+FROM table_name AS alias_name;</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Single table alias:</h5>
+            <pre><code>SELECT p.name, p.price
+FROM products AS p
+WHERE p.category = 'Electronics';</code></pre>
+        </div>
+
+        <h2 id="functions">Functions</h2>
+        <p>SQL provides built-in functions to perform calculations and manipulate data.</p>
+
+        <h3>Sample Data for Function Examples</h3>
+        <h4>customers table:</h4>
+        <table>
+            <tr>
+                <th>id</th>
+                <th>first_name</th>
+                <th>last_name</th>
+                <th>email</th>
+                <th>registration_date</th>
+                <th>age</th>
+            </tr>
+            <tr><td>1</td><td>john</td><td>doe</td><td>john.doe@email.com</td><td>2023-01-15</td><td>25</td></tr>
+            <tr><td>2</td><td>jane</td><td>smith</td><td>jane.smith@email.com</td><td>2023-02-20</td><td>30</td></tr>
+            <tr><td>3</td><td>mike</td><td>johnson</td><td>mike.johnson@email.com</td><td>2023-01-10</td><td>35</td></tr>
+            <tr><td>4</td><td>sarah</td><td>wilson</td><td>sarah.wilson@email.com</td><td>2023-03-05</td><td>28</td></tr>
+        </table>
+
+        <h3>1. String Functions</h3>
+
+        <h4>CONCAT Function</h4>
+        <p>Combines two or more strings.</p>
+        
+        <div class="syntax">
+            <h5>Syntax:</h5>
+            <pre><code>CONCAT(string1, string2, ...)</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Combine first and last name:</h5>
+            <pre><code>SELECT CONCAT(first_name, ' ', last_name) AS full_name
+FROM customers;</code></pre>
+        </div>
+
+        <h4>Output:</h4>
+        <table>
+            <tr>
+                <th>full_name</th>
+            </tr>
+            <tr><td>john doe</td></tr>
+            <tr><td>jane smith</td></tr>
+            <tr><td>mike johnson</td></tr>
+            <tr><td>sarah wilson</td></tr>
+        </table>
+
+        <h4>UPPER Function</h4>
+        <p>Converts string to uppercase.</p>
+        
+        <div class="syntax">
+            <h5>Syntax:</h5>
+            <pre><code>UPPER(string)</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Convert names to uppercase:</h5>
+            <pre><code>SELECT UPPER(first_name) AS first_name_upper, 
+       UPPER(last_name) AS last_name_upper
+FROM customers;</code></pre>
+        </div>
+
+        <h4>LOWER Function</h4>
+        <p>Converts string to lowercase.</p>
+        
+        <div class="syntax">
+            <h5>Syntax:</h5>
+            <pre><code>LOWER(string)</code></pre>
+        </div>
+
+        <h4>SUBSTRING Function</h4>
+        <p>Extracts a substring from a string.</p>
+        
+        <div class="syntax">
+            <h5>Syntax:</h5>
+            <pre><code>SUBSTRING(string, start_position, length)</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Extract first 3 characters of first name:</h5>
+            <pre><code>SELECT first_name, SUBSTRING(first_name, 1, 3) AS first_three_chars
+FROM customers;</code></pre>
+        </div>
+
+        <h3>2. Numeric Functions</h3>
+
+        <h4>Sample Data for Numeric Functions</h4>
+        <h4>sales table:</h4>
+        <table>
+            <tr>
+                <th>id</th>
+                <th>product_id</th>
+                <th>quantity</th>
+                <th>unit_price</th>
+                <th>total_amount</th>
+            </tr>
+            <tr><td>1</td><td>1</td><td>2</td><td>999.99</td><td>1999.98</td></tr>
+            <tr><td>2</td><td>2</td><td>5</td><td>25.99</td><td>129.95</td></tr>
+            <tr><td>3</td><td>3</td><td>1</td><td>199.99</td><td>199.99</td></tr>
+            <tr><td>4</td><td>4</td><td>10</td><td>5.99</td><td>59.90</td></tr>
+            <tr><td>5</td><td>5</td><td>3</td><td>399.99</td><td>1199.97</td></tr>
+        </table>
+
+        <h4>ROUND Function</h4>
+        <p>Rounds a number to a specified number of decimal places.</p>
+        
+        <div class="syntax">
+            <h5>Syntax:</h5>
+            <pre><code>ROUND(number, decimal_places)</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Round to whole numbers:</h5>
+            <pre><code>SELECT unit_price, ROUND(unit_price, 0) AS rounded_price
+FROM sales;</code></pre>
+        </div>
+
+        <h4>CEIL Function</h4>
+        <p>Returns the smallest integer greater than or equal to the number.</p>
+        
+        <div class="syntax">
+            <h5>Syntax:</h5>
+            <pre><code>CEIL(number)</code></pre>
+        </div>
+
+        <h4>FLOOR Function</h4>
+        <p>Returns the largest integer less than or equal to the number.</p>
+        
+        <div class="syntax">
+            <h5>Syntax:</h5>
+            <pre><code>FLOOR(number)</code></pre>
+        </div>
+
+        <h3>3. Date Functions</h3>
+
+        <h4>Sample Data for Date Functions</h4>
+        <h4>orders table:</h4>
+        <table>
+            <tr>
+                <th>id</th>
+                <th>customer_id</th>
+                <th>order_date</th>
+                <th>ship_date</th>
+                <th>delivery_date</th>
+            </tr>
+            <tr><td>1</td><td>1</td><td>2023-01-15</td><td>2023-01-17</td><td>2023-01-20</td></tr>
+            <tr><td>2</td><td>2</td><td>2023-02-20</td><td>2023-02-22</td><td>2023-02-25</td></tr>
+            <tr><td>3</td><td>3</td><td>2023-01-10</td><td>2023-01-12</td><td>2023-01-15</td></tr>
+            <tr><td>4</td><td>4</td><td>2023-03-05</td><td>2023-03-07</td><td>2023-03-10</td></tr>
+            <tr><td>5</td><td>1</td><td>2023-04-01</td><td>2023-04-03</td><td>2023-04-06</td></tr>
+        </table>
+
+        <h4>NOW() Function</h4>
+        <p>Returns the current date and time.</p>
+        
+        <div class="syntax">
+            <h5>Syntax:</h5>
+            <pre><code>NOW()</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Current date and time:</h5>
+            <pre><code>SELECT NOW() AS current_datetime;</code></pre>
+        </div>
+
+        <h4>DATEPART Function</h4>
+        <p>Extracts a specific part of a date.</p>
+        
+        <div class="syntax">
+            <h5>Syntax:</h5>
+            <pre><code>DATEPART(part, date)</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Extract year and month:</h5>
+            <pre><code>SELECT order_date,
+       DATEPART(YEAR, order_date) AS order_year,
+       DATEPART(MONTH, order_date) AS order_month,
+       DATEPART(DAY, order_date) AS order_day
+FROM orders;</code></pre>
+        </div>
+
+        <h4>DATEDIFF Function</h4>
+        <p>Calculates the difference between two dates.</p>
+        
+        <div class="syntax">
+            <h5>Syntax:</h5>
+            <pre><code>DATEDIFF(date1, date2)</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Days between order and delivery:</h5>
+            <pre><code>SELECT id, order_date, delivery_date,
+       DATEDIFF(delivery_date, order_date) AS delivery_days
+FROM orders;</code></pre>
+        </div>
+
+        <h2>Summary</h2>
+        <p>This guide covered the fundamental SQL concepts for beginners:</p>
+        
+        <div class="benefits">
+            <ol>
+                <li><strong>Introduction to SQL</strong> - Understanding what SQL is and its benefits</li>
+                <li><strong>Types of SQL</strong> - DDL, DML, DCL, and TCL commands</li>
+                <li><strong>Basic Commands</strong> - SELECT, INSERT, UPDATE, DELETE with examples</li>
+                <li><strong>Data Types</strong> - Numeric, String, and Date/Time types</li>
+                <li><strong>Filtering</strong> - WHERE, AND, OR, NOT, BETWEEN, IN, LIKE, IS NULL</li>
+                <li><strong>Sorting</strong> - ORDER BY for organizing results</li>
+                <li><strong>Aliases</strong> - AS keyword for temporary names</li>
+                <li><strong>Functions</strong> - String, Numeric, and Date functions with practical examples</li>
+            </ol>
+        </div>
+
+        <p>Each concept includes detailed explanations, syntax, practical examples, and sample output tables to help you understand how SQL works in real-world scenarios.</p>
+
+        <h3>Next Steps</h3>
+        <p>After mastering these beginner concepts, you can move on to:</p>
+        <ul>
+            <li><strong>Intermediate SQL</strong> - JOINs, Subqueries, GROUP BY, HAVING</li>
+            <li><strong>Advanced SQL</strong> - Window Functions, CTEs, Stored Procedures</li>
+            <li><strong>Database Design</strong> - Normalization, Relationships, Indexes</li>
+        </ul>
+
+        <h3>Practice Tips</h3>
+        <div class="tip">
+            <ol>
+                <li><strong>Start with simple queries</strong> and gradually increase complexity</li>
+                <li><strong>Practice with real data</strong> to understand practical applications</li>
+                <li><strong>Use different database systems</strong> (MySQL, PostgreSQL, SQL Server)</li>
+                <li><strong>Build small projects</strong> to reinforce learning</li>
+                <li><strong>Read and write lots of SQL</strong> to improve fluency</li>
+            </ol>
+        </div>
+
+        <p style="text-align: center; font-size: 1.2em; color: #27ae60; margin-top: 30px;">
+            <strong>Happy querying! 🚀</strong>
+        </p>
+
+        </div>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.querySelector('.sidebar-toggle');
+            
+            if (window.innerWidth <= 768 && 
+                !sidebar.contains(event.target) && 
+                !toggle.contains(event.target) && 
+                sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    // Calculate offset to account for sticky TOC
+                    const tocElement = document.querySelector('.toc');
+                    const tocHeight = tocElement ? tocElement.offsetHeight : 0;
+                    const offset = tocHeight + 40; // Extra 40px for better spacing
+                    
+                    const targetPosition = target.offsetTop - offset;
+                    
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Update active link in TOC
+                    document.querySelectorAll('.toc a').forEach(link => {
+                        link.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                }
+            });
+        });
+
+        // Highlight current section in TOC on scroll
+        window.addEventListener('scroll', function() {
+            const sections = document.querySelectorAll('h2[id]');
+            const tocLinks = document.querySelectorAll('.toc a');
+            
+            let current = '';
+            const tocElement = document.querySelector('.toc');
+            const tocHeight = tocElement ? tocElement.offsetHeight : 0;
+            const offset = tocHeight + 50; // Same offset as smooth scrolling
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.offsetHeight;
+                if (window.scrollY >= sectionTop - offset) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            tocLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
