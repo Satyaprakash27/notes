@@ -18,11 +18,6 @@ Welcome to your comprehensive Python documentation collection! This repository c
 - **Topics**: Asyncio, concurrent programming, performance optimization
 - **Level**: Intermediate to Advanced
 
-### 🎨 Python Decorators
-- **Guide**: [Python Decorators](Decorators/decorators-guide.html)
-- **Topics**: Decorator patterns, advanced usage, best practices
-- **Level**: Intermediate
-
 ### 🚀 FastAPI Framework (Complete Series)
 FastAPI is our most comprehensive topic with 7 detailed guides:
 
@@ -95,7 +90,6 @@ Use the links in this README to jump to specific guides.
 Python Documentation Hub
 ├── 🤖 Agentic AI
 ├── ⚡ Async Programming  
-├── 🎨 Decorators
 ├── 🚀 FastAPI (7 guides)
 │   ├── Overview
 │   ├── Fundamentals
@@ -114,7 +108,6 @@ Python Documentation Hub
 |-------|------------|------------|-----------|
 | Agentic AI | Advanced | 1 | AI agent patterns |
 | Async Programming | Intermediate | 1 | Concurrency & performance |
-| Decorators | Intermediate | 1 | Python patterns |
 | **FastAPI** | **Beginner-Advanced** | **7** | **Complete web framework** |
 | LangChain | Intermediate | 1 | LLM applications |
 | LangGraph | Advanced | 1 | Graph-based AI |
