@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚖️ Trade-offs & Decision Making Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #e8e8e8;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: #1e1e1e;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            border-right: 1px solid #333;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background: #2d2d2d;
+            border-bottom: 1px solid #444;
+        }
+
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 1.3em;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #f0f0f0;
+            border: none;
+            padding: 0;
+        }
+
+        .sidebar-nav {
+            padding: 0;
+        }
+
+        .sidebar-link {
+            display: block;
+            color: #b8b8b8;
+            text-decoration: none;
+            padding: 15px 20px;
+            border-bottom: 1px solid #444;
+            transition: background 0.2s ease;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 1.1em;
+            font-weight: 500;
+        }
+
+        .sidebar-link:hover {
+            background: #3a3a3a;
+            color: #f0f0f0;
+        }
+
+        .sidebar-link.current {
+            background: #3498db;
+            color: white;
+            font-weight: 600;
+        }
+
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(30, 30, 30, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid #444;
+        }
+        h1 {
+            color: #f0f0f0;
+            text-align: center;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #e0e0e0;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+            margin-top: 30px;
+            font-size: 1.8em;
+            scroll-margin-top: 100px;
+        }
+        h3 {
+            color: #3498db;
+            margin-top: 25px;
+            font-size: 1.4em;
+        }
+        h4 {
+            color: #5dade2;
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+        .toc {
+            background: rgba(52, 152, 219, 0.15);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(52, 152, 219, 0.3);
+        }
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .toc li {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex: 0 1 calc(25% - 0.5rem);
+            min-width: 140px;
+        }
+        .toc li:nth-child(n+5) {
+            flex: 0 1 calc(33.33% - 0.5rem);
+        }
+        .toc a {
+            color: #e0e0e0;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            white-space: nowrap;
+            background: rgba(50, 50, 50, 0.7);
+            border: 1px solid rgba(52, 152, 219, 0.3);
+            min-height: 40px;
+            width: 100%;
+        }
+        .toc a:hover, .toc a.active {
+            background: linear-gradient(45deg, #3498db, #5dade2);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+        
+        pre {
+            background: #000000;
+            color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        code {
+            background: #000000;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #ffffff;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: #2a2a2a;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        th, td {
+            border: 1px solid #444;
+            padding: 12px;
+            text-align: left;
+            color: #e0e0e0;
+        }
+        th {
+            background: #3498db;
+            color: white;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background: #333;
+        }
+        tr:hover {
+            background: #404040;
+        }
+        .warning {
+            background: #3a2f1a;
+            border: 1px solid #b8860b;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #ffd700;
+        }
+        .warning::before {
+            content: "⚠️ ";
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .tip {
+            background: #1a3a2f;
+            border: 1px solid #27ae60;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #7bed9f;
+        }
+        .tip::before {
+            content: "💡 ";
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .example {
+            background: #2a2a2a;
+            border-left: 4px solid #17a2b8;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #e0e0e0;
+        }
+        .example h5 {
+            margin-top: 0;
+            color: #17a2b8;
+            font-size: 1.1em;
+        }
+        .syntax {
+            background: #2a2a2a;
+            border-left: 4px solid #6c757d;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #e0e0e0;
+        }
+        .syntax h5 {
+            margin-top: 0;
+            color: #6c757d;
+            font-size: 1.1em;
+        }
+        .benefits {
+            background: #1a3a1a;
+            border: 1px solid #3498db;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #90ee90;
+        }
+        .benefits ul {
+            margin: 10px 0;
+        }
+        .benefits li {
+            margin: 5px 0;
+        }
+        .checklist {
+            background: #2a2a3a;
+            border: 1px solid #3498db;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #e0e0f0;
+        }
+        .protocol {
+            background: #1a2a3a;
+            border: 1px solid #3498db;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #a8c8f0;
+        }
+        .comparison {
+            background: #3a1a1a;
+            border: 1px solid #e74c3c;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #ffb3b3;
+        }
+        .security {
+            background: #1a3a1a;
+            border: 1px solid #27ae60;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #90ee90;
+        }
+        .decision-matrix {
+            background: #2a2a3a;
+            border: 1px solid #e67e22;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #f39c12;
+        }
+        .pitfall {
+            background: #3a1a2a;
+            border: 1px solid #e74c3c;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #ff6b6b;
+        }
+        .pitfall::before {
+            content: "⚠️ ";
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .best-practice {
+            background: #1a3a2a;
+            border: 1px solid #27ae60;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #2ecc71;
+        }
+        .best-practice::before {
+            content: "✅ ";
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        @media (max-width: 1024px) {
+            .toc ul {
+                justify-content: center;
+                gap: 0.75rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .sidebar-toggle {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            h2 {
+                font-size: 1.5em;
+            }
+
+            table {
+                font-size: 0.9em;
+            }
+
+            .toc {
+                position: static;
+                margin: 20px 0;
+            }
+
+            .toc ul {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+    
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2><a href="../system-design.html" style="color: inherit; text-decoration: none;">🗂️ System Design</a></h2>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="../1.Fundamentals/system-design-fundamentals.html" class="sidebar-link">
+                🏗️ Fundamentals
+            </a>
+            <a href="../2.Networking & Communication/networking-communication.html" class="sidebar-link">
+                🌐 Networking & Communication
+            </a>
+            <a href="../3.Databases/databases.html" class="sidebar-link">
+                🗃️ Databases
+            </a>
+            <a href="../4.Caching/caching.html" class="sidebar-link">
+                🗄️ Caching
+            </a>
+            <a href="../5.Message Queues & Event-Driven Systems/message-queues-event-driven.html" class="sidebar-link">
+                📬 Message Queues & Events
+            </a>
+            <a href="../6.Storage Systems/storage-systems.html" class="sidebar-link">
+                💾 Storage Systems
+            </a>
+            <a href="../7.Design Patterns & Architecture/design-patterns-architecture.html" class="sidebar-link">
+                🏛️ Design Patterns
+            </a>
+            <a href="../8.Scalability & Performance/scalability-performance.html" class="sidebar-link">
+                📈 Scalability & Performance
+            </a>
+            <a href="../9.Security in System Design/security-system-design.html" class="sidebar-link">
+                🔒 Security
+            </a>
+            <a href="../10.Monitoring & Observability/monitoring-observability.html" class="sidebar-link">
+                📊 Monitoring & Observability
+            </a>
+            <a href="../11.Deployment & DevOps/deployment-devops.html" class="sidebar-link">
+                🚀 Deployment & DevOps
+            </a>
+            <a href="../12.Popular Use Cases/popular-use-cases.html" class="sidebar-link">
+                🎯 Popular Use Cases
+            </a>
+            <a href="../13.Trade-offs & Decision Making/trade-offs-decision-making.html" class="sidebar-link current">
+                ⚖️ Trade-offs & Decisions
+            </a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="container">
+        <h1>⚖️ Trade-offs & Decision Making Guide</h1>
+        
+        <div class="toc" id="toc">
+            <ul>
+                <li><a href="#sql-vs-nosql">SQL vs NoSQL</a></li>
+                <li><a href="#caching-vs-db">Caching vs DB</a></li>
+                <li><a href="#consistency-availability">Consistency vs Availability</a></li>
+                <li><a href="#when-queues">When to Use Queues</a></li>
+                <li><a href="#when-microservices">When to Use Microservices</a></li>
+                <li><a href="#service-discovery">Service Discovery</a></li>
+                <li><a href="#decision-framework">Decision Framework</a></li>
+            </ul>
+        </div>
+
+        <h2>Introduction</h2>
+        <p>System design is fundamentally about making trade-offs. Every architectural decision involves choosing between competing priorities, and understanding these trade-offs is crucial for building robust, scalable systems. This guide explores key decision points that architects and engineers face when designing distributed systems.</p>
+
+        <div class="tip">
+            <strong>Key Insight:</strong> The art of system design lies not in finding perfect solutions, but in making informed compromises that align with your specific requirements, constraints, and context.
+        </div>
+
+        <h2 id="sql-vs-nosql">SQL vs NoSQL</h2>
+        <p>One of the most fundamental decisions in system design is choosing between SQL (relational) and NoSQL (non-relational) databases. Each approach has distinct advantages and trade-offs that make them suitable for different use cases.</p>
+
+        <h3>SQL Databases (RDBMS)</h3>
+        <div class="benefits">
+            <h4>Advantages:</h4>
+            <ul>
+                <li><strong>ACID Compliance:</strong> Strong consistency guarantees</li>
+                <li><strong>Mature Ecosystem:</strong> Well-established tools, libraries, and expertise</li>
+                <li><strong>Standardized Query Language:</strong> SQL is universally understood</li>
+                <li><strong>Complex Queries:</strong> Excellent support for joins, aggregations, and complex relationships</li>
+                <li><strong>Data Integrity:</strong> Foreign keys, constraints, and schema validation</li>
+                <li><strong>Transactions:</strong> Multi-table operations with rollback capabilities</li>
+            </ul>
+        </div>
+
+        <div class="comparison">
+            <h4>Disadvantages:</h4>
+            <ul>
+                <li><strong>Vertical Scaling:</strong> Limited horizontal scaling options</li>
+                <li><strong>Schema Rigidity:</strong> Changes require migrations and downtime</li>
+                <li><strong>Performance:</strong> Can be slower for simple read/write operations</li>
+                <li><strong>Complexity:</strong> Joining multiple tables can be expensive</li>
+            </ul>
+        </div>
+
+        <div class="example">
+            <h5>Best Use Cases for SQL:</h5>
+            <ul>
+                <li>Financial applications requiring ACID compliance</li>
+                <li>Complex reporting and analytics</li>
+                <li>Applications with well-defined, stable schemas</li>
+                <li>Systems requiring strong consistency</li>
+                <li>Traditional business applications (CRM, ERP)</li>
+            </ul>
+        </div>
+
+        <h3>NoSQL Databases</h3>
+        <p>NoSQL databases come in several types, each optimized for different use cases:</p>
+
+        <h4>Document Stores (MongoDB, CouchDB)</h4>
+        <div class="protocol">
+            <h5>Advantages:</h5>
+            <ul>
+                <li>Flexible schema design</li>
+                <li>Natural fit for JSON/object-oriented data</li>
+                <li>Horizontal scaling capabilities</li>
+                <li>Fast read/write operations</li>
+            </ul>
+            <h5>Disadvantages:</h5>
+            <ul>
+                <li>Limited query capabilities</li>
+                <li>Eventual consistency models</li>
+                <li>No native joins</li>
+            </ul>
+            <h5>Use Cases:</h5>
+            <ul>
+                <li>Content management systems</li>
+                <li>Product catalogs</li>
+                <li>User profiles and preferences</li>
+            </ul>
+        </div>
+
+        <h4>Key-Value Stores (Redis, DynamoDB)</h4>
+        <div class="protocol">
+            <h5>Advantages:</h5>
+            <ul>
+                <li>Extremely fast operations</li>
+                <li>Simple data model</li>
+                <li>Excellent for caching</li>
+                <li>Horizontal scaling</li>
+            </ul>
+            <h5>Disadvantages:</h5>
+            <ul>
+                <li>Limited query options</li>
+                <li>No complex relationships</li>
+                <li>Simple data structures only</li>
+            </ul>
+            <h5>Use Cases:</h5>
+            <ul>
+                <li>Session storage</li>
+                <li>Caching layers</li>
+                <li>Real-time recommendations</li>
+                <li>Shopping carts</li>
+            </ul>
+        </div>
+
+        <h4>Column-Family (Cassandra, HBase)</h4>
+        <div class="protocol">
+            <h5>Advantages:</h5>
+            <ul>
+                <li>Excellent for time-series data</li>
+                <li>High write throughput</li>
+                <li>Horizontal scaling</li>
+                <li>Fault tolerance</li>
+            </ul>
+            <h5>Disadvantages:</h5>
+            <ul>
+                <li>Complex data modeling</li>
+                <li>Limited query flexibility</li>
+                <li>Eventual consistency</li>
+            </ul>
+            <h5>Use Cases:</h5>
+            <ul>
+                <li>IoT sensor data</li>
+                <li>Logging and analytics</li>
+                <li>Time-series databases</li>
+            </ul>
+        </div>
+
+        <h4>Graph Databases (Neo4j, Amazon Neptune)</h4>
+        <div class="protocol">
+            <h5>Advantages:</h5>
+            <ul>
+                <li>Natural representation of relationships</li>
+                <li>Fast traversal of connections</li>
+                <li>Flexible schema for relationships</li>
+            </ul>
+            <h5>Disadvantages:</h5>
+            <ul>
+                <li>Specialized use cases</li>
+                <li>Learning curve</li>
+                <li>Limited horizontal scaling</li>
+            </ul>
+            <h5>Use Cases:</h5>
+            <ul>
+                <li>Social networks</li>
+                <li>Recommendation engines</li>
+                <li>Fraud detection</li>
+                <li>Knowledge graphs</li>
+            </ul>
+        </div>
+
+        <h3>Decision Matrix</h3>
+        <table>
+            <tr>
+                <th>Factor</th>
+                <th>SQL</th>
+                <th>NoSQL</th>
+            </tr>
+            <tr>
+                <td><strong>Consistency</strong></td>
+                <td>Strong</td>
+                <td>Eventual (mostly)</td>
+            </tr>
+            <tr>
+                <td><strong>Scalability</strong></td>
+                <td>Vertical</td>
+                <td>Horizontal</td>
+            </tr>
+            <tr>
+                <td><strong>Flexibility</strong></td>
+                <td>Low</td>
+                <td>High</td>
+            </tr>
+            <tr>
+                <td><strong>Query Complexity</strong></td>
+                <td>High</td>
+                <td>Low-Medium</td>
+            </tr>
+            <tr>
+                <td><strong>Development Speed</strong></td>
+                <td>Medium</td>
+                <td>Fast</td>
+            </tr>
+            <tr>
+                <td><strong>Operational Complexity</strong></td>
+                <td>Low</td>
+                <td>Medium-High</td>
+            </tr>
+        </table>
+
+        <div class="decision-matrix">
+            <h4>When to Choose SQL:</h4>
+            <ul>
+                <li>Need ACID transactions</li>
+                <li>Complex queries and reporting</li>
+                <li>Well-defined, stable schema</li>
+                <li>Strong consistency requirements</li>
+                <li>Team familiar with SQL</li>
+                <li>Moderate scale requirements</li>
+            </ul>
+        </div>
+
+        <div class="decision-matrix">
+            <h4>When to Choose NoSQL:</h4>
+            <ul>
+                <li>Need horizontal scaling</li>
+                <li>Flexible or evolving schema</li>
+                <li>High performance requirements</li>
+                <li>Eventual consistency acceptable</li>
+                <li>Simple query patterns</li>
+                <li>Handling unstructured data</li>
+            </ul>
+        </div>
+
+        <h2 id="caching-vs-db">Caching vs DB Reads</h2>
+        <p>Caching is a critical optimization technique, but it introduces complexity and potential consistency issues. Understanding when and how to implement caching is essential for system performance.</p>
+
+        <h3>Direct Database Reads</h3>
+        <div class="benefits">
+            <h4>Advantages:</h4>
+            <ul>
+                <li><strong>Consistency:</strong> Always up-to-date data</li>
+                <li><strong>Simplicity:</strong> Fewer moving parts</li>
+                <li><strong>Reliability:</strong> Single source of truth</li>
+                <li><strong>Easier Debugging:</strong> Straightforward data flow</li>
+            </ul>
+        </div>
+
+        <div class="comparison">
+            <h4>Disadvantages:</h4>
+            <ul>
+                <li><strong>Latency:</strong> Higher response times</li>
+                <li><strong>Database Load:</strong> Increased pressure on database</li>
+                <li><strong>Scalability:</strong> Database becomes bottleneck</li>
+                <li><strong>Cost:</strong> Higher database resource usage</li>
+            </ul>
+        </div>
+
+        <h3>Caching Strategies</h3>
+
+        <h4>1. Cache-Aside (Lazy Loading)</h4>
+        <div class="syntax">
+            <h5>Pattern:</h5>
+            <pre>Application → Check Cache → Cache Miss → Database → Update Cache → Return Data</pre>
+        </div>
+
+        <div class="protocol">
+            <h5>Advantages:</h5>
+            <ul>
+                <li>Cache only what's needed</li>
+                <li>Resilient to cache failures</li>
+                <li>Data consistency maintained</li>
+            </ul>
+            <h5>Disadvantages:</h5>
+            <ul>
+                <li>Cache miss penalty</li>
+                <li>Potential for stale data</li>
+                <li>Complex cache invalidation</li>
+            </ul>
+        </div>
+
+        <h4>2. Write-Through</h4>
+        <div class="syntax">
+            <h5>Pattern:</h5>
+            <pre>Application → Write to Cache → Write to Database → Confirm Write</pre>
+        </div>
+
+        <div class="protocol">
+            <h5>Advantages:</h5>
+            <ul>
+                <li>Cache always consistent</li>
+                <li>Read performance excellent</li>
+                <li>Simple consistency model</li>
+            </ul>
+            <h5>Disadvantages:</h5>
+            <ul>
+                <li>Write latency increased</li>
+                <li>Unnecessary caching of unread data</li>
+                <li>Cache storage overhead</li>
+            </ul>
+        </div>
+
+        <h4>3. Write-Behind (Write-Back)</h4>
+        <div class="syntax">
+            <h5>Pattern:</h5>
+            <pre>Application → Write to Cache → Asynchronous Write to Database</pre>
+        </div>
+
+        <div class="protocol">
+            <h5>Advantages:</h5>
+            <ul>
+                <li>Excellent write performance</li>
+                <li>Reduced database load</li>
+                <li>Batch write optimization</li>
+            </ul>
+            <h5>Disadvantages:</h5>
+            <ul>
+                <li>Risk of data loss</li>
+                <li>Complex consistency management</li>
+                <li>Difficult error handling</li>
+            </ul>
+        </div>
+
+        <h3>Cache Levels</h3>
+        <table>
+            <tr>
+                <th>Cache Level</th>
+                <th>Pros</th>
+                <th>Cons</th>
+            </tr>
+            <tr>
+                <td><strong>Browser Cache</strong></td>
+                <td>Reduced server load, faster user experience</td>
+                <td>Limited control, potential stale data</td>
+            </tr>
+            <tr>
+                <td><strong>CDN</strong></td>
+                <td>Global distribution, reduced latency</td>
+                <td>Cost, cache invalidation complexity</td>
+            </tr>
+            <tr>
+                <td><strong>Load Balancer Cache</strong></td>
+                <td>Shared across instances, SSL termination</td>
+                <td>Single point of failure, limited storage</td>
+            </tr>
+            <tr>
+                <td><strong>Application Cache</strong></td>
+                <td>Application-specific logic, fine-grained control</td>
+                <td>Memory limitations, instance-specific</td>
+            </tr>
+            <tr>
+                <td><strong>Database Cache</strong></td>
+                <td>Query-level optimization, automatic management</td>
+                <td>Limited customization, database-specific</td>
+            </tr>
+        </table>
+
+        <div class="decision-matrix">
+            <h4>Use Database Reads When:</h4>
+            <ul>
+                <li>Data changes frequently</li>
+                <li>Strong consistency required</li>
+                <li>Simple application architecture</li>
+                <li>Low to moderate traffic</li>
+                <li>Cache invalidation is complex</li>
+                <li>Development resources limited</li>
+            </ul>
+        </div>
+
+        <div class="decision-matrix">
+            <h4>Use Caching When:</h4>
+            <ul>
+                <li>Read-heavy workloads</li>
+                <li>Expensive database operations</li>
+                <li>High traffic volume</li>
+                <li>Acceptable eventual consistency</li>
+                <li>Predictable access patterns</li>
+                <li>Performance is critical</li>
+            </ul>
+        </div>
+
+        <h2 id="consistency-availability">Consistency vs Availability</h2>
+        <p>The CAP theorem states that in a distributed system, you can guarantee at most two out of three: <strong>Consistency</strong>, <strong>Availability</strong>, and <strong>Partition Tolerance</strong>.</p>
+
+        <h3>Consistency Models</h3>
+
+        <h4>Strong Consistency</h4>
+        <div class="security">
+            <ul>
+                <li>All nodes see the same data simultaneously</li>
+                <li>Requires coordination between nodes</li>
+                <li>Higher latency, potential availability issues</li>
+                <li><strong>Examples:</strong> Banking transactions, inventory management</li>
+            </ul>
+        </div>
+
+        <h4>Eventual Consistency</h4>
+        <div class="protocol">
+            <ul>
+                <li>Nodes will eventually converge to the same state</li>
+                <li>Allows for temporary inconsistencies</li>
+                <li>Better availability and performance</li>
+                <li><strong>Examples:</strong> Social media feeds, DNS systems</li>
+            </ul>
+        </div>
+
+        <h4>Weak Consistency</h4>
+        <div class="example">
+            <ul>
+                <li>No guarantees about when all nodes will be consistent</li>
+                <li>Highest availability and performance</li>
+                <li>Application must handle inconsistencies</li>
+                <li><strong>Examples:</strong> Real-time gaming, live video streaming</li>
+            </ul>
+        </div>
+
+        <h3>Availability Patterns</h3>
+
+        <h4>Failover Patterns</h4>
+        <table>
+            <tr>
+                <th>Pattern</th>
+                <th>Advantages</th>
+                <th>Disadvantages</th>
+                <th>Use Cases</th>
+            </tr>
+            <tr>
+                <td><strong>Active-Passive</strong></td>
+                <td>Simple implementation, clear consistency</td>
+                <td>Wasted resources, failover time</td>
+                <td>Financial systems, critical applications</td>
+            </tr>
+            <tr>
+                <td><strong>Active-Active</strong></td>
+                <td>Better resource utilization, faster failover</td>
+                <td>Complex synchronization, consistency issues</td>
+                <td>Social media, content platforms</td>
+            </tr>
+        </table>
+
+        <h4>Replication Strategies</h4>
+        <table>
+            <tr>
+                <th>Strategy</th>
+                <th>Advantages</th>
+                <th>Disadvantages</th>
+                <th>Best For</th>
+            </tr>
+            <tr>
+                <td><strong>Master-Slave</strong></td>
+                <td>Read scaling, clear consistency</td>
+                <td>Write bottleneck, slave lag</td>
+                <td>Read-heavy applications</td>
+            </tr>
+            <tr>
+                <td><strong>Master-Master</strong></td>
+                <td>Write scaling, higher availability</td>
+                <td>Conflict resolution complexity</td>
+                <td>Distributed applications</td>
+            </tr>
+        </table>
+
+        <h2 id="when-queues">When to Use Queues</h2>
+        <p>Message queues are essential for building resilient, scalable systems. They provide asynchronous communication, load leveling, and fault tolerance.</p>
+
+        <h3>Queue Benefits</h3>
+        <div class="benefits">
+            <h4>Decoupling:</h4>
+            <ul>
+                <li><strong>Temporal Decoupling:</strong> Producer and consumer don't need to be online simultaneously</li>
+                <li><strong>Spatial Decoupling:</strong> Services don't need to know about each other's location</li>
+                <li><strong>Synchronization Decoupling:</strong> Services can operate at different speeds</li>
+            </ul>
+        </div>
+
+        <div class="benefits">
+            <h4>Scalability:</h4>
+            <ul>
+                <li><strong>Load Leveling:</strong> Smooth out traffic spikes</li>
+                <li><strong>Elastic Scaling:</strong> Add/remove consumers based on queue depth</li>
+                <li><strong>Parallel Processing:</strong> Multiple consumers can process messages concurrently</li>
+            </ul>
+        </div>
+
+        <div class="benefits">
+            <h4>Reliability:</h4>
+            <ul>
+                <li><strong>Fault Tolerance:</strong> Messages persist even if consumers fail</li>
+                <li><strong>Retry Mechanisms:</strong> Handle transient failures automatically</li>
+                <li><strong>Dead Letter Queues:</strong> Isolate problematic messages</li>
+            </ul>
+        </div>
+
+        <h3>Queue Types</h3>
+        <table>
+            <tr>
+                <th>Type</th>
+                <th>Characteristics</th>
+                <th>Use Cases</th>
+            </tr>
+            <tr>
+                <td><strong>Point-to-Point</strong></td>
+                <td>One message consumed by one consumer</td>
+                <td>Order processing, email sending</td>
+            </tr>
+            <tr>
+                <td><strong>Publish-Subscribe</strong></td>
+                <td>One message consumed by multiple subscribers</td>
+                <td>Event notifications, real-time updates</td>
+            </tr>
+            <tr>
+                <td><strong>Priority Queues</strong></td>
+                <td>Messages processed by priority</td>
+                <td>Emergency alerts, VIP requests</td>
+            </tr>
+        </table>
+
+        <h3>Queue Technologies</h3>
+        <table>
+            <tr>
+                <th>Technology</th>
+                <th>Advantages</th>
+                <th>Disadvantages</th>
+                <th>Best For</th>
+            </tr>
+            <tr>
+                <td><strong>Redis</strong></td>
+                <td>In-memory performance, simple implementation</td>
+                <td>Limited persistence, single-threaded</td>
+                <td>Session management, simple queues</td>
+            </tr>
+            <tr>
+                <td><strong>RabbitMQ</strong></td>
+                <td>Rich routing, strong consistency</td>
+                <td>Complex configuration, memory usage</td>
+                <td>Enterprise messaging, reliable delivery</td>
+            </tr>
+            <tr>
+                <td><strong>Apache Kafka</strong></td>
+                <td>High throughput, stream processing</td>
+                <td>Complex setup, higher latency</td>
+                <td>Event streaming, log aggregation</td>
+            </tr>
+            <tr>
+                <td><strong>Amazon SQS</strong></td>
+                <td>Fully managed, automatic scaling</td>
+                <td>Vendor lock-in, limited customization</td>
+                <td>AWS-native applications, serverless</td>
+            </tr>
+        </table>
+
+        <div class="decision-matrix">
+            <h4>Use Queues When:</h4>
+            <ul>
+                <li>Asynchronous processing needed</li>
+                <li>Load balancing across workers</li>
+                <li>Decoupling services</li>
+                <li>Handling traffic spikes</li>
+                <li>Reliable communication required</li>
+                <li>Background job processing</li>
+            </ul>
+        </div>
+
+        <div class="warning">
+            <h4>Avoid Queues When:</h4>
+            <ul>
+                <li>Real-time requirements (immediate response needed)</li>
+                <li>Simple architectures (adding unnecessary complexity)</li>
+                <li>Strong consistency required (synchronous processing)</li>
+                <li>Low message volume (overhead exceeds benefits)</li>
+                <li>Debugging complexity is problematic</li>
+            </ul>
+        </div>
+
+        <h2 id="when-microservices">When to Use Microservices</h2>
+        <p>Microservices architecture breaks down applications into small, independent services. While offering many benefits, it also introduces significant complexity.</p>
+
+        <h3>Microservices Benefits</h3>
+        <div class="benefits">
+            <h4>Scalability:</h4>
+            <ul>
+                <li><strong>Independent Scaling:</strong> Scale services based on individual needs</li>
+                <li><strong>Resource Optimization:</strong> Allocate resources efficiently</li>
+                <li><strong>Technology Diversity:</strong> Use different technologies for different services</li>
+            </ul>
+        </div>
+
+        <div class="benefits">
+            <h4>Development Velocity:</h4>
+            <ul>
+                <li><strong>Team Independence:</strong> Teams can develop and deploy independently</li>
+                <li><strong>Faster Iterations:</strong> Smaller codebases, faster development cycles</li>
+                <li><strong>Parallel Development:</strong> Multiple teams working simultaneously</li>
+            </ul>
+        </div>
+
+        <div class="benefits">
+            <h4>Fault Isolation:</h4>
+            <ul>
+                <li><strong>Service Boundaries:</strong> Failures contained within services</li>
+                <li><strong>Resilience:</strong> System continues operating despite individual service failures</li>
+                <li><strong>Graceful Degradation:</strong> Reduced functionality rather than complete failure</li>
+            </ul>
+        </div>
+
+        <h3>Microservices Challenges</h3>
+        <div class="comparison">
+            <h4>Complexity:</h4>
+            <ul>
+                <li><strong>Distributed System Complexity:</strong> Network calls, latency, failures</li>
+                <li><strong>Service Discovery:</strong> Finding and connecting to services</li>
+                <li><strong>Configuration Management:</strong> Managing configurations across services</li>
+                <li><strong>Monitoring:</strong> Tracking performance across multiple services</li>
+            </ul>
+        </div>
+
+        <div class="comparison">
+            <h4>Data Management:</h4>
+            <ul>
+                <li><strong>Data Consistency:</strong> Managing transactions across services</li>
+                <li><strong>Data Synchronization:</strong> Keeping related data consistent</li>
+                <li><strong>Database per Service:</strong> Data isolation and sharing challenges</li>
+            </ul>
+        </div>
+
+        <h3>Microservices vs Monolith Decision Matrix</h3>
+        <table>
+            <tr>
+                <th>Factor</th>
+                <th>Monolith</th>
+                <th>Microservices</th>
+            </tr>
+            <tr>
+                <td><strong>Team Size</strong></td>
+                <td>&lt; 10 developers</td>
+                <td>&gt; 10 developers</td>
+            </tr>
+            <tr>
+                <td><strong>Business Complexity</strong></td>
+                <td>Simple domain</td>
+                <td>Complex domain</td>
+            </tr>
+            <tr>
+                <td><strong>Scalability Needs</strong></td>
+                <td>Uniform scaling</td>
+                <td>Selective scaling</td>
+            </tr>
+            <tr>
+                <td><strong>Development Speed</strong></td>
+                <td>Fast initially</td>
+                <td>Slower initially, faster long-term</td>
+            </tr>
+            <tr>
+                <td><strong>Operational Complexity</strong></td>
+                <td>Low</td>
+                <td>High</td>
+            </tr>
+            <tr>
+                <td><strong>Data Consistency</strong></td>
+                <td>Strong</td>
+                <td>Eventual</td>
+            </tr>
+        </table>
+
+        <div class="decision-matrix">
+            <h4>Use Microservices When:</h4>
+            <ul>
+                <li>Large development teams (&gt; 10 developers)</li>
+                <li>Complex business domain with distinct capabilities</li>
+                <li>Different scaling needs for different components</li>
+                <li>Benefits from using different technologies</li>
+                <li>Strong DevOps and operational capabilities</li>
+            </ul>
+        </div>
+
+        <div class="warning">
+            <h4>Avoid Microservices When:</h4>
+            <ul>
+                <li>Small teams (&lt; 10 developers)</li>
+                <li>Simple applications with limited complexity</li>
+                <li>Services are highly interdependent</li>
+                <li>Limited DevOps maturity</li>
+                <li>Performance requirements are very strict</li>
+                <li>Strong ACID requirements</li>
+            </ul>
+        </div>
+
+        <h2 id="service-discovery">Service Discovery</h2>
+        <p>Service discovery is the process of automatically detecting and connecting to services in a distributed system. It's essential for microservices architectures where services need to find and communicate with each other.</p>
+
+        <h3>Service Discovery Patterns</h3>
+        <table>
+            <tr>
+                <th>Pattern</th>
+                <th>Advantages</th>
+                <th>Disadvantages</th>
+                <th>Best For</th>
+            </tr>
+            <tr>
+                <td><strong>Client-Side Discovery</strong></td>
+                <td>Simple architecture, client controls load balancing</td>
+                <td>Client complexity, tight coupling</td>
+                <td>Internal services, controlled environments</td>
+            </tr>
+            <tr>
+                <td><strong>Server-Side Discovery</strong></td>
+                <td>Client simplicity, centralized load balancing</td>
+                <td>Additional network hop, load balancer complexity</td>
+                <td>External clients, protocol agnostic</td>
+            </tr>
+            <tr>
+                <td><strong>Service Mesh</strong></td>
+                <td>Advanced traffic management, security features</td>
+                <td>Complex setup, performance overhead</td>
+                <td>Large-scale microservices, complex routing</td>
+            </tr>
+        </table>
+
+        <h3>Service Registry Technologies</h3>
+        <table>
+            <tr>
+                <th>Technology</th>
+                <th>Features</th>
+                <th>Advantages</th>
+                <th>Use Cases</th>
+            </tr>
+            <tr>
+                <td><strong>Consul</strong></td>
+                <td>Service discovery, health checking, key-value storage</td>
+                <td>Rich feature set, high availability</td>
+                <td>Enterprise environments, multi-cloud</td>
+            </tr>
+            <tr>
+                <td><strong>Eureka</strong></td>
+                <td>Service registration, health monitoring</td>
+                <td>Battle-tested, Spring Cloud integration</td>
+                <td>Spring Boot applications, AWS deployments</td>
+            </tr>
+            <tr>
+                <td><strong>etcd</strong></td>
+                <td>Distributed key-value store, strong consistency</td>
+                <td>High performance, Kubernetes integration</td>
+                <td>Kubernetes environments, configuration management</td>
+            </tr>
+            <tr>
+                <td><strong>Zookeeper</strong></td>
+                <td>Distributed coordination, configuration management</td>
+                <td>Mature and stable, strong consistency</td>
+                <td>Kafka coordination, distributed systems</td>
+            </tr>
+        </table>
+
+        <h3>Service Discovery Challenges</h3>
+        <div class="comparison">
+            <h4>Key Challenges:</h4>
+            <ul>
+                <li><strong>Consistency vs Availability:</strong> Choose between accurate service information and registry availability</li>
+                <li><strong>Service Mesh Complexity:</strong> Complex routing rules and configuration</li>
+                <li><strong>Health Check Accuracy:</strong> Avoiding false positives and negatives</li>
+                <li><strong>Network Partitions:</strong> Handling split-brain scenarios</li>
+            </ul>
+        </div>
+
+        <h2 id="decision-framework">Decision Framework</h2>
+        <p>A systematic approach to making architectural decisions helps ensure consistent, well-reasoned choices that align with business and technical requirements.</p>
+
+        <h3>Decision Process</h3>
+        <div class="checklist">
+            <h4>1. Define Requirements</h4>
+            <ul>
+                <li><strong>Functional Requirements:</strong> What the system must do</li>
+                <li><strong>Non-Functional Requirements:</strong> Performance, availability, consistency</li>
+                <li><strong>Business Constraints:</strong> Budget, timeline, team skills</li>
+                <li><strong>Technical Constraints:</strong> Existing infrastructure, compliance</li>
+            </ul>
+        </div>
+
+        <div class="checklist">
+            <h4>2. Identify Stakeholders</h4>
+            <ul>
+                <li><strong>Users:</strong> Performance, availability expectations</li>
+                <li><strong>Business:</strong> Cost, time-to-market, revenue impact</li>
+                <li><strong>Operations:</strong> Maintainability, monitoring, scaling</li>
+                <li><strong>Development:</strong> Productivity, complexity, skills</li>
+            </ul>
+        </div>
+
+        <div class="checklist">
+            <h4>3. Analyze Trade-offs</h4>
+            <ul>
+                <li><strong>Performance vs Consistency:</strong> Fast responses vs accurate data</li>
+                <li><strong>Availability vs Consistency:</strong> Always accessible vs always accurate</li>
+                <li><strong>Complexity vs Maintainability:</strong> Feature richness vs simplicity</li>
+                <li><strong>Cost vs Performance:</strong> Budget constraints vs performance needs</li>
+            </ul>
+        </div>
+
+        <div class="checklist">
+            <h4>4. Evaluate Options</h4>
+            <ul>
+                <li><strong>Proof of Concept:</strong> Build small prototypes</li>
+                <li><strong>Benchmarking:</strong> Measure performance characteristics</li>
+                <li><strong>Risk Assessment:</strong> Identify potential issues</li>
+                <li><strong>Cost Analysis:</strong> Total cost of ownership</li>
+            </ul>
+        </div>
+
+        <div class="checklist">
+            <h4>5. Make Decisions</h4>
+            <ul>
+                <li><strong>Document Rationale:</strong> Record decision reasoning</li>
+                <li><strong>Review Process:</strong> Regular architecture reviews</li>
+                <li><strong>Iteration:</strong> Adjust based on new information</li>
+                <li><strong>Monitoring:</strong> Track decision outcomes</li>
+            </ul>
+        </div>
+
+        <h3>Decision Templates</h3>
+        <div class="syntax">
+            <h5>Architecture Decision Record (ADR) Template:</h5>
+            <pre># ADR-001: [Decision Title]
+
+## Status
+[Proposed | Accepted | Deprecated]
+
+## Context
+[Describe the situation and problem]
+
+## Decision
+[Describe the chosen solution]
+
+## Consequences
+[Positive and negative consequences]
+
+## Alternatives Considered
+[Other options and why they were rejected]</pre>
+        </div>
+
+        <h3>Common Decision Scenarios</h3>
+        <div class="example">
+            <h5>Scenario 1: High-Traffic Web Application</h5>
+            <p><strong>Requirements:</strong> 100,000+ concurrent users, &lt;100ms response time, 99.9% availability</p>
+            <p><strong>Key Decisions:</strong> CDN strategy, load balancing, database sharding, caching layers</p>
+        </div>
+
+        <div class="example">
+            <h5>Scenario 2: Financial Trading System</h5>
+            <p><strong>Requirements:</strong> Strong consistency, &lt;1ms latency, audit trails, regulatory compliance</p>
+            <p><strong>Key Decisions:</strong> Database technology, message queuing, disaster recovery, security</p>
+        </div>
+
+        <div class="example">
+            <h5>Scenario 3: IoT Data Platform</h5>
+            <p><strong>Requirements:</strong> Millions of devices, real-time analytics, data retention, scalable ingestion</p>
+            <p><strong>Key Decisions:</strong> Stream processing, time-series database, device management, data pipeline</p>
+        </div>
+
+        <h2>Common Pitfalls</h2>
+        <div class="pitfall">
+            <h4>Over-Engineering</h4>
+            <p><strong>Problem:</strong> Building for requirements that don't exist</p>
+            <p><strong>Solution:</strong> Start simple, evolve based on actual needs</p>
+            <p><strong>Example:</strong> Implementing microservices for a small application</p>
+        </div>
+
+        <div class="pitfall">
+            <h4>Under-Engineering</h4>
+            <p><strong>Problem:</strong> Not considering future growth</p>
+            <p><strong>Solution:</strong> Plan for reasonable growth, avoid premature scaling</p>
+            <p><strong>Example:</strong> Single database for rapidly growing application</p>
+        </div>
+
+        <div class="pitfall">
+            <h4>Technology Bias</h4>
+            <p><strong>Problem:</strong> Choosing familiar technologies regardless of fit</p>
+            <p><strong>Solution:</strong> Evaluate options objectively based on requirements</p>
+            <p><strong>Example:</strong> Using SQL database for all data storage needs</p>
+        </div>
+
+        <div class="pitfall">
+            <h4>Ignoring Operational Complexity</h4>
+            <p><strong>Problem:</strong> Focusing only on development, ignoring operations</p>
+            <p><strong>Solution:</strong> Consider deployment, monitoring, and maintenance</p>
+            <p><strong>Example:</strong> Microservices without proper monitoring</p>
+        </div>
+
+        <div class="pitfall">
+            <h4>Cargo Cult Architecture</h4>
+            <p><strong>Problem:</strong> Copying successful architectures without understanding</p>
+            <p><strong>Solution:</strong> Understand the context and requirements behind decisions</p>
+            <p><strong>Example:</strong> Adopting Netflix's architecture for a small startup</p>
+        </div>
+
+        <h2>Best Practices</h2>
+        <div class="best-practice">
+            <h4>Start Simple</h4>
+            <ul>
+                <li>Begin with simple architecture (monolith first)</li>
+                <li>Add complexity as needed</li>
+                <li>Measure everything to make data-driven decisions</li>
+                <li>Document decisions for future reference</li>
+            </ul>
+        </div>
+
+        <div class="best-practice">
+            <h4>Embrace Reversibility</h4>
+            <ul>
+                <li>Make choices that can be changed</li>
+                <li>Use feature flags to enable/disable features</li>
+                <li>Create abstraction layers to isolate technology choices</li>
+                <li>Plan for incremental migration</li>
+            </ul>
+        </div>
+
+        <div class="best-practice">
+            <h4>Focus on Business Value</h4>
+            <ul>
+                <li>Align architecture with business objectives</li>
+                <li>Perform cost-benefit analysis</li>
+                <li>Balance perfection with speed to market</li>
+                <li>Prioritize user-facing improvements</li>
+            </ul>
+        </div>
+
+        <div class="best-practice">
+            <h4>Plan for Failure</h4>
+            <ul>
+                <li>Identify potential failure points</li>
+                <li>Design for graceful degradation</li>
+                <li>Implement comprehensive monitoring</li>
+                <li>Prepare disaster recovery plans</li>
+            </ul>
+        </div>
+
+        <div class="best-practice">
+            <h4>Consider Total Cost of Ownership</h4>
+            <ul>
+                <li>Factor in development costs</li>
+                <li>Account for operational expenses</li>
+                <li>Consider opportunity costs</li>
+                <li>Plan for technical debt</li>
+            </ul>
+        </div>
+
+        <div class="best-practice">
+            <h4>Continuous Learning</h4>
+            <ul>
+                <li>Stay updated with technology trends</li>
+                <li>Learn from failures and successes</li>
+                <li>Share knowledge and experiences</li>
+                <li>Continuously iterate and improve</li>
+            </ul>
+        </div>
+
+        <h2>Conclusion</h2>
+        <p>System design is about making informed trade-offs rather than finding perfect solutions. Every architectural decision involves compromises, and the key is to understand these trade-offs and make decisions that align with your specific context, requirements, and constraints.</p>
+
+        <div class="tip">
+            <strong>Remember:</strong>
+            <ul>
+                <li><strong>Context Matters:</strong> What works for one system may not work for another</li>
+                <li><strong>Requirements Change:</strong> Be prepared to adapt your architecture</li>
+                <li><strong>Simplicity is Valuable:</strong> Avoid unnecessary complexity</li>
+                <li><strong>Measure and Learn:</strong> Use data to validate your decisions</li>
+            </ul>
+        </div>
+
+        <p>The goal is not to avoid all trade-offs but to make conscious, well-informed decisions that best serve your system's needs. Regular review and evolution of your architecture ensures it continues to meet changing requirements and takes advantage of new technologies and patterns.</p>
+
+        <p>By understanding the trade-offs discussed in this guide and applying the decision framework, you'll be better equipped to design systems that are robust, scalable, and maintainable while meeting your specific business and technical requirements.</p>
+        </div>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.querySelector('.sidebar-toggle');
+            
+            if (window.innerWidth <= 768 && 
+                !sidebar.contains(event.target) && 
+                !toggle.contains(event.target) && 
+                sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    const offsetTop = target.offsetTop - 130;
+                    window.scrollTo({
+                        top: offsetTop,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Update TOC active state
+                    document.querySelectorAll('.toc a').forEach(link => {
+                        link.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                }
+            });
+        });
+
+        // Update active TOC item on scroll
+        window.addEventListener('scroll', function() {
+            const sections = document.querySelectorAll('h2[id]');
+            const tocLinks = document.querySelectorAll('.toc a');
+            let current = '';
+
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                const sectionHeight = section.offsetHeight;
+                if (pageYOffset >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            tocLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

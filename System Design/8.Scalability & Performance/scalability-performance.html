@@ -1,0 +1,1587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚡ Scalability & Performance Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #e8e8e8;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: #1e1e1e;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            border-right: 1px solid #333;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background: #2d2d2d;
+            border-bottom: 1px solid #444;
+        }
+
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 1.3em;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #f0f0f0;
+            border: none;
+            padding: 0;
+        }
+
+        .sidebar-nav {
+            padding: 0;
+        }
+
+        .sidebar-link {
+            display: block;
+            color: #b8b8b8;
+            text-decoration: none;
+            padding: 15px 20px;
+            border-bottom: 1px solid #444;
+            transition: background 0.2s ease;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 1.1em;
+            font-weight: 500;
+        }
+
+        .sidebar-link:hover {
+            background: #3a3a3a;
+            color: #f0f0f0;
+        }
+
+        .sidebar-link.current {
+            background: #3498db;
+            color: white;
+            font-weight: 600;
+        }
+
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(30, 30, 30, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid #444;
+        }
+
+        h1 {
+            color: #f0f0f0;
+            text-align: center;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: #e0e0e0;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+            margin-top: 30px;
+            font-size: 1.8em;
+        }
+
+        h3 {
+            color: #3498db;
+            margin-top: 25px;
+            font-size: 1.4em;
+        }
+
+        h4 {
+            color: #5dade2;
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+
+        h5 {
+            color: #82b1ff;
+            margin-top: 15px;
+            font-size: 1.1em;
+        }
+
+        .toc {
+            background: rgba(52, 152, 219, 0.15);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(52, 152, 219, 0.3);
+        }
+
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-evenly;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .toc li {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex: 0 1 calc(16% - 0.5rem);
+            min-width: 140px;
+        }
+
+        .toc a {
+            color: #e0e0e0;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            white-space: nowrap;
+            background: rgba(50, 50, 50, 0.7);
+            border: 1px solid rgba(52, 152, 219, 0.3);
+            min-height: 40px;
+            width: 100%;
+        }
+
+        .toc a:hover, .toc a.active {
+            background: linear-gradient(45deg, #3498db, #5dade2);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        pre {
+            background: #000000;
+            color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        code {
+            background: #000000;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #ffffff;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: #2a2a2a;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th, td {
+            border: 1px solid #444;
+            padding: 12px;
+            text-align: left;
+            color: #e0e0e0;
+        }
+
+        th {
+            background: #3498db;
+            color: white;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background: #333;
+        }
+
+        tr:hover {
+            background: #404040;
+        }
+
+        .warning {
+            background: #3a2f1a;
+            border: 1px solid #b8860b;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #ffd700;
+        }
+
+        .warning::before {
+            content: "⚠️ ";
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .tip {
+            background: #1a3a2f;
+            border: 1px solid #27ae60;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #7bed9f;
+        }
+
+        .tip::before {
+            content: "💡 ";
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .example {
+            background: #2a2a2a;
+            border-left: 4px solid #17a2b8;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #e0e0e0;
+        }
+
+        .example h5 {
+            margin-top: 0;
+            color: #17a2b8;
+            font-size: 1.1em;
+        }
+
+        .syntax {
+            background: #2a2a2a;
+            border-left: 4px solid #6c757d;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #e0e0e0;
+        }
+
+        .syntax h5 {
+            margin-top: 0;
+            color: #6c757d;
+            font-size: 1.1em;
+        }
+
+        .benefits {
+            background: #1a3a1a;
+            border: 1px solid #3498db;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #90ee90;
+        }
+
+        .benefits ul {
+            margin: 10px 0;
+        }
+
+        .comparison {
+            background: #2a2a2a;
+            border: 1px solid #3498db;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #e0e0e0;
+        }
+
+        .comparison h5 {
+            margin-top: 0;
+            color: #3498db;
+            font-size: 1.1em;
+        }
+
+        .algorithm {
+            background: #2a1a3a;
+            border: 1px solid #8e44ad;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #d1c4e9;
+        }
+
+        .algorithm h5 {
+            margin-top: 0;
+            color: #8e44ad;
+            font-size: 1.1em;
+        }
+
+        .performance {
+            background: #1a2a3a;
+            border: 1px solid #e74c3c;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #ff9999;
+        }
+
+        .performance h5 {
+            margin-top: 0;
+            color: #e74c3c;
+            font-size: 1.1em;
+        }
+
+        .scaling {
+            background: #1a3a3a;
+            border: 1px solid #f39c12;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #ffd54f;
+        }
+
+        .scaling h5 {
+            margin-top: 0;
+            color: #f39c12;
+            font-size: 1.1em;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .sidebar-toggle {
+                display: block;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            .toc ul {
+                flex-direction: column;
+            }
+            
+            .toc li {
+                flex: 1 1 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2><a href="../system-design.html" style="color: inherit; text-decoration: none;">🗂️ System Design</a></h2>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="../1.Fundamentals/system-design-fundamentals.html" class="sidebar-link">
+                🏗️ Fundamentals
+            </a>
+            <a href="../2.Networking & Communication/networking-communication.html" class="sidebar-link">
+                🌐 Networking & Communication
+            </a>
+            <a href="../3.Databases/databases.html" class="sidebar-link">
+                🗃️ Databases
+            </a>
+            <a href="../4.Caching/caching.html" class="sidebar-link">
+                🗄️ Caching
+            </a>
+            <a href="../5.Message Queues & Event-Driven Systems/message-queues-event-driven.html" class="sidebar-link">
+                📬 Message Queues & Events
+            </a>
+            <a href="../6.Storage Systems/storage-systems.html" class="sidebar-link">
+                💾 Storage Systems
+            </a>
+            <a href="../7.Design Patterns & Architecture/design-patterns-architecture.html" class="sidebar-link">
+                🏛️ Design Patterns
+            </a>
+            <a href="../8.Scalability & Performance/scalability-performance.html" class="sidebar-link current">
+                📈 Scalability & Performance
+            </a>
+            <a href="../9.Security in System Design/security-system-design.html" class="sidebar-link">
+                🔒 Security
+            </a>
+            <a href="../10.Monitoring & Observability/monitoring-observability.html" class="sidebar-link">
+                📊 Monitoring & Observability
+            </a>
+            <a href="../11.Deployment & DevOps/deployment-devops.html" class="sidebar-link">
+                🚀 Deployment & DevOps
+            </a>
+            <a href="../12.Popular Use Cases/popular-use-cases.html" class="sidebar-link">
+                🎯 Popular Use Cases
+            </a>
+            <a href="../13.Trade-offs & Decision Making/trade-offs-decision-making.html" class="sidebar-link">
+                ⚖️ Trade-offs & Decisions
+            </a>
+        </nav>
+    </div>
+
+    <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+
+    <div class="main-content">
+        <div class="container">
+            <h1>⚡ Scalability & Performance Guide</h1>
+            
+            <div class="toc">
+                <ul>
+                    <li><a href="#load-balancing">🔄 Load Balancing</a></li>
+                    <li><a href="#horizontal-scaling">📈 Horizontal Scaling</a></li>
+                    <li><a href="#performance-bottlenecks">⚡ Bottlenecks</a></li>
+                    <li><a href="#connection-pooling">🔗 Connection Pooling</a></li>
+                    <li><a href="#cdn-usage">🌐 CDN Usage</a></li>
+                    <li><a href="#rate-limiting">⏱️ Rate Limiting</a></li>
+                </ul>
+            </div>
+
+            <section id="load-balancing">
+                <h2>🔄 Load Balancing</h2>
+                <p>Load balancing is a technique used to distribute incoming network traffic across multiple servers to ensure no single server becomes overwhelmed, improving overall system performance and reliability.</p>
+
+                <h3>Types of Load Balancing Algorithms</h3>
+
+                <h4>Round-Robin</h4>
+                <div class="algorithm">
+                    <h5>Algorithm Details</h5>
+                    <p><strong>Description:</strong> Requests are distributed sequentially across all available servers</p>
+                    <p><strong>Pros:</strong> Simple to implement, equal distribution</p>
+                    <p><strong>Cons:</strong> Doesn't consider server capacity or current load</p>
+                    <p><strong>Use Case:</strong> When all servers have similar specifications and handle similar workloads</p>
+                </div>
+
+                <div class="example">
+                    <h5>Round-Robin Example</h5>
+                    <pre><code>Request 1 → Server A
+Request 2 → Server B  
+Request 3 → Server C
+Request 4 → Server A (cycle repeats)</code></pre>
+                </div>
+
+                <h4>Least Connections</h4>
+                <div class="algorithm">
+                    <h5>Algorithm Details</h5>
+                    <p><strong>Description:</strong> Routes requests to the server with the fewest active connections</p>
+                    <p><strong>Pros:</strong> Better for long-lived connections, considers current load</p>
+                    <p><strong>Cons:</strong> Slightly more complex, requires connection tracking</p>
+                    <p><strong>Use Case:</strong> Applications with persistent connections or varying request processing times</p>
+                </div>
+
+                <h4>Weighted Round-Robin</h4>
+                <div class="algorithm">
+                    <h5>Algorithm Details</h5>
+                    <p><strong>Description:</strong> Assigns weights to servers based on their capacity</p>
+                    <p><strong>Pros:</strong> Accounts for different server capabilities</p>
+                    <p><strong>Cons:</strong> Requires manual weight configuration</p>
+                    <p><strong>Use Case:</strong> When servers have different specifications</p>
+                </div>
+
+                <h4>IP Hash</h4>
+                <div class="algorithm">
+                    <h5>Algorithm Details</h5>
+                    <p><strong>Description:</strong> Uses client IP to determine which server to route to</p>
+                    <p><strong>Pros:</strong> Ensures session affinity</p>
+                    <p><strong>Cons:</strong> May cause uneven distribution</p>
+                    <p><strong>Use Case:</strong> Applications requiring session persistence</p>
+                </div>
+
+                <h4>Health Check-Based</h4>
+                <div class="algorithm">
+                    <h5>Algorithm Details</h5>
+                    <p><strong>Description:</strong> Only routes traffic to healthy servers</p>
+                    <p><strong>Pros:</strong> Improves reliability, automatic failover</p>
+                    <p><strong>Cons:</strong> Requires health monitoring overhead</p>
+                    <p><strong>Use Case:</strong> Critical applications requiring high availability</p>
+                </div>
+
+                <h3>Load Balancer Types</h3>
+
+                <div class="comparison">
+                    <h5>Layer 4 vs Layer 7 Load Balancers</h5>
+                    <table>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Layer 4 (Transport)</th>
+                            <th>Layer 7 (Application)</th>
+                        </tr>
+                        <tr>
+                            <td>Routing Based On</td>
+                            <td>IP and port</td>
+                            <td>Application data (HTTP headers, URLs)</td>
+                        </tr>
+                        <tr>
+                            <td>Speed</td>
+                            <td>Faster processing</td>
+                            <td>Slower but more intelligent</td>
+                        </tr>
+                        <tr>
+                            <td>Features</td>
+                            <td>TCP/UDP load balancing</td>
+                            <td>Content-based routing, SSL termination</td>
+                        </tr>
+                        <tr>
+                            <td>Examples</td>
+                            <td>AWS Network Load Balancer, HAProxy</td>
+                            <td>AWS Application Load Balancer, NGINX</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="example">
+                    <h5>NGINX Load Balancer Configuration</h5>
+                    <pre><code># NGINX Load Balancer Configuration
+upstream backend {
+    least_conn;
+    server backend1.example.com:8080 weight=3;
+    server backend2.example.com:8080 weight=2;
+    server backend3.example.com:8080 weight=1;
+}
+
+server {
+    listen 80;
+    location / {
+        proxy_pass http://backend;
+    }
+}</code></pre>
+                </div>
+            </section>
+
+            <section id="horizontal-scaling">
+                <h2>📈 Horizontal Scaling</h2>
+                <p>Horizontal scaling (scale-out) involves adding more servers to handle increased load, as opposed to vertical scaling (scale-up) which involves adding more power to existing servers.</p>
+
+                <h3>Stateless Services</h3>
+
+                <div class="scaling">
+                    <h5>Stateless Service Principles</h5>
+                    <ul>
+                        <li><strong>No Server-Side State:</strong> Each request contains all necessary information</li>
+                        <li><strong>Idempotency:</strong> Same request produces same result regardless of server</li>
+                        <li><strong>Session Independence:</strong> No reliance on server-specific data</li>
+                    </ul>
+                </div>
+
+                <div class="benefits">
+                    <h5>Benefits of Stateless Services</h5>
+                    <ul>
+                        <li><strong>Easy Scaling:</strong> Add/remove servers without affecting functionality</li>
+                        <li><strong>Fault Tolerance:</strong> Failure of one server doesn't affect others</li>
+                        <li><strong>Load Distribution:</strong> Requests can be handled by any available server</li>
+                    </ul>
+                </div>
+
+                <h4>Implementation Strategies</h4>
+
+                <div class="example">
+                    <h5>Stateful vs Stateless Service Design</h5>
+                    <pre><code># Bad: Stateful service
+class OrderService:
+    def __init__(self):
+        self.pending_orders = {}  # Server-specific state
+    
+    def create_order(self, user_id, items):
+        order_id = generate_id()
+        self.pending_orders[order_id] = {
+            'user_id': user_id,
+            'items': items
+        }
+        return order_id
+
+# Good: Stateless service
+class OrderService:
+    def __init__(self, redis_client, database):
+        self.redis = redis_client
+        self.db = database
+    
+    def create_order(self, user_id, items):
+        order_id = generate_id()
+        order_data = {
+            'user_id': user_id,
+            'items': items
+        }
+        # Store in external systems
+        self.redis.set(f"order:{order_id}", json.dumps(order_data))
+        self.db.save_order(order_data)
+        return order_id</code></pre>
+                </div>
+
+                <h4>Database Design for Horizontal Scaling</h4>
+
+                <div class="example">
+                    <h5>Horizontal Partitioning Example</h5>
+                    <pre><code>-- Horizontal partitioning example
+CREATE TABLE orders_2024_q1 (
+    id INT PRIMARY KEY,
+    user_id INT,
+    created_at TIMESTAMP,
+    -- ... other fields
+    CHECK (created_at >= '2024-01-01' AND created_at < '2024-04-01')
+);
+
+CREATE TABLE orders_2024_q2 (
+    id INT PRIMARY KEY,
+    user_id INT,
+    created_at TIMESTAMP,
+    -- ... other fields
+    CHECK (created_at >= '2024-04-01' AND created_at < '2024-07-01')
+);</code></pre>
+                </div>
+
+                <h3>Auto-Scaling Strategies</h3>
+
+                <div class="scaling">
+                    <h5>Auto-Scaling Types</h5>
+                    <table>
+                        <tr>
+                            <th>Strategy</th>
+                            <th>Trigger</th>
+                            <th>Response Time</th>
+                            <th>Use Case</th>
+                        </tr>
+                        <tr>
+                            <td>Reactive Scaling</td>
+                            <td>Current metrics (CPU, memory, requests)</td>
+                            <td>Minutes to scale</td>
+                            <td>Handling sudden traffic spikes</td>
+                        </tr>
+                        <tr>
+                            <td>Predictive Scaling</td>
+                            <td>Historical patterns and forecasts</td>
+                            <td>Proactive scaling</td>
+                            <td>Anticipated traffic patterns</td>
+                        </tr>
+                        <tr>
+                            <td>Scheduled Scaling</td>
+                            <td>Time-based scaling rules</td>
+                            <td>Predetermined events</td>
+                            <td>Known traffic patterns</td>
+                        </tr>
+                    </table>
+                </div>
+            </section>
+
+            <section id="performance-bottlenecks">
+                <h2>⚡ Performance Bottlenecks</h2>
+                <p>Performance bottlenecks are system components that limit overall performance. Identifying and addressing these bottlenecks is crucial for system optimization.</p>
+
+                <h3>CPU Bottlenecks</h3>
+
+                <div class="performance">
+                    <h5>CPU Bottleneck Symptoms</h5>
+                    <ul>
+                        <li>High CPU utilization (>80% consistently)</li>
+                        <li>Increased response times</li>
+                        <li>Request queuing</li>
+                        <li>Thread pool exhaustion</li>
+                    </ul>
+                </div>
+
+                <div class="performance">
+                    <h5>Common Causes</h5>
+                    <ul>
+                        <li><strong>Inefficient Algorithms:</strong> O(n²) instead of O(n log n)</li>
+                        <li><strong>Poor Code Optimization:</strong> Unnecessary loops, heavy computations</li>
+                        <li><strong>Blocking Operations:</strong> Synchronous I/O in CPU-bound tasks</li>
+                        <li><strong>Resource Contention:</strong> Multiple threads competing for CPU</li>
+                    </ul>
+                </div>
+
+                <div class="example">
+                    <h5>CPU Optimization Example</h5>
+                    <pre><code># Bad: CPU-intensive synchronous operation
+def process_data(data_list):
+    results = []
+    for item in data_list:
+        # Heavy computation
+        result = complex_calculation(item)
+        results.append(result)
+    return results
+
+# Good: Asynchronous processing with multiprocessing
+import multiprocessing as mp
+from concurrent.futures import ProcessPoolExecutor
+
+def process_data_parallel(data_list):
+    with ProcessPoolExecutor(max_workers=mp.cpu_count()) as executor:
+        results = list(executor.map(complex_calculation, data_list))
+    return results</code></pre>
+                </div>
+
+                <h3>I/O Bottlenecks</h3>
+
+                <div class="performance">
+                    <h5>I/O Bottleneck Symptoms</h5>
+                    <ul>
+                        <li>High I/O wait times</li>
+                        <li>Slow database queries</li>
+                        <li>Network latency issues</li>
+                        <li>Disk read/write delays</li>
+                    </ul>
+                </div>
+
+                <div class="performance">
+                    <h5>Common Causes</h5>
+                    <ul>
+                        <li><strong>Disk I/O:</strong> Slow storage, fragmented files</li>
+                        <li><strong>Network I/O:</strong> High latency, limited bandwidth</li>
+                        <li><strong>Database I/O:</strong> Inefficient queries, missing indexes</li>
+                        <li><strong>Blocking I/O:</strong> Synchronous operations blocking threads</li>
+                    </ul>
+                </div>
+
+                <div class="example">
+                    <h5>I/O Optimization Example</h5>
+                    <pre><code># Bad: Synchronous I/O operations
+def fetch_user_data(user_ids):
+    users = []
+    for user_id in user_ids:
+        user = database.get_user(user_id)  # Blocking call
+        profile = api.get_profile(user_id)  # Blocking call
+        users.append({'user': user, 'profile': profile})
+    return users
+
+# Good: Asynchronous I/O operations
+import asyncio
+import aiohttp
+
+async def fetch_user_data_async(user_ids):
+    tasks = []
+    for user_id in user_ids:
+        task = fetch_single_user(user_id)
+        tasks.append(task)
+    
+    results = await asyncio.gather(*tasks)
+    return results
+
+async def fetch_single_user(user_id):
+    user_task = database.get_user_async(user_id)
+    profile_task = api.get_profile_async(user_id)
+    
+    user, profile = await asyncio.gather(user_task, profile_task)
+    return {'user': user, 'profile': profile}</code></pre>
+                </div>
+
+                <h3>Memory Bottlenecks</h3>
+
+                <div class="performance">
+                    <h5>Memory Bottleneck Symptoms</h5>
+                    <ul>
+                        <li>High memory usage</li>
+                        <li>Frequent garbage collection</li>
+                        <li>OutOfMemory errors</li>
+                        <li>Swapping to disk</li>
+                    </ul>
+                </div>
+
+                <div class="example">
+                    <h5>Memory Optimization Example</h5>
+                    <pre><code># Bad: Memory-inefficient data processing
+def process_large_file(filename):
+    with open(filename, 'r') as f:
+        data = f.read()  # Loads entire file into memory
+    
+    results = []
+    for line in data.split('\n'):
+        results.append(process_line(line))
+    return results
+
+# Good: Memory-efficient streaming
+def process_large_file_streaming(filename):
+    def line_generator():
+        with open(filename, 'r') as f:
+            for line in f:  # Processes one line at a time
+                yield process_line(line.strip())
+    
+    return line_generator()</code></pre>
+                </div>
+
+                <h3>Database Bottlenecks</h3>
+
+                <div class="performance">
+                    <h5>Common Database Issues</h5>
+                    <ul>
+                        <li><strong>Missing Indexes:</strong> Slow query performance</li>
+                        <li><strong>N+1 Query Problem:</strong> Multiple queries for related data</li>
+                        <li><strong>Lock Contention:</strong> Concurrent access issues</li>
+                        <li><strong>Poor Query Design:</strong> Inefficient SQL queries</li>
+                    </ul>
+                </div>
+
+                <div class="example">
+                    <h5>Database Optimization Example</h5>
+                    <pre><code>-- Bad: N+1 query problem
+SELECT * FROM users WHERE active = true;
+-- Then for each user:
+SELECT * FROM orders WHERE user_id = ?;
+
+-- Good: Join query
+SELECT u.*, o.* 
+FROM users u 
+LEFT JOIN orders o ON u.id = o.user_id 
+WHERE u.active = true;
+
+-- Add appropriate indexes
+CREATE INDEX idx_users_active ON users(active);
+CREATE INDEX idx_orders_user_id ON orders(user_id);</code></pre>
+                </div>
+            </section>
+
+            <section id="connection-pooling">
+                <h2>🔗 Connection Pooling</h2>
+                <p>Connection pooling is a technique that maintains a cache of database connections that can be reused across multiple requests, reducing the overhead of establishing and tearing down connections.</p>
+
+                <h3>Benefits</h3>
+
+                <div class="benefits">
+                    <h5>Performance Improvements</h5>
+                    <ul>
+                        <li><strong>Reduced Latency:</strong> Eliminates connection establishment overhead</li>
+                        <li><strong>Resource Efficiency:</strong> Reuses existing connections</li>
+                        <li><strong>Scalability:</strong> Handles more concurrent requests with fewer resources</li>
+                    </ul>
+                </div>
+
+                <div class="benefits">
+                    <h5>Resource Management</h5>
+                    <ul>
+                        <li><strong>Connection Limits:</strong> Controls maximum database connections</li>
+                        <li><strong>Memory Usage:</strong> Reduces connection-related memory allocation</li>
+                        <li><strong>Network Resources:</strong> Minimizes network handshake overhead</li>
+                    </ul>
+                </div>
+
+                <h3>Implementation</h3>
+
+                <div class="example">
+                    <h5>Database Connection Pool</h5>
+                    <pre><code># Using SQLAlchemy connection pooling
+from sqlalchemy import create_engine
+from sqlalchemy.pool import QueuePool
+
+# Configure connection pool
+engine = create_engine(
+    'postgresql://user:pass@localhost/db',
+    poolclass=QueuePool,
+    pool_size=20,          # Number of connections to maintain
+    max_overflow=30,       # Additional connections when needed
+    pool_recycle=3600,     # Recycle connections after 1 hour
+    pool_pre_ping=True     # Validate connections before use
+)
+
+# Connection pool usage
+def get_user(user_id):
+    with engine.connect() as conn:
+        result = conn.execute(
+            "SELECT * FROM users WHERE id = %s", (user_id,)
+        )
+        return result.fetchone()</code></pre>
+                </div>
+
+                <div class="example">
+                    <h5>HTTP Connection Pool</h5>
+                    <pre><code>import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
+
+# Configure HTTP connection pool
+session = requests.Session()
+retry_strategy = Retry(
+    total=3,
+    backoff_factor=1,
+    status_forcelist=[429, 500, 502, 503, 504]
+)
+adapter = HTTPAdapter(
+    pool_connections=20,    # Number of connection pools
+    pool_maxsize=20,        # Maximum connections per pool
+    max_retries=retry_strategy
+)
+session.mount("http://", adapter)
+session.mount("https://", adapter)
+
+# Reuse connections
+def fetch_data(url):
+    response = session.get(url)
+    return response.json()</code></pre>
+                </div>
+
+                <h3>Best Practices</h3>
+
+                <div class="tip">
+                    <strong>Optimal Pool Size Calculation:</strong> Use the formula: 
+                    <code>pool_size = ((core_count * 2) + effective_spindle_count)</code>
+                    For SSD: effective_spindle_count = 1, For HDD: use actual spindle count
+                </div>
+
+                <div class="example">
+                    <h5>Connection Pool with Health Checks</h5>
+                    <pre><code># Implement connection health checks
+class ConnectionPool:
+    def __init__(self, max_connections=10):
+        self.max_connections = max_connections
+        self.connections = []
+        self.available = []
+    
+    def get_connection(self):
+        if self.available:
+            conn = self.available.pop()
+            if self.is_connection_valid(conn):
+                return conn
+            else:
+                # Connection is stale, create new one
+                return self.create_connection()
+        elif len(self.connections) < self.max_connections:
+            return self.create_connection()
+        else:
+            raise Exception("Connection pool exhausted")
+    
+    def return_connection(self, conn):
+        if self.is_connection_valid(conn):
+            self.available.append(conn)
+        else:
+            self.connections.remove(conn)
+            conn.close()
+    
+    def is_connection_valid(self, conn):
+        try:
+            conn.execute("SELECT 1")
+            return True
+        except:
+            return False</code></pre>
+                </div>
+            </section>
+
+            <section id="cdn-usage">
+                <h2>🌐 CDN Usage</h2>
+                <p>Content Delivery Networks (CDNs) are geographically distributed networks of proxy servers that cache and deliver content to users from the nearest location, reducing latency and improving performance.</p>
+
+                <h3>How CDNs Work</h3>
+
+                <div class="example">
+                    <h5>CDN Content Delivery Flow</h5>
+                    <pre><code>User Request → DNS Resolution → Nearest Edge Server → Content Delivery
+     ↓ (if cache miss)
+Edge Server → Origin Server → Cache Content → Deliver to User</code></pre>
+                </div>
+
+                <div class="scaling">
+                    <h5>CDN Components</h5>
+                    <ul>
+                        <li><strong>Origin Server:</strong> Hosts the original content</li>
+                        <li><strong>Edge Servers:</strong> Distributed cache servers worldwide</li>
+                        <li><strong>Cache Hit:</strong> Content served from edge server</li>
+                        <li><strong>Cache Miss:</strong> Content fetched from origin and cached</li>
+                    </ul>
+                </div>
+
+                <h3>Types of CDN Content</h3>
+
+                <h4>Static Content</h4>
+                <div class="example">
+                    <h5>Static Content Examples</h5>
+                    <ul>
+                        <li><strong>Images:</strong> JPEG, PNG, WebP, SVG</li>
+                        <li><strong>CSS/JavaScript:</strong> Stylesheets and scripts</li>
+                        <li><strong>Documents:</strong> PDFs, videos, audio files</li>
+                        <li><strong>Fonts:</strong> Web fonts and icon fonts</li>
+                    </ul>
+                </div>
+
+                <div class="example">
+                    <h5>Before and After CDN Implementation</h5>
+                    <pre><code>&lt;!-- Before CDN --&gt;
+&lt;link rel="stylesheet" href="/static/css/main.css"&gt;
+&lt;script src="/static/js/app.js"&gt;&lt;/script&gt;
+
+&lt;!-- After CDN --&gt;
+&lt;link rel="stylesheet" href="https://cdn.example.com/css/main.css"&gt;
+&lt;script src="https://cdn.example.com/js/app.js"&gt;&lt;/script&gt;</code></pre>
+                </div>
+
+                <h4>Dynamic Content</h4>
+                <div class="scaling">
+                    <h5>Dynamic Content Types</h5>
+                    <ul>
+                        <li><strong>API Responses:</strong> Cacheable API endpoints</li>
+                        <li><strong>Personalized Content:</strong> User-specific but cacheable</li>
+                        <li><strong>Real-time Data:</strong> With appropriate TTL settings</li>
+                    </ul>
+                </div>
+
+                <h3>CDN Configuration</h3>
+
+                <div class="example">
+                    <h5>Cache Headers Configuration</h5>
+                    <pre><code># Flask example with cache headers
+from flask import Flask, make_response
+
+app = Flask(__name__)
+
+@app.route('/api/products')
+def get_products():
+    products = fetch_products()
+    response = make_response(products)
+    
+    # Cache for 1 hour
+    response.headers['Cache-Control'] = 'public, max-age=3600'
+    response.headers['ETag'] = generate_etag(products)
+    
+    return response
+
+@app.route('/static/&lt;path:filename&gt;')
+def static_files(filename):
+    response = make_response(send_static_file(filename))
+    
+    # Cache static files for 1 year
+    response.headers['Cache-Control'] = 'public, max-age=31536000'
+    response.headers['Expires'] = 'Thu, 31 Dec 2025 23:59:59 GMT'
+    
+    return response</code></pre>
+                </div>
+
+                <div class="example">
+                    <h5>CDN Cache Purging</h5>
+                    <pre><code># Cloudflare API example for cache purging
+import requests
+
+def purge_cdn_cache(urls):
+    headers = {
+        'X-Auth-Email': 'your-email@example.com',
+        'X-Auth-Key': 'your-api-key',
+        'Content-Type': 'application/json'
+    }
+    
+    data = {
+        'files': urls
+    }
+    
+    response = requests.post(
+        'https://api.cloudflare.com/client/v4/zones/zone-id/purge_cache',
+        headers=headers,
+        json=data
+    )
+    
+    return response.json()
+
+# Usage
+purge_cdn_cache([
+    'https://example.com/css/main.css',
+    'https://example.com/js/app.js'
+])</code></pre>
+                </div>
+
+                <h3>Best Practices</h3>
+
+                <div class="example">
+                    <h5>Cache-Busting with Versioning</h5>
+                    <pre><code># Implement cache-busting with versioning
+def generate_asset_url(asset_path, version=None):
+    if not version:
+        version = get_current_version()
+    
+    return f"https://cdn.example.com/{asset_path}?v={version}"
+
+# Usage in templates
+css_url = generate_asset_url('css/main.css', '1.2.3')
+js_url = generate_asset_url('js/app.js', '1.2.3')</code></pre>
+                </div>
+
+                <div class="example">
+                    <h5>Multi-CDN Strategy</h5>
+                    <pre><code># Implement CDN failover
+class CDNManager:
+    def __init__(self):
+        self.primary_cdn = 'https://primary-cdn.example.com'
+        self.fallback_cdn = 'https://fallback-cdn.example.com'
+        self.local_fallback = '/static'
+    
+    def get_asset_url(self, asset_path):
+        # Try primary CDN first
+        primary_url = f"{self.primary_cdn}/{asset_path}"
+        if self.is_cdn_available(self.primary_cdn):
+            return primary_url
+        
+        # Fallback to secondary CDN
+        fallback_url = f"{self.fallback_cdn}/{asset_path}"
+        if self.is_cdn_available(self.fallback_cdn):
+            return fallback_url
+        
+        # Local fallback
+        return f"{self.local_fallback}/{asset_path}"
+    
+    def is_cdn_available(self, cdn_url):
+        try:
+            response = requests.head(cdn_url, timeout=2)
+            return response.status_code == 200
+        except:
+            return False</code></pre>
+                </div>
+            </section>
+
+            <section id="rate-limiting">
+                <h2>⏱️ Rate Limiting and Backpressure</h2>
+                <p>Rate limiting and backpressure are techniques used to control the flow of requests to prevent system overload and maintain performance under high traffic conditions.</p>
+
+                <h3>Rate Limiting</h3>
+                <p>Rate limiting restricts the number of requests a client can make within a specified time window.</p>
+
+                <h4>Types of Rate Limiting</h4>
+
+                <h5>Token Bucket Algorithm</h5>
+                <div class="example">
+                    <h5>Token Bucket Implementation</h5>
+                    <pre><code>import time
+import threading
+
+class TokenBucket:
+    def __init__(self, capacity, refill_rate):
+        self.capacity = capacity
+        self.tokens = capacity
+        self.refill_rate = refill_rate
+        self.last_refill = time.time()
+        self.lock = threading.Lock()
+    
+    def consume(self, tokens=1):
+        with self.lock:
+            now = time.time()
+            # Add tokens based on elapsed time
+            tokens_to_add = (now - self.last_refill) * self.refill_rate
+            self.tokens = min(self.capacity, self.tokens + tokens_to_add)
+            self.last_refill = now
+            
+            if self.tokens >= tokens:
+                self.tokens -= tokens
+                return True
+            return False
+
+# Usage
+bucket = TokenBucket(capacity=100, refill_rate=10)  # 10 tokens per second
+
+def handle_request():
+    if bucket.consume():
+        # Process request
+        return process_request()
+    else:
+        # Rate limit exceeded
+        return {"error": "Rate limit exceeded"}, 429</code></pre>
+                </div>
+
+                <h5>Sliding Window Algorithm</h5>
+                <div class="example">
+                    <h5>Sliding Window Implementation</h5>
+                    <pre><code>import time
+from collections import deque
+
+class SlidingWindowRateLimit:
+    def __init__(self, max_requests, window_size):
+        self.max_requests = max_requests
+        self.window_size = window_size
+        self.requests = deque()
+        self.lock = threading.Lock()
+    
+    def is_allowed(self):
+        with self.lock:
+            now = time.time()
+            # Remove requests outside the window
+            while self.requests and self.requests[0] < now - self.window_size:
+                self.requests.popleft()
+            
+            if len(self.requests) < self.max_requests:
+                self.requests.append(now)
+                return True
+            return False
+
+# Usage
+rate_limiter = SlidingWindowRateLimit(max_requests=100, window_size=60)
+
+def api_endpoint():
+    if not rate_limiter.is_allowed():
+        return {"error": "Rate limit exceeded"}, 429
+    
+    return process_request()</code></pre>
+                </div>
+
+                <h4>Distributed Rate Limiting</h4>
+                <div class="example">
+                    <h5>Redis-Based Distributed Rate Limiting</h5>
+                    <pre><code>import redis
+import time
+
+class DistributedRateLimit:
+    def __init__(self, redis_client, key_prefix="rate_limit"):
+        self.redis = redis_client
+        self.key_prefix = key_prefix
+    
+    def is_allowed(self, identifier, max_requests, window_size):
+        key = f"{self.key_prefix}:{identifier}"
+        pipe = self.redis.pipeline()
+        
+        # Sliding window using sorted sets
+        now = time.time()
+        window_start = now - window_size
+        
+        # Remove old entries
+        pipe.zremrangebyscore(key, 0, window_start)
+        
+        # Count current requests
+        pipe.zcard(key)
+        
+        # Add current request
+        pipe.zadd(key, {str(now): now})
+        
+        # Set expiration
+        pipe.expire(key, int(window_size) + 1)
+        
+        results = pipe.execute()
+        current_requests = results[1]
+        
+        return current_requests < max_requests
+
+# Usage with Redis
+redis_client = redis.Redis(host='localhost', port=6379, db=0)
+rate_limiter = DistributedRateLimit(redis_client)
+
+def api_endpoint(user_id):
+    if not rate_limiter.is_allowed(user_id, max_requests=100, window_size=60):
+        return {"error": "Rate limit exceeded"}, 429
+    
+    return process_request()</code></pre>
+                </div>
+
+                <h3>Backpressure</h3>
+                <p>Backpressure is a mechanism to handle situations where the system is receiving more requests than it can process.</p>
+
+                <h4>Queue-Based Backpressure</h4>
+                <div class="example">
+                    <h5>Backpressure Handler Implementation</h5>
+                    <pre><code>import queue
+import threading
+import time
+
+class BackpressureHandler:
+    def __init__(self, max_queue_size=1000, max_workers=10):
+        self.request_queue = queue.Queue(maxsize=max_queue_size)
+        self.max_workers = max_workers
+        self.workers = []
+        self.start_workers()
+    
+    def start_workers(self):
+        for i in range(self.max_workers):
+            worker = threading.Thread(target=self.worker_loop)
+            worker.daemon = True
+            worker.start()
+            self.workers.append(worker)
+    
+    def worker_loop(self):
+        while True:
+            try:
+                request = self.request_queue.get(timeout=1)
+                self.process_request(request)
+                self.request_queue.task_done()
+            except queue.Empty:
+                continue
+    
+    def handle_request(self, request):
+        try:
+            # Non-blocking put with timeout
+            self.request_queue.put(request, timeout=0.1)
+            return {"status": "queued"}
+        except queue.Full:
+            # Queue is full, reject request
+            return {"error": "System overloaded, try again later"}, 503
+    
+    def process_request(self, request):
+        # Simulate request processing
+        time.sleep(0.1)
+        print(f"Processed request: {request}")</code></pre>
+                </div>
+
+                <h4>Circuit Breaker Pattern</h4>
+                <div class="example">
+                    <h5>Circuit Breaker Implementation</h5>
+                    <pre><code>import time
+import threading
+
+class CircuitBreaker:
+    def __init__(self, failure_threshold=5, recovery_timeout=60, expected_exception=Exception):
+        self.failure_threshold = failure_threshold
+        self.recovery_timeout = recovery_timeout
+        self.expected_exception = expected_exception
+        
+        self.failure_count = 0
+        self.last_failure_time = None
+        self.state = 'CLOSED'  # CLOSED, OPEN, HALF_OPEN
+        self.lock = threading.Lock()
+    
+    def call(self, func, *args, **kwargs):
+        with self.lock:
+            if self.state == 'OPEN':
+                if self._should_attempt_reset():
+                    self.state = 'HALF_OPEN'
+                else:
+                    raise Exception("Circuit breaker is OPEN")
+            
+            try:
+                result = func(*args, **kwargs)
+                self._on_success()
+                return result
+            except self.expected_exception as e:
+                self._on_failure()
+                raise e
+    
+    def _should_attempt_reset(self):
+        return (time.time() - self.last_failure_time) > self.recovery_timeout
+    
+    def _on_success(self):
+        self.failure_count = 0
+        self.state = 'CLOSED'
+    
+    def _on_failure(self):
+        self.failure_count += 1
+        self.last_failure_time = time.time()
+        
+        if self.failure_count >= self.failure_threshold:
+            self.state = 'OPEN'
+
+# Usage
+circuit_breaker = CircuitBreaker(failure_threshold=3, recovery_timeout=30)
+
+def unreliable_service():
+    # Simulate unreliable external service
+    import random
+    if random.random() < 0.5:
+        raise Exception("Service unavailable")
+    return "Success"
+
+def protected_call():
+    try:
+        return circuit_breaker.call(unreliable_service)
+    except Exception as e:
+        return f"Service failed: {e}"</code></pre>
+                </div>
+
+                <h3>Advanced Rate Limiting Strategies</h3>
+
+                <h4>Adaptive Rate Limiting</h4>
+                <div class="example">
+                    <h5>Adaptive Rate Limiting Implementation</h5>
+                    <pre><code>class AdaptiveRateLimit:
+    def __init__(self, base_limit=100, min_limit=10, max_limit=1000):
+        self.base_limit = base_limit
+        self.min_limit = min_limit
+        self.max_limit = max_limit
+        self.current_limit = base_limit
+        self.success_count = 0
+        self.failure_count = 0
+        self.last_adjustment = time.time()
+    
+    def adjust_limits(self):
+        now = time.time()
+        if now - self.last_adjustment < 60:  # Adjust every minute
+            return
+        
+        success_rate = self.success_count / (self.success_count + self.failure_count + 1)
+        
+        if success_rate > 0.95:  # High success rate, increase limit
+            self.current_limit = min(self.max_limit, self.current_limit * 1.1)
+        elif success_rate < 0.8:  # Low success rate, decrease limit
+            self.current_limit = max(self.min_limit, self.current_limit * 0.9)
+        
+        # Reset counters
+        self.success_count = 0
+        self.failure_count = 0
+        self.last_adjustment = now
+    
+    def is_allowed(self, identifier):
+        self.adjust_limits()
+        # Use current_limit for rate limiting logic
+        return self.check_rate_limit(identifier, self.current_limit)</code></pre>
+                </div>
+
+                <h4>Priority-Based Rate Limiting</h4>
+                <div class="example">
+                    <h5>Priority-Based Rate Limiting</h5>
+                    <pre><code>class PriorityRateLimit:
+    def __init__(self):
+        self.limits = {
+            'premium': TokenBucket(capacity=1000, refill_rate=100),
+            'standard': TokenBucket(capacity=100, refill_rate=10),
+            'basic': TokenBucket(capacity=10, refill_rate=1)
+        }
+    
+    def is_allowed(self, user_type, tokens=1):
+        if user_type in self.limits:
+            return self.limits[user_type].consume(tokens)
+        return False
+    
+    def get_user_priority(self, user_id):
+        # Determine user priority based on subscription, etc.
+        user = get_user(user_id)
+        return user.subscription_tier
+
+# Usage
+priority_limiter = PriorityRateLimit()
+
+def api_endpoint(user_id):
+    user_priority = priority_limiter.get_user_priority(user_id)
+    
+    if not priority_limiter.is_allowed(user_priority):
+        return {"error": "Rate limit exceeded"}, 429
+    
+    return process_request()</code></pre>
+                </div>
+            </section>
+
+            <section id="summary">
+                <h2>📋 Summary</h2>
+                <p>This comprehensive guide covers the essential aspects of scalability and performance optimization:</p>
+
+                <div class="benefits">
+                    <h5>Key Topics Covered</h5>
+                    <ul>
+                        <li><strong>Load Balancing:</strong> Distributing traffic across multiple servers using various algorithms</li>
+                        <li><strong>Horizontal Scaling:</strong> Adding more servers and maintaining stateless services</li>
+                        <li><strong>Performance Bottlenecks:</strong> Identifying and resolving CPU, I/O, memory, and database limitations</li>
+                        <li><strong>Connection Pooling:</strong> Efficient management of database and HTTP connections</li>
+                        <li><strong>CDN Usage:</strong> Leveraging content delivery networks for global performance</li>
+                        <li><strong>Rate Limiting and Backpressure:</strong> Controlling request flow and preventing system overload</li>
+                    </ul>
+                </div>
+
+                <div class="tip">
+                    <h5>Key Takeaways</h5>
+                    <ul>
+                        <li><strong>Design for Scale:</strong> Plan for growth from the beginning</li>
+                        <li><strong>Monitor Performance:</strong> Continuously measure and optimize bottlenecks</li>
+                        <li><strong>Use Appropriate Tools:</strong> Choose the right solution for your specific use case</li>
+                        <li><strong>Test Under Load:</strong> Validate performance improvements with realistic traffic</li>
+                        <li><strong>Plan for Failure:</strong> Implement resilience patterns like circuit breakers and graceful degradation</li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    // Calculate offset to account for sticky TOC
+                    const tocElement = document.querySelector('.toc');
+                    const tocHeight = tocElement ? tocElement.offsetHeight : 0;
+                    const offset = tocHeight + 40; // Extra 40px for better spacing
+                    
+                    const targetPosition = target.offsetTop - offset;
+                    
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Update active link in TOC
+                    document.querySelectorAll('.toc a').forEach(link => {
+                        link.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                }
+            });
+        });
+
+        // Highlight active section in navigation
+        window.addEventListener('scroll', function() {
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.sidebar-link');
+            
+            let current = '';
+            const tocElement = document.querySelector('.toc');
+            const tocHeight = tocElement ? tocElement.offsetHeight : 0;
+            const offset = tocHeight + 50; // Same offset as smooth scrolling
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.scrollY >= sectionTop - offset) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('current');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('current');
+                }
+            });
+        });
+
+        // Add active class to TOC links
+        document.querySelectorAll('.toc a').forEach(link => {
+            link.addEventListener('click', function() {
+                document.querySelectorAll('.toc a').forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

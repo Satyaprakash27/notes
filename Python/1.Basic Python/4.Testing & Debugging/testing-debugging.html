@@ -11,11 +11,15 @@
             box-sizing: border-box;
         }
 
+        html {
+            scroll-padding-top: 150px;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
-            color: #333;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #e8e8e8;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
             min-height: 100vh;
             margin: 0;
             display: flex;
@@ -23,7 +27,7 @@
 
         .sidebar {
             width: 280px;
-            background: #2c3e50;
+            background: #1e1e1e;
             color: white;
             height: 100vh;
             position: fixed;
@@ -32,18 +36,19 @@
             overflow-y: auto;
             z-index: 1000;
             transition: transform 0.3s ease;
+            border-right: 1px solid #333;
         }
 
         .sidebar-header {
             padding: 20px;
-            background: #34495e;
-            border-bottom: 1px solid #455a75;
+            background: #2d2d2d;
+            border-bottom: 1px solid #444;
         }
 
         .sidebar-header h2 {
             margin: 0;
             font-size: 1.3em;
-            color: #ecf0f1;
+            color: #f0f0f0;
             border: none;
             padding: 0;
         }
@@ -53,12 +58,12 @@
         }
 
         .sidebar-section {
-            border-bottom: 1px solid #455a75;
+            border-bottom: 1px solid #444;
         }
 
         .sidebar-section-title {
-            background: #34495e;
-            color: #ecf0f1;
+            background: #2d2d2d;
+            color: #f0f0f0;
             padding: 15px 20px;
             margin: 0;
             font-size: 1.1em;
@@ -71,11 +76,11 @@
         }
 
         .sidebar-section-title:hover {
-            background: #455a75;
+            background: #3a3a3a;
         }
 
         .sidebar-links {
-            background: #2c3e50;
+            background: #1e1e1e;
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.3s ease;
@@ -87,20 +92,20 @@
 
         .sidebar-links a {
             display: block;
-            color: #bdc3c7;
+            color: #b8b8b8;
             text-decoration: none;
             padding: 12px 25px;
-            border-bottom: 1px solid #34495e;
+            border-bottom: 1px solid #444;
             transition: background 0.2s ease;
         }
 
         .sidebar-links a:hover {
-            background: #34495e;
-            color: #ecf0f1;
+            background: #3a3a3a;
+            color: #f0f0f0;
         }
 
         .sidebar-links a.current {
-            background: #3498db;
+            background: #27ae60;
             color: white;
             font-weight: 600;
         }
@@ -129,7 +134,8 @@
             max-width: 1000px;
             margin: 0 auto;
             padding: 20px;
-            background: white;
+            background: rgba(30, 30, 30, 0.95);
+            border: 1px solid #444;
             margin-top: 20px;
             margin-bottom: 20px;
             border-radius: 15px;
@@ -155,7 +161,7 @@
         }
 
         h1 {
-            color: #2c3e50;
+            color: #e8e8e8;
             text-align: center;
             margin-bottom: 30px;
             font-size: 2.5em;
@@ -184,46 +190,49 @@
         }
 
         h3 {
-            color: #34495e;
+            color: #74b9ff;
             margin-top: 25px;
             margin-bottom: 15px;
             font-size: 1.3em;
         }
 
         h4 {
-            color: #2c3e50;
+            color: #ddd;
             margin-top: 20px;
             margin-bottom: 10px;
             font-size: 1.1em;
         }
 
         p {
+            color: #e0e0e0;
+            line-height: 1.6;
             margin-bottom: 15px;
             text-align: justify;
         }
 
         .intro {
-            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            background: linear-gradient(135deg, #3a4a5c, #2c3e50);
             color: white;
             padding: 30px;
             border-radius: 10px;
             margin-bottom: 30px;
             text-align: center;
             font-size: 1.1em;
+            border: 1px solid #444;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
             margin: 20px 0;
-            background: #fff;
+            background: #2a2a2a;
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
 
         th {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, #3a4a5c, #2c3e50);
             color: white;
             padding: 15px;
             text-align: left;
@@ -231,16 +240,17 @@
         }
 
         td {
+            color: #e0e0e0;
             padding: 12px 15px;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid #444;
         }
 
         tr:nth-child(even) {
-            background: #f8f9fa;
+            background: #333;
         }
 
         tr:hover {
-            background: #e3f2fd;
+            background: #3a4a5c;
             transition: background 0.3s ease;
         }
 
@@ -278,12 +288,13 @@
         .code-block.json { border-left-color: #f39c12; }
 
         .highlight-box {
-            background: linear-gradient(135deg, #ffecd2, #fcb69f);
-            border: 2px solid #ff6b6b;
+            background: linear-gradient(135deg, #3a2d1f, #4a3a28);
+            border: 2px solid #e74c3c;
             border-radius: 10px;
             padding: 20px;
             margin: 20px 0;
             position: relative;
+            color: #e0e0e0;
         }
 
         .highlight-box::before {
@@ -291,7 +302,7 @@
             position: absolute;
             top: -10px;
             left: 20px;
-            background: #ff6b6b;
+            background: #e74c3c;
             color: white;
             padding: 5px 10px;
             border-radius: 15px;
@@ -299,12 +310,13 @@
         }
 
         .theory-box {
-            background: linear-gradient(135deg, #e8f5e8, #f0f8ff);
+            background: linear-gradient(135deg, #2d3f2d, #3a4a3a);
             border: 2px solid #27ae60;
             border-radius: 10px;
             padding: 20px;
             margin: 20px 0;
             position: relative;
+            color: #e0e0e0;
         }
 
         .theory-box::before {
@@ -320,12 +332,13 @@
         }
 
         .testing-box {
-            background: linear-gradient(135deg, #fff3e0, #f3e5f5);
+            background: linear-gradient(135deg, #3d3a2f, #4a3a2d);
             border: 2px solid #ff9800;
             border-radius: 10px;
             padding: 20px;
             margin: 20px 0;
             position: relative;
+            color: #e0e0e0;
         }
 
         .testing-box::before {
@@ -341,12 +354,13 @@
         }
 
         .debug-box {
-            background: linear-gradient(135deg, #ffebee, #f1f8e9);
+            background: linear-gradient(135deg, #3d2f2f, #4a3a3a);
             border: 2px solid #f44336;
             border-radius: 10px;
             padding: 20px;
             margin: 20px 0;
             position: relative;
+            color: #e0e0e0;
         }
 
         .debug-box::before {
@@ -362,12 +376,13 @@
         }
 
         .pitfall-box {
-            background: linear-gradient(135deg, #fce4ec, #fff8e1);
+            background: linear-gradient(135deg, #3d2f3a, #4a3a45);
             border: 2px solid #e91e63;
             border-radius: 10px;
             padding: 20px;
             margin: 20px 0;
             position: relative;
+            color: #e0e0e0;
         }
 
         .pitfall-box::before {
@@ -390,13 +405,14 @@
         }
 
         .testing-card {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, #3a4a5c, #2c3e50);
             color: white;
             padding: 20px;
             border-radius: 10px;
             text-align: center;
             transform: translateY(0);
             transition: transform 0.3s ease;
+            border: 1px solid #444;
         }
 
         .testing-card:hover {
@@ -410,41 +426,51 @@
         }
 
         .nav {
-            background: rgba(255, 255, 255, 0.9);
-            padding: 1rem;
+            background: rgba(30, 30, 30, 0.95);
+            padding: 0.8rem;
             border-radius: 10px;
             margin-bottom: 2rem;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
             position: sticky;
             top: 20px;
             z-index: 100;
+            border: 1px solid #444;
         }
 
         .nav ul {
             list-style: none;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 1rem;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 0.4rem;
+            row-gap: 0.2rem;
+            margin: 0;
+            padding: 0;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
         .nav a {
-            color: #667eea;
+            color: #74b9ff;
             text-decoration: none;
-            padding: 0.5rem 1rem;
+            padding: 0.4rem 0.6rem;
             border-radius: 25px;
             transition: all 0.3s ease;
             font-weight: 500;
+            text-align: center;
+            display: block;
+            font-size: 0.9rem;
         }
 
         .nav a:hover, .nav a.active {
-            background: linear-gradient(45deg, #667eea, #764ba2);
+            background: linear-gradient(45deg, #3a4a5c, #2c3e50);
             color: white;
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 5px 15px rgba(58, 74, 92, 0.4);
         }
 
         ul, ol {
+            color: #e0e0e0;
             padding-left: 20px;
             margin-bottom: 15px;
         }
@@ -454,19 +480,23 @@
         }
 
         strong {
-            color: #2c3e50;
+            color: #74b9ff;
             font-weight: 600;
         }
 
         code {
-            background: #f1f1f1;
+            background: #2d2d2d;
+            color: #e74c3c;
             padding: 2px 6px;
             border-radius: 3px;
             font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-            color: #e83e8c;
         }
 
         @media (max-width: 768px) {
+            .nav ul {
+                grid-template-columns: 1fr;
+            }
+            
             .container {
                 margin: 10px;
                 padding: 15px;
@@ -571,15 +601,15 @@
 
             <nav class="nav">
                 <ul>
-                    <li><a href="#introduction" class="nav-link">📖 Introduction</a></li>
-                    <li><a href="#testing-fundamentals" class="nav-link">🧪 Testing Fundamentals</a></li>
-                    <li><a href="#testing-frameworks" class="nav-link">🔧 Testing Frameworks</a></li>
-                    <li><a href="#debugging" class="nav-link">🐛 Debugging Techniques</a></li>
-                    <li><a href="#code-quality" class="nav-link">✨ Code Quality</a></li>
-                    <li><a href="#performance" class="nav-link">⚡ Performance Testing</a></li>
-                    <li><a href="#advanced" class="nav-link">🚀 Advanced Concepts</a></li>
-                    <li><a href="#real-world" class="nav-link">🌍 Real-world Examples</a></li>
-                    <li><a href="#pitfalls" class="nav-link">⚠️ Common Pitfalls</a></li>
+                    <li><a href="#introduction" class="nav-link">Introduction</a></li>
+                    <li><a href="#testing-fundamentals" class="nav-link">Testing Fundamentals</a></li>
+                    <li><a href="#testing-frameworks" class="nav-link">Testing Frameworks</a></li>
+                    <li><a href="#debugging" class="nav-link">Debugging Techniques</a></li>
+                    <li><a href="#code-quality" class="nav-link">Code Quality</a></li>
+                    <li><a href="#performance" class="nav-link">Performance Testing</a></li>
+                    <li><a href="#advanced" class="nav-link">Advanced Concepts</a></li>
+                    <li><a href="#real-world" class="nav-link">Real-world Examples</a></li>
+                    <li><a href="#pitfalls" class="nav-link">Common Pitfalls</a></li>
                 </ul>
             </nav>
 
@@ -1314,9 +1344,10 @@ def production_function():
                 const targetElement = document.getElementById(targetId);
                 
                 if (targetElement) {
-                    targetElement.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
+                    const offsetTop = targetElement.offsetTop - 140;
+                    window.scrollTo({
+                        top: offsetTop,
+                        behavior: 'smooth'
                     });
                 }
                 
@@ -1333,9 +1364,9 @@ def production_function():
             
             let current = '';
             sections.forEach(section => {
-                const sectionTop = section.offsetTop;
+                const sectionTop = section.offsetTop - 180;
                 const sectionHeight = section.clientHeight;
-                if (window.pageYOffset >= sectionTop - 200) {
+                if (window.pageYOffset >= sectionTop) {
                     current = section.getAttribute('id');
                 }
             });

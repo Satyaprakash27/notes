@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌐 Networking & Communication Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #e8e8e8;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: #1e1e1e;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            border-right: 1px solid #333;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background: #2d2d2d;
+            border-bottom: 1px solid #444;
+        }
+
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 1.3em;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #f0f0f0;
+            border: none;
+            padding: 0;
+        }
+
+        .sidebar-nav {
+            padding: 0;
+        }
+
+        .sidebar-link {
+            display: block;
+            color: #b8b8b8;
+            text-decoration: none;
+            padding: 15px 20px;
+            border-bottom: 1px solid #444;
+            transition: background 0.2s ease;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 1.1em;
+            font-weight: 500;
+        }
+
+        .sidebar-link:hover {
+            background: #3a3a3a;
+            color: #f0f0f0;
+        }
+
+        .sidebar-link.current {
+            background: #3498db;
+            color: white;
+            font-weight: 600;
+        }
+
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(30, 30, 30, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid #444;
+        }
+        h1 {
+            color: #f0f0f0;
+            text-align: center;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #e0e0e0;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+            margin-top: 30px;
+            font-size: 1.8em;
+        }
+        h3 {
+            color: #3498db;
+            margin-top: 25px;
+            font-size: 1.4em;
+        }
+        h4 {
+            color: #5dade2;
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+        .toc {
+            background: rgba(52, 152, 219, 0.15);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(52, 152, 219, 0.3);
+        }
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-evenly;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .toc li {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex: 0 1 calc(18% - 0.5rem);
+            min-width: 140px;
+        }
+        .toc a {
+            color: #e0e0e0;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            white-space: nowrap;
+            background: rgba(50, 50, 50, 0.7);
+            border: 1px solid rgba(52, 152, 219, 0.3);
+            min-height: 40px;
+            width: 100%;
+        }
+        .toc a:hover, .toc a.active {
+            background: linear-gradient(45deg, #3498db, #5dade2);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+        
+        pre {
+            background: #000000;
+            color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        code {
+            background: #000000;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #ffffff;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: #2a2a2a;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        th, td {
+            border: 1px solid #444;
+            padding: 12px;
+            text-align: left;
+            color: #e0e0e0;
+        }
+        th {
+            background: #3498db;
+            color: white;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background: #333;
+        }
+        tr:hover {
+            background: #404040;
+        }
+        .warning {
+            background: #3a2f1a;
+            border: 1px solid #b8860b;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #ffd700;
+        }
+        .warning::before {
+            content: "⚠️ ";
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .tip {
+            background: #1a3a2f;
+            border: 1px solid #27ae60;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #7bed9f;
+        }
+        .tip::before {
+            content: "💡 ";
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .example {
+            background: #2a2a2a;
+            border-left: 4px solid #17a2b8;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #e0e0e0;
+        }
+        .example h5 {
+            margin-top: 0;
+            color: #17a2b8;
+            font-size: 1.1em;
+        }
+        .syntax {
+            background: #2a2a2a;
+            border-left: 4px solid #6c757d;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #e0e0e0;
+        }
+        .syntax h5 {
+            margin-top: 0;
+            color: #6c757d;
+            font-size: 1.1em;
+        }
+        .benefits {
+            background: #1a3a1a;
+            border: 1px solid #3498db;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #90ee90;
+        }
+        .benefits ul {
+            margin: 10px 0;
+        }
+        .benefits li {
+            margin: 5px 0;
+        }
+        .checklist {
+            background: #2a2a3a;
+            border: 1px solid #3498db;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #e0e0f0;
+        }
+        .protocol {
+            background: #1a2a3a;
+            border: 1px solid #3498db;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #a8c8f0;
+        }
+        .comparison {
+            background: #3a1a1a;
+            border: 1px solid #e74c3c;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #ffb3b3;
+        }
+        .security {
+            background: #1a3a1a;
+            border: 1px solid #27ae60;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #90ee90;
+        }
+
+        @media (max-width: 1024px) {
+            .toc ul {
+                justify-content: center;
+                gap: 0.75rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .sidebar-toggle {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            h2 {
+                font-size: 1.5em;
+            }
+
+            table {
+                font-size: 0.9em;
+            }
+
+            .toc {
+                position: static;
+                margin: 20px 0;
+            }
+
+            .toc ul {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+    
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2><a href="../system-design.html" style="color: inherit; text-decoration: none;">🗂️ System Design</a></h2>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="../1.Fundamentals/system-design-fundamentals.html" class="sidebar-link">
+                🏗️ Fundamentals
+            </a>
+            <a href="../2.Networking & Communication/networking-communication.html" class="sidebar-link current">
+                🌐 Networking & Communication
+            </a>
+            <a href="../3.Databases/databases.html" class="sidebar-link">
+                🗃️ Databases
+            </a>
+            <a href="../4.Caching/caching.html" class="sidebar-link">
+                🗄️ Caching
+            </a>
+            <a href="../5.Message Queues & Event-Driven Systems/message-queues-event-driven.html" class="sidebar-link">
+                📬 Message Queues & Events
+            </a>
+            <a href="../6.Storage Systems/storage-systems.html" class="sidebar-link">
+                💾 Storage Systems
+            </a>
+            <a href="../7.Design Patterns & Architecture/design-patterns-architecture.html" class="sidebar-link">
+                🏛️ Design Patterns
+            </a>
+            <a href="../8.Scalability & Performance/scalability-performance.html" class="sidebar-link">
+                📈 Scalability & Performance
+            </a>
+            <a href="../9.Security in System Design/security-system-design.html" class="sidebar-link">
+                🔒 Security
+            </a>
+            <a href="../10.Monitoring & Observability/monitoring-observability.html" class="sidebar-link">
+                📊 Monitoring & Observability
+            </a>
+            <a href="../11.Deployment & DevOps/deployment-devops.html" class="sidebar-link">
+                🚀 Deployment & DevOps
+            </a>
+            <a href="../12.Popular Use Cases/popular-use-cases.html" class="sidebar-link">
+                🎯 Popular Use Cases
+            </a>
+            <a href="../13.Trade-offs & Decision Making/trade-offs-decision-making.html" class="sidebar-link">
+                ⚖️ Trade-offs & Decisions
+            </a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="container">
+        <h1>🌐 Networking & Communication Guide</h1>
+        
+        <div class="toc" id="toc">
+            <ul>
+                <li><a href="#http-https">HTTP/HTTPS</a></li>
+                <li><a href="#websockets">WebSockets</a></li>
+                <li><a href="#tcp-udp">TCP vs UDP</a></li>
+                <li><a href="#dns-cdn">DNS & CDN</a></li>
+                <li><a href="#rate-limiting">Rate Limiting</a></li>
+            </ul>
+        </div>
+
+        <h2 id="http-https">HTTP/HTTPS Basics</h2>
+        <p>HTTP (HyperText Transfer Protocol) is the foundation of data communication on the World Wide Web, while HTTPS adds a security layer through SSL/TLS encryption. HTTP is a stateless, request-response protocol that operates on top of TCP, enabling clients and servers to communicate through standardized methods and status codes.</p>
+
+        <h3>HTTP Methods</h3>
+        <p>HTTP defines several methods to indicate the desired action for a given resource:</p>
+        <table>
+            <tr>
+                <th>Method</th>
+                <th>Purpose</th>
+                <th>Idempotent</th>
+                <th>Cacheable</th>
+                <th>Safe</th>
+            </tr>
+            <tr><td><strong>GET</strong></td><td>Retrieve data from server</td><td>✅</td><td>✅</td><td>✅</td></tr>
+            <tr><td><strong>POST</strong></td><td>Submit data to server</td><td>❌</td><td>❌</td><td>❌</td></tr>
+            <tr><td><strong>PUT</strong></td><td>Update/replace resource</td><td>✅</td><td>❌</td><td>❌</td></tr>
+            <tr><td><strong>DELETE</strong></td><td>Remove resource</td><td>✅</td><td>❌</td><td>❌</td></tr>
+            <tr><td><strong>PATCH</strong></td><td>Partial update of resource</td><td>❌</td><td>❌</td><td>❌</td></tr>
+            <tr><td><strong>HEAD</strong></td><td>Retrieve headers only</td><td>✅</td><td>✅</td><td>✅</td></tr>
+            <tr><td><strong>OPTIONS</strong></td><td>Check allowed methods</td><td>✅</td><td>❌</td><td>✅</td></tr>
+        </table>
+
+        <h3>HTTP Status Codes</h3>
+        <p>HTTP status codes indicate the result of the HTTP request:</p>
+
+        <h4>1xx - Informational</h4>
+        <div class="example">
+            <h5>Common 1xx Status Codes:</h5>
+            <ul>
+                <li><strong>100 Continue:</strong> Request received, continue process</li>
+                <li><strong>101 Switching Protocols:</strong> Server switching protocols</li>
+                <li><strong>102 Processing:</strong> Request being processed</li>
+            </ul>
+        </div>
+
+        <h4>2xx - Success</h4>
+        <div class="example">
+            <h5>Common 2xx Status Codes:</h5>
+            <ul>
+                <li><strong>200 OK:</strong> Request successful</li>
+                <li><strong>201 Created:</strong> Resource created successfully</li>
+                <li><strong>202 Accepted:</strong> Request accepted for processing</li>
+                <li><strong>204 No Content:</strong> Request successful, no content to return</li>
+            </ul>
+        </div>
+
+        <h4>3xx - Redirection</h4>
+        <div class="example">
+            <h5>Common 3xx Status Codes:</h5>
+            <ul>
+                <li><strong>301 Moved Permanently:</strong> Resource permanently moved</li>
+                <li><strong>302 Found:</strong> Resource temporarily moved</li>
+                <li><strong>304 Not Modified:</strong> Resource not modified since last request</li>
+                <li><strong>307 Temporary Redirect:</strong> Temporary redirect with method preserved</li>
+            </ul>
+        </div>
+
+        <h4>4xx - Client Error</h4>
+        <div class="example">
+            <h5>Common 4xx Status Codes:</h5>
+            <ul>
+                <li><strong>400 Bad Request:</strong> Invalid request syntax</li>
+                <li><strong>401 Unauthorized:</strong> Authentication required</li>
+                <li><strong>403 Forbidden:</strong> Server refuses to authorize</li>
+                <li><strong>404 Not Found:</strong> Resource not found</li>
+                <li><strong>429 Too Many Requests:</strong> Rate limit exceeded</li>
+            </ul>
+        </div>
+
+        <h4>5xx - Server Error</h4>
+        <div class="example">
+            <h5>Common 5xx Status Codes:</h5>
+            <ul>
+                <li><strong>500 Internal Server Error:</strong> Generic server error</li>
+                <li><strong>502 Bad Gateway:</strong> Invalid response from upstream server</li>
+                <li><strong>503 Service Unavailable:</strong> Server temporarily unavailable</li>
+                <li><strong>504 Gateway Timeout:</strong> Upstream server timeout</li>
+            </ul>
+        </div>
+
+        <h3>HTTPS Security Features</h3>
+        <div class="security">
+            <h4>Security Benefits:</h4>
+            <ul>
+                <li><strong>Encryption:</strong> Data transmitted is encrypted using TLS/SSL</li>
+                <li><strong>Authentication:</strong> Server identity verified through certificates</li>
+                <li><strong>Integrity:</strong> Data cannot be tampered with during transmission</li>
+                <li><strong>Certificate Chain:</strong> Hierarchical trust model through Certificate Authorities (CA)</li>
+            </ul>
+        </div>
+
+        <h3>HTTP Evolution</h3>
+        <table>
+            <tr>
+                <th>Version</th>
+                <th>Key Features</th>
+                <th>Benefits</th>
+                <th>Use Cases</th>
+            </tr>
+            <tr><td><strong>HTTP/1.1</strong></td><td>Persistent connections, chunked encoding</td><td>Connection reuse, better performance</td><td>Traditional web applications</td></tr>
+            <tr><td><strong>HTTP/2</strong></td><td>Multiplexing, server push, binary protocol</td><td>Reduced latency, better resource utilization</td><td>Modern web applications</td></tr>
+            <tr><td><strong>HTTP/3</strong></td><td>QUIC protocol, UDP-based</td><td>Faster connection establishment, improved mobile performance</td><td>High-performance applications</td></tr>
+        </table>
+
+        <h2 id="websockets">WebSockets and Long Polling</h2>
+        <p>Real-time communication mechanisms that enable bidirectional data flow between clients and servers, solving the limitations of traditional HTTP request-response patterns for interactive applications.</p>
+
+        <h3>WebSockets</h3>
+        <p>WebSockets provide full-duplex communication channels over a single TCP connection, enabling real-time data exchange with low latency and overhead.</p>
+
+        <div class="protocol">
+            <h4>WebSocket Handshake Process:</h4>
+            <ol>
+                <li>Client sends HTTP upgrade request</li>
+                <li>Server responds with 101 Switching Protocols</li>
+                <li>Connection upgraded to WebSocket protocol</li>
+                <li>Full-duplex communication begins</li>
+            </ol>
+        </div>
+
+        <div class="example">
+            <h5>WebSocket Handshake Example:</h5>
+            <pre><code>// Client Request
+GET /chat HTTP/1.1
+Host: example.com
+Upgrade: websocket
+Connection: Upgrade
+Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==
+Sec-WebSocket-Version: 13
+
+// Server Response
+HTTP/1.1 101 Switching Protocols
+Upgrade: websocket
+Connection: Upgrade
+Sec-WebSocket-Accept: s3pPLMBiTxaQ9kYGzzhZRbK+xOo=</code></pre>
+        </div>
+
+        <h3>WebSocket Characteristics</h3>
+        <div class="benefits">
+            <ul>
+                <li><strong>Full-duplex:</strong> Both client and server can send data simultaneously</li>
+                <li><strong>Low latency:</strong> No HTTP headers overhead after initial handshake</li>
+                <li><strong>Persistent connection:</strong> Connection remains open for the session duration</li>
+                <li><strong>Real-time:</strong> Immediate data transmission without polling</li>
+                <li><strong>Cross-origin support:</strong> CORS policies apply to WebSocket connections</li>
+            </ul>
+        </div>
+
+        <h3>WebSocket Use Cases</h3>
+        <table>
+            <tr>
+                <th>Use Case</th>
+                <th>Description</th>
+                <th>Benefits</th>
+            </tr>
+            <tr><td><strong>Chat Applications</strong></td><td>Real-time messaging systems</td><td>Instant message delivery, typing indicators</td></tr>
+            <tr><td><strong>Gaming</strong></td><td>Multiplayer real-time games</td><td>Low latency, synchronized game state</td></tr>
+            <tr><td><strong>Live Data Feeds</strong></td><td>Stock prices, sports scores</td><td>Real-time updates, no polling overhead</td></tr>
+            <tr><td><strong>Collaborative Tools</strong></td><td>Document editing, whiteboards</td><td>Real-time collaboration, conflict resolution</td></tr>
+            <tr><td><strong>IoT Communication</strong></td><td>Device monitoring and control</td><td>Bidirectional communication, event-driven</td></tr>
+        </table>
+
+        <h3>Long Polling</h3>
+        <p>Long polling is a technique where the client sends a request to the server, and the server holds the request open until new data is available or a timeout occurs.</p>
+
+        <div class="protocol">
+            <h4>Long Polling Process:</h4>
+            <ol>
+                <li>Client sends HTTP request to server</li>
+                <li>Server holds request open (doesn't respond immediately)</li>
+                <li>When data becomes available, server responds with data</li>
+                <li>Client processes response and immediately sends new request</li>
+                <li>Process repeats, creating continuous communication</li>
+            </ol>
+        </div>
+
+        <div class="example">
+            <h5>Long Polling Implementation:</h5>
+            <pre><code>// Client-side JavaScript
+async function longPoll() {
+    while (true) {
+        try {
+            const response = await fetch('/poll', {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                processData(data);
+            }
+        } catch (error) {
+            console.error('Long polling error:', error);
+            await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+    }
+}</code></pre>
+        </div>
+
+        <h3>WebSockets vs Long Polling Comparison</h3>
+        <div class="comparison">
+            <table>
+                <tr>
+                    <th>Aspect</th>
+                    <th>WebSockets</th>
+                    <th>Long Polling</th>
+                </tr>
+                <tr><td><strong>Latency</strong></td><td>Lower (no HTTP overhead)</td><td>Higher (HTTP headers each time)</td></tr>
+                <tr><td><strong>Complexity</strong></td><td>More complex implementation</td><td>Simpler to implement and debug</td></tr>
+                <tr><td><strong>Scalability</strong></td><td>Better for high-frequency communication</td><td>More resource intensive</td></tr>
+                <tr><td><strong>Firewall/Proxy</strong></td><td>May be blocked by some firewalls</td><td>Works better with corporate firewalls</td></tr>
+                <tr><td><strong>Fallback</strong></td><td>Requires fallback mechanism</td><td>Can serve as fallback for WebSockets</td></tr>
+                <tr><td><strong>Connection State</strong></td><td>Persistent connection</td><td>Stateless HTTP connections</td></tr>
+            </table>
+        </div>
+
+        <h2 id="tcp-udp">TCP vs UDP</h2>
+        <p>Two fundamental transport layer protocols that provide different approaches to data transmission, each optimized for specific use cases and requirements.</p>
+
+        <h3>TCP (Transmission Control Protocol)</h3>
+        <p>TCP is a connection-oriented, reliable protocol that ensures data delivery through acknowledgments, retransmission, and ordered packet delivery.</p>
+
+        <div class="protocol">
+            <h4>TCP Characteristics:</h4>
+            <ul>
+                <li><strong>Connection-oriented:</strong> Establishes connection before data transmission (3-way handshake)</li>
+                <li><strong>Reliable delivery:</strong> Guarantees data delivery through acknowledgments and retransmission</li>
+                <li><strong>Ordered delivery:</strong> Data arrives in the same order it was sent</li>
+                <li><strong>Flow control:</strong> Manages data transmission rate based on receiver capacity</li>
+                <li><strong>Congestion control:</strong> Adjusts transmission rate based on network conditions</li>
+                <li><strong>Error detection:</strong> Checksums detect corrupted data</li>
+                <li><strong>Full-duplex:</strong> Simultaneous bidirectional communication</li>
+            </ul>
+        </div>
+
+        <div class="example">
+            <h5>TCP 3-Way Handshake:</h5>
+            <pre><code>Client                    Server
+  |                         |
+  |-------- SYN ----------->|  (1) Client sends SYN
+  |<----- SYN-ACK ----------|  (2) Server responds with SYN-ACK
+  |-------- ACK ----------->|  (3) Client sends ACK
+  |                         |
+  |<==== DATA TRANSFER ====>|  Connection established</code></pre>
+        </div>
+
+        <h3>TCP Use Cases</h3>
+        <table>
+            <tr>
+                <th>Application</th>
+                <th>Protocol</th>
+                <th>Why TCP</th>
+            </tr>
+            <tr><td><strong>Web Browsing</strong></td><td>HTTP/HTTPS</td><td>Reliable page loading, no data loss</td></tr>
+            <tr><td><strong>Email</strong></td><td>SMTP, POP3, IMAP</td><td>Guaranteed message delivery</td></tr>
+            <tr><td><strong>File Transfer</strong></td><td>FTP, SFTP</td><td>Complete file integrity</td></tr>
+            <tr><td><strong>Database Connections</strong></td><td>MySQL, PostgreSQL</td><td>Reliable data transactions</td></tr>
+            <tr><td><strong>API Communications</strong></td><td>REST, GraphQL</td><td>Guaranteed request/response delivery</td></tr>
+        </table>
+
+        <h3>UDP (User Datagram Protocol)</h3>
+        <p>UDP is a connectionless, unreliable protocol that provides fast, low-overhead data transmission without guarantees of delivery, ordering, or error correction.</p>
+
+        <div class="protocol">
+            <h4>UDP Characteristics:</h4>
+            <ul>
+                <li><strong>Connectionless:</strong> No connection establishment required</li>
+                <li><strong>Unreliable:</strong> No guarantee of data delivery or ordering</li>
+                <li><strong>Low overhead:</strong> Minimal protocol headers and processing</li>
+                <li><strong>Fast transmission:</strong> No acknowledgments or retransmissions</li>
+                <li><strong>Broadcasting support:</strong> Can send data to multiple recipients</li>
+                <li><strong>No congestion control:</strong> Application must handle network congestion</li>
+                <li><strong>Stateless:</strong> Each packet is independent</li>
+            </ul>
+        </div>
+
+        <h3>UDP Use Cases</h3>
+        <table>
+            <tr>
+                <th>Application</th>
+                <th>Protocol</th>
+                <th>Why UDP</th>
+            </tr>
+            <tr><td><strong>Video Streaming</strong></td><td>RTP, RTSP</td><td>Speed over reliability, can tolerate loss</td></tr>
+            <tr><td><strong>Online Gaming</strong></td><td>Custom protocols</td><td>Low latency, real-time updates</td></tr>
+            <tr><td><strong>DNS Queries</strong></td><td>DNS</td><td>Fast lookups, can retry if needed</td></tr>
+            <tr><td><strong>DHCP</strong></td><td>DHCP</td><td>Network configuration, broadcast support</td></tr>
+            <tr><td><strong>VoIP</strong></td><td>SIP, RTP</td><td>Real-time communication, low latency</td></tr>
+            <tr><td><strong>IoT Sensors</strong></td><td>CoAP, MQTT</td><td>Lightweight, periodic data transmission</td></tr>
+        </table>
+
+        <h3>TCP vs UDP Comparison</h3>
+        <div class="comparison">
+            <table>
+                <tr>
+                    <th>Feature</th>
+                    <th>TCP</th>
+                    <th>UDP</th>
+                </tr>
+                <tr><td><strong>Connection</strong></td><td>Connection-oriented</td><td>Connectionless</td></tr>
+                <tr><td><strong>Reliability</strong></td><td>Reliable (guaranteed delivery)</td><td>Unreliable (best effort)</td></tr>
+                <tr><td><strong>Ordering</strong></td><td>Ordered delivery</td><td>No ordering guarantee</td></tr>
+                <tr><td><strong>Speed</strong></td><td>Slower (overhead)</td><td>Faster (minimal overhead)</td></tr>
+                <tr><td><strong>Header Size</strong></td><td>20-60 bytes</td><td>8 bytes</td></tr>
+                <tr><td><strong>Flow Control</strong></td><td>Yes</td><td>No</td></tr>
+                <tr><td><strong>Congestion Control</strong></td><td>Yes</td><td>No</td></tr>
+                <tr><td><strong>Error Checking</strong></td><td>Yes</td><td>Basic (checksum)</td></tr>
+                <tr><td><strong>Broadcasting</strong></td><td>No</td><td>Yes</td></tr>
+            </table>
+        </div>
+
+        <h2 id="dns-cdn">DNS and CDN</h2>
+        <p>Critical infrastructure components that optimize content delivery and enable the translation of human-readable domain names to IP addresses.</p>
+
+        <h3>DNS (Domain Name System)</h3>
+        <p>DNS is a hierarchical, distributed naming system that translates domain names into IP addresses, enabling users to access websites using memorable names instead of numeric IP addresses.</p>
+
+        <h3>DNS Hierarchy</h3>
+        <div class="protocol">
+            <h4>DNS Structure:</h4>
+            <ul>
+                <li><strong>Root servers:</strong> Top-level servers managing the root zone</li>
+                <li><strong>Top-level domain (TLD) servers:</strong> Manage domains like .com, .org, .net</li>
+                <li><strong>Authoritative servers:</strong> Store actual DNS records for specific domains</li>
+                <li><strong>Recursive resolvers:</strong> Query other DNS servers on behalf of clients</li>
+            </ul>
+        </div>
+
+        <h3>DNS Record Types</h3>
+        <table>
+            <tr>
+                <th>Record Type</th>
+                <th>Purpose</th>
+                <th>Example</th>
+            </tr>
+            <tr><td><strong>A</strong></td><td>Maps domain to IPv4 address</td><td>example.com → 192.168.1.1</td></tr>
+            <tr><td><strong>AAAA</strong></td><td>Maps domain to IPv6 address</td><td>example.com → 2001:db8::1</td></tr>
+            <tr><td><strong>CNAME</strong></td><td>Creates alias for another domain</td><td>www.example.com → example.com</td></tr>
+            <tr><td><strong>MX</strong></td><td>Specifies mail exchange servers</td><td>example.com → mail.example.com</td></tr>
+            <tr><td><strong>TXT</strong></td><td>Stores text information</td><td>Domain verification, SPF records</td></tr>
+            <tr><td><strong>NS</strong></td><td>Specifies authoritative name servers</td><td>example.com → ns1.example.com</td></tr>
+            <tr><td><strong>SOA</strong></td><td>Administrative information</td><td>Zone authority, refresh intervals</td></tr>
+        </table>
+
+        <h3>DNS Resolution Process</h3>
+        <div class="example">
+            <h5>DNS Query Resolution Steps:</h5>
+            <pre><code>1. Client queries local DNS resolver
+   "What is the IP for example.com?"
+
+2. Resolver checks cache
+   Cache miss → Continue to step 3
+   Cache hit → Return IP address
+
+3. Resolver queries root servers
+   "Where can I find .com servers?"
+   Root server responds with TLD server IPs
+
+4. Resolver queries TLD servers
+   "Where can I find example.com?"
+   TLD server responds with authoritative server IPs
+
+5. Resolver queries authoritative servers
+   "What is the IP for example.com?"
+   Authoritative server responds with IP address
+
+6. Resolver caches result and returns to client</code></pre>
+        </div>
+
+        <h3>CDN (Content Delivery Network)</h3>
+        <p>CDN is a geographically distributed network of servers that cache and deliver content to users from the nearest location, reducing latency and improving performance.</p>
+
+        <h3>CDN Architecture</h3>
+        <div class="protocol">
+            <h4>CDN Components:</h4>
+            <ul>
+                <li><strong>Edge servers:</strong> Distributed servers close to end users</li>
+                <li><strong>Origin servers:</strong> Primary servers containing original content</li>
+                <li><strong>PoP (Point of Presence):</strong> CDN server locations in different regions</li>
+                <li><strong>Cache hierarchy:</strong> Multi-level caching from edge to origin</li>
+            </ul>
+        </div>
+
+        <h3>CDN Benefits</h3>
+        <div class="benefits">
+            <ul>
+                <li><strong>Reduced latency:</strong> Content served from geographically closer servers</li>
+                <li><strong>Improved availability:</strong> Redundancy through multiple server locations</li>
+                <li><strong>Scalability:</strong> Distributes load across multiple servers</li>
+                <li><strong>Bandwidth optimization:</strong> Reduces origin server load</li>
+                <li><strong>DDoS protection:</strong> Distributes and absorbs malicious traffic</li>
+                <li><strong>Cost efficiency:</strong> Reduces bandwidth costs for origin servers</li>
+            </ul>
+        </div>
+
+        <h3>CDN Caching Strategies</h3>
+        <table>
+            <tr>
+                <th>Strategy</th>
+                <th>Description</th>
+                <th>Best For</th>
+            </tr>
+            <tr><td><strong>Static Content Caching</strong></td><td>Cache images, CSS, JavaScript files</td><td>Files that rarely change</td></tr>
+            <tr><td><strong>Dynamic Content Caching</strong></td><td>Cache API responses, personalized content</td><td>Content that changes based on user/location</td></tr>
+            <tr><td><strong>Edge Computing</strong></td><td>Processing and computation at edge locations</td><td>Real-time processing, low latency apps</td></tr>
+            <tr><td><strong>Cache Invalidation</strong></td><td>Updating or removing cached content</td><td>Ensuring content freshness</td></tr>
+        </table>
+
+        <h2 id="rate-limiting">Rate Limiting and Throttling</h2>
+        <p>Essential mechanisms for protecting systems from abuse, ensuring fair resource allocation, and maintaining service quality under high load conditions.</p>
+
+        <h3>Rate Limiting</h3>
+        <p>Rate limiting controls the number of requests a client can make to a service within a specific time window, preventing abuse and ensuring system stability.</p>
+
+        <h3>Rate Limiting Algorithms</h3>
+
+        <h4>Token Bucket Algorithm</h4>
+        <div class="example">
+            <h5>Token Bucket Implementation:</h5>
+            <pre><code>class TokenBucket {
+    constructor(capacity, refillRate) {
+        this.capacity = capacity;
+        this.tokens = capacity;
+        this.refillRate = refillRate;
+        this.lastRefill = Date.now();
+    }
+    
+    allowRequest() {
+        this.refill();
+        if (this.tokens > 0) {
+            this.tokens--;
+            return true;
+        }
+        return false;
+    }
+    
+    refill() {
+        const now = Date.now();
+        const tokensToAdd = Math.floor(
+            (now - this.lastRefill) / 1000 * this.refillRate
+        );
+        this.tokens = Math.min(this.capacity, this.tokens + tokensToAdd);
+        this.lastRefill = now;
+    }
+}</code></pre>
+        </div>
+
+        <h4>Sliding Window Algorithm</h4>
+        <div class="example">
+            <h5>Sliding Window Implementation:</h5>
+            <pre><code>class SlidingWindow {
+    constructor(windowSize, maxRequests) {
+        this.windowSize = windowSize;
+        this.maxRequests = maxRequests;
+        this.requests = [];
+    }
+    
+    allowRequest() {
+        const now = Date.now();
+        const windowStart = now - this.windowSize;
+        
+        // Remove old requests
+        this.requests = this.requests.filter(time => time > windowStart);
+        
+        if (this.requests.length < this.maxRequests) {
+            this.requests.push(now);
+            return true;
+        }
+        return false;
+    }
+}</code></pre>
+        </div>
+
+        <h3>Rate Limiting Strategies</h3>
+        <table>
+            <tr>
+                <th>Strategy</th>
+                <th>Description</th>
+                <th>Use Case</th>
+            </tr>
+            <tr><td><strong>Per-User Limits</strong></td><td>Different limits for different user types</td><td>Tiered service levels</td></tr>
+            <tr><td><strong>Per-IP Limits</strong></td><td>Limits based on client IP addresses</td><td>Preventing abuse from specific IPs</td></tr>
+            <tr><td><strong>Per-API Endpoint</strong></td><td>Different limits for different endpoints</td><td>Protecting sensitive operations</td></tr>
+            <tr><td><strong>Global Limits</strong></td><td>Overall system-wide limits</td><td>Protecting system resources</td></tr>
+            <tr><td><strong>Distributed Limits</strong></td><td>Coordination across multiple servers</td><td>Scalable rate limiting</td></tr>
+        </table>
+
+        <h3>Throttling Techniques</h3>
+        <div class="protocol">
+            <h4>Throttling Methods:</h4>
+            <ul>
+                <li><strong>Request queuing:</strong> Queue excess requests for later processing</li>
+                <li><strong>Request prioritization:</strong> Process high-priority requests first</li>
+                <li><strong>Circuit breakers:</strong> Stop requests when system is overloaded</li>
+                <li><strong>Load shedding:</strong> Drop low-priority requests during high load</li>
+                <li><strong>Backpressure:</strong> Slow down upstream systems when downstream is overwhelmed</li>
+            </ul>
+        </div>
+
+        <h3>Response Strategies</h3>
+        <div class="example">
+            <h5>Rate Limiting Response Headers:</h5>
+            <pre><code>HTTP/1.1 429 Too Many Requests
+X-RateLimit-Limit: 1000
+X-RateLimit-Remaining: 0
+X-RateLimit-Reset: 1640995200
+Retry-After: 60
+
+{
+    "error": "Rate limit exceeded",
+    "message": "Too many requests. Try again in 60 seconds.",
+    "retry_after": 60
+}</code></pre>
+        </div>
+
+        <h3>Implementation Levels</h3>
+        <table>
+            <tr>
+                <th>Level</th>
+                <th>Implementation</th>
+                <th>Pros</th>
+                <th>Cons</th>
+            </tr>
+            <tr><td><strong>Application Level</strong></td><td>Code within application</td><td>Fine-grained control</td><td>Resource intensive</td></tr>
+            <tr><td><strong>API Gateway</strong></td><td>Centralized gateway</td><td>Consistent policies</td><td>Single point of failure</td></tr>
+            <tr><td><strong>Load Balancer</strong></td><td>Network-level limiting</td><td>High performance</td><td>Less flexibility</td></tr>
+            <tr><td><strong>Infrastructure</strong></td><td>Firewall/network equipment</td><td>Network-level protection</td><td>Basic functionality</td></tr>
+        </table>
+
+        <h3>Monitoring and Metrics</h3>
+        <div class="checklist">
+            <h4>Key Metrics to Monitor:</h4>
+            <ul>
+                <li>☐ Request rate tracking (requests per second/minute)</li>
+                <li>☐ Error rate monitoring (percentage of throttled requests)</li>
+                <li>☐ Latency impact (performance impact of rate limiting)</li>
+                <li>☐ User experience metrics (balancing protection with usability)</li>
+                <li>☐ System resource utilization</li>
+                <li>☐ False positive rates (legitimate requests blocked)</li>
+            </ul>
+        </div>
+
+        <h2>Best Practices</h2>
+
+        <h3>Protocol Selection</h3>
+        <div class="tip">
+            <ul>
+                <li><strong>Use HTTPS for all web communications:</strong> Ensure security and privacy</li>
+                <li><strong>Choose WebSockets for real-time applications:</strong> Low latency, full-duplex communication</li>
+                <li><strong>Use TCP for reliability, UDP for speed:</strong> Match protocol to use case</li>
+                <li><strong>Implement proper error handling:</strong> Handle network failures gracefully</li>
+                <li><strong>Design for network partitions:</strong> Assume network unreliability</li>
+            </ul>
+        </div>
+
+        <h3>Performance Optimization</h3>
+        <div class="benefits">
+            <ul>
+                <li><strong>Minimize round trips:</strong> Reduce number of network calls</li>
+                <li><strong>Use appropriate caching strategies:</strong> Cache at multiple levels</li>
+                <li><strong>Implement connection pooling:</strong> Reuse connections efficiently</li>
+                <li><strong>Optimize payload sizes:</strong> Compress and minimize data transfer</li>
+                <li><strong>Use CDNs for static content:</strong> Reduce latency through geographic distribution</li>
+            </ul>
+        </div>
+
+        <h3>Security Considerations</h3>
+        <div class="security">
+            <ul>
+                <li><strong>Implement rate limiting:</strong> Protect against abuse and DoS attacks</li>
+                <li><strong>Use proper authentication:</strong> Secure API endpoints</li>
+                <li><strong>Validate all inputs:</strong> Prevent injection attacks</li>
+                <li><strong>Monitor for anomalies:</strong> Detect and respond to security threats</li>
+                <li><strong>Keep certificates updated:</strong> Maintain SSL/TLS certificate validity</li>
+            </ul>
+        </div>
+
+        <h2>Summary</h2>
+        <p>Networking and communication form the foundation of distributed systems. Understanding these protocols and patterns is essential for building robust, scalable, and secure applications.</p>
+
+        <div class="benefits">
+            <h3>Key Takeaways</h3>
+            <ul>
+                <li><strong>Protocol selection matters:</strong> Choose the right protocol for your use case</li>
+                <li><strong>Security is essential:</strong> Always use HTTPS and implement proper security measures</li>
+                <li><strong>Performance optimization:</strong> Leverage caching, CDNs, and efficient protocols</li>
+                <li><strong>Plan for scale:</strong> Implement rate limiting and monitoring from the start</li>
+                <li><strong>Monitor and measure:</strong> Track key metrics to ensure optimal performance</li>
+            </ul>
+        </div>
+
+        <h3>Next Steps</h3>
+        <p>After mastering networking and communication concepts, explore:</p>
+        <ul>
+            <li><strong>Advanced caching strategies</strong> in the Caching section</li>
+            <li><strong>Database communication patterns</strong> in the Databases section</li>
+            <li><strong>Security protocols</strong> in the Security section</li>
+            <li><strong>Performance optimization</strong> in the Scalability & Performance section</li>
+        </ul>
+
+        <p style="text-align: center; font-size: 1.2em; color: #3498db; margin-top: 30px;">
+            <strong>Efficient networking and communication are the backbone of distributed systems. Master these concepts to build better applications! 🚀</strong>
+        </p>
+
+        </div>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.querySelector('.sidebar-toggle');
+            
+            if (window.innerWidth <= 768 && 
+                !sidebar.contains(event.target) && 
+                !toggle.contains(event.target) && 
+                sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    // Calculate offset to account for sticky TOC
+                    const tocElement = document.querySelector('.toc');
+                    const tocHeight = tocElement ? tocElement.offsetHeight : 0;
+                    const offset = tocHeight + 40; // Extra 40px for better spacing
+                    
+                    const targetPosition = target.offsetTop - offset;
+                    
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Update active link in TOC
+                    document.querySelectorAll('.toc a').forEach(link => {
+                        link.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                }
+            });
+        });
+
+        // Highlight current section in TOC on scroll
+        window.addEventListener('scroll', function() {
+            const sections = document.querySelectorAll('h2[id]');
+            const tocLinks = document.querySelectorAll('.toc a');
+            
+            let current = '';
+            const tocElement = document.querySelector('.toc');
+            const tocHeight = tocElement ? tocElement.offsetHeight : 0;
+            const offset = tocHeight + 50; // Same offset as smooth scrolling
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (window.scrollY >= sectionTop - offset) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            tocLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

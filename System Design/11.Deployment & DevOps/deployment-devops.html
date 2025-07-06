@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Deployment & DevOps Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #e8e8e8;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: #1e1e1e;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            border-right: 1px solid #333;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background: #2d2d2d;
+            border-bottom: 1px solid #444;
+        }
+
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 1.3em;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #f0f0f0;
+            border: none;
+            padding: 0;
+        }
+
+        .sidebar-nav {
+            padding: 0;
+        }
+
+        .sidebar-link {
+            display: block;
+            color: #b8b8b8;
+            text-decoration: none;
+            padding: 15px 20px;
+            border-bottom: 1px solid #444;
+            transition: background 0.2s ease;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 1.1em;
+            font-weight: 500;
+        }
+
+        .sidebar-link:hover {
+            background: #3a3a3a;
+            color: #f0f0f0;
+        }
+
+        .sidebar-link.current {
+            background: #3498db;
+            color: white;
+            font-weight: 600;
+        }
+
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(30, 30, 30, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid #444;
+        }
+        h1 {
+            color: #f0f0f0;
+            text-align: center;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #e0e0e0;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+            margin-top: 30px;
+            font-size: 1.8em;
+        }
+        h3 {
+            color: #3498db;
+            margin-top: 25px;
+            font-size: 1.4em;
+        }
+        h4 {
+            color: #5dade2;
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+        .toc {
+            background: rgba(52, 152, 219, 0.15);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(52, 152, 219, 0.3);
+        }
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-evenly;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .toc li {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex: 0 1 calc(18% - 0.5rem);
+            min-width: 140px;
+        }
+        .toc a {
+            color: #e0e0e0;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            white-space: nowrap;
+            background: rgba(50, 50, 50, 0.7);
+            border: 1px solid rgba(52, 152, 219, 0.3);
+            min-height: 40px;
+            width: 100%;
+        }
+        .toc a:hover, .toc a.active {
+            background: linear-gradient(45deg, #3498db, #5dade2);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+        
+        pre {
+            background: #000000;
+            color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        code {
+            background: #000000;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #ffffff;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: #2a2a2a;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        th, td {
+            border: 1px solid #444;
+            padding: 12px;
+            text-align: left;
+            color: #e0e0e0;
+        }
+        th {
+            background: #3498db;
+            color: white;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background: #333;
+        }
+        tr:hover {
+            background: #404040;
+        }
+        .warning {
+            background: #3a2f1a;
+            border: 1px solid #b8860b;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #ffd700;
+        }
+        .warning::before {
+            content: "⚠️ ";
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .tip {
+            background: #1a3a2f;
+            border: 1px solid #27ae60;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #7bed9f;
+        }
+        .tip::before {
+            content: "💡 ";
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .example {
+            background: #2a2a2a;
+            border-left: 4px solid #17a2b8;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #e0e0e0;
+        }
+        .example h5 {
+            margin-top: 0;
+            color: #17a2b8;
+            font-size: 1.1em;
+        }
+        .syntax {
+            background: #2a2a2a;
+            border-left: 4px solid #6c757d;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #e0e0e0;
+        }
+        .syntax h5 {
+            margin-top: 0;
+            color: #6c757d;
+            font-size: 1.1em;
+        }
+        .benefits {
+            background: #1a3a1a;
+            border: 1px solid #3498db;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #90ee90;
+        }
+        .benefits ul {
+            margin: 10px 0;
+        }
+        .benefits li {
+            margin: 5px 0;
+        }
+        .checklist {
+            background: #2a2a3a;
+            border: 1px solid #3498db;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #e0e0f0;
+        }
+        .protocol {
+            background: #1a2a3a;
+            border: 1px solid #3498db;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #a8c8f0;
+        }
+        .comparison {
+            background: #3a1a1a;
+            border: 1px solid #e74c3c;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #ffb3b3;
+        }
+        .security {
+            background: #1a3a1a;
+            border: 1px solid #27ae60;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #90ee90;
+        }
+        .architecture {
+            background: #2a1a3a;
+            border: 1px solid #9b59b6;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #d2b3e6;
+        }
+        .implementation {
+            background: #1a3a3a;
+            border: 1px solid #17a2b8;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #7dd3fc;
+        }
+        .deployment {
+            background: #3a2a1a;
+            border: 1px solid #f39c12;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #ffd93d;
+        }
+
+        @media (max-width: 1024px) {
+            .toc ul {
+                justify-content: center;
+                gap: 0.75rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .sidebar-toggle {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            h2 {
+                font-size: 1.5em;
+            }
+
+            table {
+                font-size: 0.9em;
+            }
+
+            .toc {
+                position: static;
+                margin: 20px 0;
+            }
+
+            .toc ul {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+    
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2><a href="../system-design.html" style="color: inherit; text-decoration: none;">🗂️ System Design</a></h2>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="../1.Fundamentals/system-design-fundamentals.html" class="sidebar-link">
+                🏗️ Fundamentals
+            </a>
+            <a href="../2.Networking & Communication/networking-communication.html" class="sidebar-link">
+                🌐 Networking & Communication
+            </a>
+            <a href="../3.Databases/databases.html" class="sidebar-link">
+                🗃️ Databases
+            </a>
+            <a href="../4.Caching/caching.html" class="sidebar-link">
+                🗄️ Caching
+            </a>
+            <a href="../5.Message Queues & Event-Driven Systems/message-queues-event-driven.html" class="sidebar-link">
+                📬 Message Queues & Events
+            </a>
+            <a href="../6.Storage Systems/storage-systems.html" class="sidebar-link">
+                💾 Storage Systems
+            </a>
+            <a href="../7.Design Patterns & Architecture/design-patterns-architecture.html" class="sidebar-link">
+                🏛️ Design Patterns
+            </a>
+            <a href="../8.Scalability & Performance/scalability-performance.html" class="sidebar-link">
+                📈 Scalability & Performance
+            </a>
+            <a href="../9.Security in System Design/security-system-design.html" class="sidebar-link">
+                🔒 Security
+            </a>
+            <a href="../10.Monitoring & Observability/monitoring-observability.html" class="sidebar-link">
+                📊 Monitoring & Observability
+            </a>
+            <a href="../11.Deployment & DevOps/deployment-devops.html" class="sidebar-link current">
+                🚀 Deployment & DevOps
+            </a>
+            <a href="../12.Popular Use Cases/popular-use-cases.html" class="sidebar-link">
+                🎯 Popular Use Cases
+            </a>
+            <a href="../13.Trade-offs & Decision Making/trade-offs-decision-making.html" class="sidebar-link">
+                ⚖️ Trade-offs & Decisions
+            </a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="container">
+        <h1>🚀 Deployment & DevOps Guide</h1>
+        
+        <div class="toc" id="toc">
+            <ul>
+                <li><a href="#introduction">Introduction</a></li>
+                <li><a href="#ci-cd">CI/CD Pipelines</a></li>
+                <li><a href="#docker-kubernetes">Docker & Kubernetes</a></li>
+                <li><a href="#deployment-strategies">Deployment Strategies</a></li>
+                <li><a href="#infrastructure-as-code">Infrastructure as Code</a></li>
+                <li><a href="#service-discovery">Service Discovery</a></li>
+                <li><a href="#best-practices">Best Practices</a></li>
+                <li><a href="#security">Security</a></li>
+                <li><a href="#monitoring">Monitoring</a></li>
+                <li><a href="#challenges">Challenges</a></li>
+            </ul>
+        </div>
+
+        <h2 id="introduction">Introduction</h2>
+        <p>Deployment & DevOps practices are essential for delivering reliable, scalable, and maintainable software systems. DevOps bridges the gap between development and operations teams, enabling faster delivery cycles while maintaining system reliability and security.</p>
+
+        <div class="protocol">
+            <h4>Core Principles:</h4>
+            <ul>
+                <li><strong>Automation:</strong> Reduce manual processes and human error</li>
+                <li><strong>Collaboration:</strong> Break down silos between teams</li>
+                <li><strong>Continuous Improvement:</strong> Iteratively enhance processes</li>
+                <li><strong>Monitoring:</strong> Observe system behavior and performance</li>
+                <li><strong>Reliability:</strong> Ensure systems are robust and resilient</li>
+            </ul>
+        </div>
+
+        <div class="benefits">
+            <h4>Key Benefits:</h4>
+            <ul>
+                <li><strong>Faster Time to Market:</strong> Accelerated delivery cycles</li>
+                <li><strong>Improved Quality:</strong> Automated testing and validation</li>
+                <li><strong>Enhanced Collaboration:</strong> Better team communication</li>
+                <li><strong>Reduced Risks:</strong> Smaller, more frequent deployments</li>
+                <li><strong>Better Resource Utilization:</strong> Optimized infrastructure usage</li>
+            </ul>
+        </div>
+
+        <h2 id="ci-cd">CI/CD Pipelines</h2>
+        <p>Continuous Integration/Continuous Deployment (CI/CD) is a method to frequently deliver applications by introducing automation into the stages of application development.</p>
+
+        <h3>Continuous Integration (CI)</h3>
+        <p>Process of automatically integrating code changes from multiple contributors into a shared repository.</p>
+
+        <div class="checklist">
+            <h4>Key Components:</h4>
+            <ul>
+                <li><strong>Source Control:</strong> Git-based repositories</li>
+                <li><strong>Build Automation:</strong> Compile and package code</li>
+                <li><strong>Testing:</strong> Automated test execution</li>
+                <li><strong>Quality Gates:</strong> Code quality checks</li>
+                <li><strong>Artifact Storage:</strong> Store build outputs</li>
+            </ul>
+        </div>
+
+        <div class="example">
+            <h5>CI Pipeline Stages:</h5>
+            <pre><code>Code Commit → Build → Unit Tests → Integration Tests → Code Quality → Artifact Creation</code></pre>
+        </div>
+
+        <h3>Continuous Deployment (CD)</h3>
+        <p>Automated deployment of applications to production environments after passing CI stages.</p>
+
+        <div class="example">
+            <h5>CD Pipeline Stages:</h5>
+            <pre><code>Artifact → Deploy to Staging → Integration Tests → Deploy to Production → Post-deployment Tests</code></pre>
+        </div>
+
+        <h3>Pipeline Implementation</h3>
+
+        <h4>GitHub Actions Example</h4>
+        <div class="example">
+            <h5>Complete CI/CD Pipeline:</h5>
+            <pre><code>name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run tests
+      run: npm test
+      
+    - name: Run linting
+      run: npm run lint
+      
+    - name: Build application
+      run: npm run build
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+    - name: Deploy to production
+      run: |
+        echo "Deploying to production..."
+        # Deployment commands here</code></pre>
+        </div>
+
+        <h4>Jenkins Pipeline Example</h4>
+        <div class="example">
+            <h5>Declarative Pipeline:</h5>
+            <pre><code>pipeline {
+    agent any
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/example/repo.git'
+            }
+        }
+        
+        stage('Build') {
+            steps {
+                sh 'npm install'
+                sh 'npm run build'
+            }
+        }
+        
+        stage('Test') {
+            parallel {
+                stage('Unit Tests') {
+                    steps {
+                        sh 'npm run test:unit'
+                    }
+                }
+                stage('Integration Tests') {
+                    steps {
+                        sh 'npm run test:integration'
+                    }
+                }
+            }
+        }
+        
+        stage('Deploy') {
+            when {
+                branch 'main'
+            }
+            steps {
+                sh 'kubectl apply -f k8s/'
+            }
+        }
+    }
+    
+    post {
+        always {
+            publishTestResults testResultsPattern: 'test-results.xml'
+        }
+    }
+}</code></pre>
+        </div>
+
+        <h3>Pipeline Best Practices</h3>
+        <div class="tip">
+            <ul>
+                <li><strong>Fast Feedback:</strong> Keep pipelines fast (< 10 minutes)</li>
+                <li><strong>Fail Fast:</strong> Catch issues early in the pipeline</li>
+                <li><strong>Parallel Execution:</strong> Run tests in parallel when possible</li>
+                <li><strong>Artifact Management:</strong> Store and version build artifacts</li>
+                <li><strong>Environment Consistency:</strong> Use identical environments</li>
+                <li><strong>Security Scanning:</strong> Include security checks in pipeline</li>
+            </ul>
+        </div>
+
+        <h2 id="docker-kubernetes">Docker & Kubernetes Basics</h2>
+        <p>Containerization and orchestration are fundamental to modern application deployment and management.</p>
+
+        <h3>Docker</h3>
+        <p>Docker is a containerization platform that packages applications and their dependencies into lightweight, portable containers.</p>
+
+        <div class="protocol">
+            <h4>Key Concepts:</h4>
+            <ul>
+                <li><strong>Images:</strong> Read-only templates for creating containers</li>
+                <li><strong>Containers:</strong> Running instances of images</li>
+                <li><strong>Dockerfile:</strong> Instructions for building images</li>
+                <li><strong>Registry:</strong> Storage for Docker images</li>
+            </ul>
+        </div>
+
+        <div class="example">
+            <h5>Multi-stage Dockerfile Example:</h5>
+            <pre><code># Multi-stage build
+FROM node:16-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+
+FROM node:16-alpine AS runtime
+WORKDIR /app
+COPY --from=builder /app/node_modules ./node_modules
+COPY . .
+EXPOSE 3000
+USER node
+CMD ["node", "server.js"]</code></pre>
+        </div>
+
+        <div class="tip">
+            <h4>Docker Best Practices:</h4>
+            <ul>
+                <li>Use multi-stage builds</li>
+                <li>Minimize image layers</li>
+                <li>Use specific image tags</li>
+                <li>Run as non-root user</li>
+                <li>Implement health checks</li>
+            </ul>
+        </div>
+
+        <h3>Kubernetes</h3>
+        <p>Kubernetes is a container orchestration platform that automates deployment, scaling, and management of containerized applications.</p>
+
+        <div class="checklist">
+            <h4>Key Components:</h4>
+            <ul>
+                <li><strong>Pods:</strong> Smallest deployable units</li>
+                <li><strong>Services:</strong> Network abstraction for pods</li>
+                <li><strong>Deployments:</strong> Manage pod replicas</li>
+                <li><strong>ConfigMaps:</strong> Configuration data</li>
+                <li><strong>Secrets:</strong> Sensitive data</li>
+                <li><strong>Ingress:</strong> External access management</li>
+            </ul>
+        </div>
+
+        <div class="architecture">
+            <h4>Kubernetes Architecture:</h4>
+            <pre><code>Master Node:
+├── API Server
+├── Controller Manager
+├── Scheduler
+└── etcd
+
+Worker Nodes:
+├── Kubelet
+├── Container Runtime
+└── Kube Proxy</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Complete Kubernetes Deployment:</h5>
+            <pre><code>apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-app
+  labels:
+    app: web-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: web-app
+  template:
+    metadata:
+      labels:
+        app: web-app
+    spec:
+      containers:
+      - name: web-app
+        image: nginx:1.20
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 80
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-app-service
+spec:
+  selector:
+    app: web-app
+  ports:
+  - port: 80
+    targetPort: 80
+  type: ClusterIP
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: web-app-ingress
+spec:
+  rules:
+  - host: example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: web-app-service
+            port:
+              number: 80</code></pre>
+        </div>
+
+        <h2 id="deployment-strategies">Blue/Green & Canary Deployments</h2>
+        <p>Advanced deployment strategies that minimize downtime and reduce deployment risks.</p>
+
+        <h3>Blue/Green Deployment</h3>
+        <p>Blue/Green deployment maintains two identical production environments. At any time, only one environment serves production traffic.</p>
+
+        <div class="deployment">
+            <h4>Architecture:</h4>
+            <pre><code>Load Balancer
+├── Blue Environment (Active)
+└── Green Environment (Standby)</code></pre>
+        </div>
+
+        <div class="protocol">
+            <h4>Deployment Process:</h4>
+            <ol>
+                <li><strong>Blue Active:</strong> Current production environment</li>
+                <li><strong>Deploy to Green:</strong> Deploy new version to standby</li>
+                <li><strong>Test Green:</strong> Validate new deployment</li>
+                <li><strong>Switch Traffic:</strong> Route traffic to Green</li>
+                <li><strong>Blue Standby:</strong> Blue becomes new standby</li>
+            </ol>
+        </div>
+
+        <div class="benefits">
+            <h4>Benefits:</h4>
+            <ul>
+                <li><strong>Zero Downtime:</strong> Instant switchover</li>
+                <li><strong>Easy Rollback:</strong> Switch back to Blue if issues</li>
+                <li><strong>Full Testing:</strong> Complete validation before switch</li>
+                <li><strong>Risk Mitigation:</strong> Parallel environments</li>
+            </ul>
+        </div>
+
+        <h3>Canary Deployment</h3>
+        <p>Canary deployment gradually rolls out changes to a small subset of users before full deployment.</p>
+
+        <div class="deployment">
+            <h4>Traffic Distribution:</h4>
+            <pre><code>Load Balancer
+├── Stable Version (90% traffic)
+└── Canary Version (10% traffic)</code></pre>
+        </div>
+
+        <div class="protocol">
+            <h4>Canary Process:</h4>
+            <ol>
+                <li><strong>Deploy Canary:</strong> Deploy new version to small percentage</li>
+                <li><strong>Monitor Metrics:</strong> Observe performance and errors</li>
+                <li><strong>Gradual Rollout:</strong> Increase traffic percentage</li>
+                <li><strong>Full Deployment:</strong> Complete rollout if successful</li>
+                <li><strong>Rollback:</strong> Revert if issues detected</li>
+            </ol>
+        </div>
+
+        <div class="checklist">
+            <h4>Canary Metrics to Monitor:</h4>
+            <ul>
+                <li><strong>Error Rate:</strong> 4xx/5xx responses</li>
+                <li><strong>Response Time:</strong> Latency percentiles</li>
+                <li><strong>Success Rate:</strong> Business transaction success</li>
+                <li><strong>Resource Usage:</strong> CPU/Memory consumption</li>
+            </ul>
+        </div>
+
+        <h3>Rolling Deployment</h3>
+        <p>Rolling deployment gradually replaces instances of the old version with the new version.</p>
+
+        <div class="example">
+            <h5>Kubernetes Rolling Update:</h5>
+            <pre><code>apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-rolling
+spec:
+  replicas: 6
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 2        # 2 extra pods during update
+      maxUnavailable: 1  # 1 pod can be unavailable
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: app
+        image: myapp:v2.0
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5</code></pre>
+        </div>
+
+        <h2 id="infrastructure-as-code">Infrastructure as Code (Terraform)</h2>
+        <p>Infrastructure as Code (IaC) manages and provisions computing infrastructure through machine-readable definition files.</p>
+
+        <h3>Terraform Basics</h3>
+        <div class="protocol">
+            <h4>Core Concepts:</h4>
+            <ul>
+                <li><strong>Providers:</strong> Interface to APIs (AWS, Azure, GCP)</li>
+                <li><strong>Resources:</strong> Infrastructure components</li>
+                <li><strong>Variables:</strong> Parameterize configurations</li>
+                <li><strong>Outputs:</strong> Return values from resources</li>
+                <li><strong>State:</strong> Track resource status</li>
+            </ul>
+        </div>
+
+        <div class="example">
+            <h5>Complete Terraform Configuration:</h5>
+            <pre><code># Configure the AWS Provider
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+  
+  backend "s3" {
+    bucket = "terraform-state-bucket"
+    key    = "infrastructure/terraform.tfstate"
+    region = "us-east-1"
+  }
+}
+
+provider "aws" {
+  region = var.aws_region
+}
+
+# Variables
+variable "aws_region" {
+  description = "AWS region"
+  type        = string
+  default     = "us-east-1"
+}
+
+variable "environment" {
+  description = "Environment name"
+  type        = string
+  default     = "production"
+}
+
+# VPC
+resource "aws_vpc" "main" {
+  cidr_block           = "10.0.0.0/16"
+  enable_dns_hostnames = true
+  enable_dns_support   = true
+  
+  tags = {
+    Name        = "${var.environment}-vpc"
+    Environment = var.environment
+  }
+}
+
+# Internet Gateway
+resource "aws_internet_gateway" "main" {
+  vpc_id = aws_vpc.main.id
+  
+  tags = {
+    Name        = "${var.environment}-igw"
+    Environment = var.environment
+  }
+}
+
+# Outputs
+output "vpc_id" {
+  description = "VPC ID"
+  value       = aws_vpc.main.id
+}</code></pre>
+        </div>
+
+        <div class="tip">
+            <h4>Terraform Best Practices:</h4>
+            <ul>
+                <li><strong>State Management:</strong> Use remote state backend</li>
+                <li><strong>Modular Structure:</strong> Organize code into modules</li>
+                <li><strong>Version Control:</strong> Tag infrastructure versions</li>
+                <li><strong>Security:</strong> Use least privilege IAM policies</li>
+            </ul>
+        </div>
+
+        <div class="implementation">
+            <h4>Terraform Workflow:</h4>
+            <pre><code># Initialize Terraform
+terraform init
+
+# Plan changes
+terraform plan -var-file="environments/prod.tfvars"
+
+# Apply changes
+terraform apply -var-file="environments/prod.tfvars"
+
+# Destroy infrastructure
+terraform destroy -var-file="environments/prod.tfvars"</code></pre>
+        </div>
+
+        <h2 id="service-discovery">Service Discovery</h2>
+        <p>Service discovery is the process of automatically detecting and connecting to services in a distributed system.</p>
+
+        <h3>Consul</h3>
+        <p>Consul is a service mesh solution providing service discovery, configuration, and segmentation functionality.</p>
+
+        <div class="architecture">
+            <h4>Consul Architecture:</h4>
+            <pre><code>Consul Cluster
+├── Server Nodes (3-5)
+├── Client Nodes (on each server)
+└── Consul Connect (Service Mesh)</code></pre>
+        </div>
+
+        <div class="protocol">
+            <h4>Key Features:</h4>
+            <ul>
+                <li><strong>Service Registration:</strong> Services register themselves</li>
+                <li><strong>Health Checking:</strong> Monitor service health</li>
+                <li><strong>DNS Interface:</strong> Resolve services via DNS</li>
+                <li><strong>Key-Value Store:</strong> Configuration management</li>
+                <li><strong>Service Mesh:</strong> Secure service communication</li>
+            </ul>
+        </div>
+
+        <div class="example">
+            <h5>Service Registration:</h5>
+            <pre><code>{
+  "service": {
+    "name": "web-api",
+    "id": "web-api-1",
+    "port": 8080,
+    "tags": ["api", "web"],
+    "address": "192.168.1.100",
+    "check": {
+      "http": "http://192.168.1.100:8080/health",
+      "interval": "10s",
+      "timeout": "3s"
+    }
+  }
+}</code></pre>
+        </div>
+
+        <h3>Service Discovery Patterns</h3>
+        <table>
+            <tr>
+                <th>Pattern</th>
+                <th>Description</th>
+                <th>Examples</th>
+                <th>Use Cases</th>
+            </tr>
+            <tr>
+                <td><strong>Client-side Discovery</strong></td>
+                <td>Client queries service registry</td>
+                <td>Eureka, Consul</td>
+                <td>Microservices, load balancing</td>
+            </tr>
+            <tr>
+                <td><strong>Server-side Discovery</strong></td>
+                <td>Load balancer queries service registry</td>
+                <td>AWS ALB, Nginx Plus</td>
+                <td>Transparent to clients</td>
+            </tr>
+            <tr>
+                <td><strong>Service Mesh</strong></td>
+                <td>Sidecar proxy handles discovery</td>
+                <td>Istio, Linkerd</td>
+                <td>Complex microservices</td>
+            </tr>
+        </table>
+
+        <h3>Kubernetes Service Discovery</h3>
+        <div class="checklist">
+            <h4>Built-in Mechanisms:</h4>
+            <ul>
+                <li><strong>DNS:</strong> Services accessible via DNS names</li>
+                <li><strong>Environment Variables:</strong> Service info injected</li>
+                <li><strong>Service API:</strong> Programmatic service discovery</li>
+            </ul>
+        </div>
+
+        <h2 id="best-practices">Best Practices</h2>
+        <p>Essential practices for successful DevOps implementation and deployment strategies.</p>
+
+        <h3>CI/CD Best Practices</h3>
+        <div class="checklist">
+            <h4>Pipeline Design:</h4>
+            <ul>
+                <li>Keep pipelines fast and reliable</li>
+                <li>Fail fast with early feedback</li>
+                <li>Use parallel execution</li>
+                <li>Implement proper testing pyramid</li>
+            </ul>
+        </div>
+
+        <h3>Container Best Practices</h3>
+        <div class="tip">
+            <h4>Image Management:</h4>
+            <ul>
+                <li>Use minimal base images</li>
+                <li>Implement multi-stage builds</li>
+                <li>Scan images for vulnerabilities</li>
+                <li>Tag images properly</li>
+            </ul>
+        </div>
+
+        <h3>Deployment Best Practices</h3>
+        <div class="implementation">
+            <h4>Strategy Selection:</h4>
+            <ul>
+                <li>Choose appropriate deployment strategy</li>
+                <li>Consider business requirements</li>
+                <li>Plan rollback procedures</li>
+                <li>Implement feature flags</li>
+            </ul>
+        </div>
+
+        <h2 id="security">Security Considerations</h2>
+        <p>Security must be integrated throughout the entire deployment pipeline and infrastructure.</p>
+
+        <h3>Pipeline Security</h3>
+        <div class="security">
+            <h4>Code Security:</h4>
+            <ul>
+                <li>Static code analysis</li>
+                <li>Dependency scanning</li>
+                <li>Secret scanning</li>
+                <li>License compliance</li>
+            </ul>
+        </div>
+
+        <div class="security">
+            <h4>Build Security:</h4>
+            <ul>
+                <li>Secure build environments</li>
+                <li>Artifact signing</li>
+                <li>Supply chain security</li>
+                <li>Reproducible builds</li>
+            </ul>
+        </div>
+
+        <h3>Infrastructure Security</h3>
+        <div class="security">
+            <h4>Network Security:</h4>
+            <ul>
+                <li>VPC isolation</li>
+                <li>Security groups</li>
+                <li>Network policies</li>
+                <li>TLS encryption</li>
+            </ul>
+        </div>
+
+        <div class="security">
+            <h4>Identity and Access:</h4>
+            <ul>
+                <li>RBAC implementation</li>
+                <li>Service accounts</li>
+                <li>Least privilege principle</li>
+                <li>Multi-factor authentication</li>
+            </ul>
+        </div>
+
+        <h2 id="monitoring">Monitoring and Observability</h2>
+        <p>Comprehensive monitoring is essential for successful DevOps operations.</p>
+
+        <h3>Deployment Monitoring</h3>
+        <div class="checklist">
+            <h4>Deployment Metrics:</h4>
+            <ul>
+                <li>Deployment frequency</li>
+                <li>Lead time</li>
+                <li>Change failure rate</li>
+                <li>Mean time to recovery</li>
+            </ul>
+        </div>
+
+        <h3>Application Monitoring</h3>
+        <div class="checklist">
+            <h4>Key Metrics:</h4>
+            <ul>
+                <li>Response time</li>
+                <li>Error rates</li>
+                <li>Throughput</li>
+                <li>Resource utilization</li>
+            </ul>
+        </div>
+
+        <h2 id="challenges">Common Challenges</h2>
+        <p>Understanding and addressing common challenges in DevOps implementation.</p>
+
+        <h3>Technical Challenges</h3>
+        <table>
+            <tr>
+                <th>Challenge</th>
+                <th>Description</th>
+                <th>Solution</th>
+            </tr>
+            <tr>
+                <td><strong>Configuration Management</strong></td>
+                <td>Managing configurations across environments</td>
+                <td>Use configuration management tools and IaC</td>
+            </tr>
+            <tr>
+                <td><strong>Dependency Management</strong></td>
+                <td>Complex service dependencies</td>
+                <td>Implement proper service discovery and health checks</td>
+            </tr>
+            <tr>
+                <td><strong>Rollback Complexity</strong></td>
+                <td>Database schema changes</td>
+                <td>Implement backward-compatible changes</td>
+            </tr>
+        </table>
+
+        <h3>Organizational Challenges</h3>
+        <table>
+            <tr>
+                <th>Challenge</th>
+                <th>Description</th>
+                <th>Solution</th>
+            </tr>
+            <tr>
+                <td><strong>Cultural Resistance</strong></td>
+                <td>Traditional development practices</td>
+                <td>Gradual adoption and training</td>
+            </tr>
+            <tr>
+                <td><strong>Skill Gaps</strong></td>
+                <td>Lack of DevOps expertise</td>
+                <td>Training programs and knowledge sharing</td>
+            </tr>
+            <tr>
+                <td><strong>Tool Complexity</strong></td>
+                <td>Too many tools and complexity</td>
+                <td>Standardization and automation</td>
+            </tr>
+        </table>
+
+        <div class="tip">
+            <h4>Success Factors:</h4>
+            <ul>
+                <li><strong>Start Small:</strong> Begin with basic CI/CD and gradually add complexity</li>
+                <li><strong>Automate Everything:</strong> Reduce manual processes and human error</li>
+                <li><strong>Monitor Continuously:</strong> Implement comprehensive observability</li>
+                <li><strong>Secure by Design:</strong> Include security in every stage</li>
+                <li><strong>Foster Culture:</strong> Encourage collaboration and continuous improvement</li>
+            </ul>
+        </div>
+
+        <h2>Conclusion</h2>
+        <p>Deployment & DevOps practices are fundamental to modern software development, enabling organizations to deliver faster, improve quality, increase reliability, enhance security, scale efficiently, and maintain visibility.</p>
+
+        <div class="benefits">
+            <h4>Key Success Factors:</h4>
+            <ul>
+                <li><strong>Start Small:</strong> Begin with basic CI/CD and gradually add complexity</li>
+                <li><strong>Automate Everything:</strong> Reduce manual processes and human error</li>
+                <li><strong>Monitor Continuously:</strong> Implement comprehensive observability</li>
+                <li><strong>Secure by Design:</strong> Include security in every stage</li>
+                <li><strong>Foster Culture:</strong> Encourage collaboration and continuous improvement</li>
+            </ul>
+        </div>
+
+        <div class="warning">
+            The journey to effective DevOps requires commitment to continuous learning, experimentation, and improvement. Success depends on both technical implementation and cultural transformation. Remember that DevOps is not just about tools—it's about people, processes, and continuous improvement.
+        </div>
+
+        <p style="text-align: center; font-size: 1.2em; color: #3498db; margin-top: 30px;">
+            <strong>Successful DevOps transformation enables organizations to deliver value faster while maintaining high quality and security standards! 🚀</strong>
+        </p>
+    </div>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.querySelector('.sidebar-toggle');
+            
+            if (window.innerWidth <= 768 && 
+                !sidebar.contains(event.target) && 
+                !toggle.contains(event.target) && 
+                sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    // Calculate offset to account for sticky TOC
+                    const tocElement = document.querySelector('.toc');
+                    const tocHeight = tocElement ? tocElement.offsetHeight : 0;
+                    const offset = tocHeight + 40; // Extra 40px for better spacing
+                    
+                    const targetPosition = target.offsetTop - offset;
+                    
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Update active link in TOC
+                    document.querySelectorAll('.toc a').forEach(link => {
+                        link.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                }
+            });
+        });
+
+        // Highlight current section in TOC on scroll
+        window.addEventListener('scroll', function() {
+            const sections = document.querySelectorAll('h2[id]');
+            const tocLinks = document.querySelectorAll('.toc a');
+            
+            let current = '';
+            const tocElement = document.querySelector('.toc');
+            const tocHeight = tocElement ? tocElement.offsetHeight : 0;
+            const offset = tocHeight + 50; // Same offset as smooth scrolling
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (window.scrollY >= sectionTop - offset) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            tocLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

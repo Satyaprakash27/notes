@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔒 Security in System Design</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #e8e8e8;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: #1e1e1e;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            border-right: 1px solid #333;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background: #2d2d2d;
+            border-bottom: 1px solid #444;
+        }
+
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 1.3em;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #f0f0f0;
+            border: none;
+            padding: 0;
+        }
+
+        .sidebar-nav {
+            padding: 0;
+        }
+
+        .sidebar-link {
+            display: block;
+            color: #b8b8b8;
+            text-decoration: none;
+            padding: 15px 20px;
+            border-bottom: 1px solid #444;
+            transition: background 0.2s ease;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 1.1em;
+            font-weight: 500;
+        }
+
+        .sidebar-link:hover {
+            background: #3a3a3a;
+            color: #f0f0f0;
+        }
+
+        .sidebar-link.current {
+            background: #3498db;
+            color: white;
+            font-weight: 600;
+        }
+
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(30, 30, 30, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid #444;
+        }
+        
+        h1 {
+            color: #f0f0f0;
+            text-align: center;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #e0e0e0;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+            margin-top: 30px;
+            font-size: 1.8em;
+        }
+        h3 {
+            color: #3498db;
+            margin-top: 25px;
+            font-size: 1.4em;
+        }
+        h4 {
+            color: #5dade2;
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+        .toc {
+            background: rgba(52, 152, 219, 0.15);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(52, 152, 219, 0.3);
+        }
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-evenly;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .toc li {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex: 0 1 calc(18% - 0.5rem);
+            min-width: 140px;
+        }
+        .toc a {
+            color: #e0e0e0;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            white-space: nowrap;
+            background: rgba(50, 50, 50, 0.7);
+            border: 1px solid rgba(52, 152, 219, 0.3);
+            min-height: 40px;
+            width: 100%;
+        }
+        .toc a:hover, .toc a.active {
+            background: linear-gradient(45deg, #3498db, #5dade2);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+        
+        pre {
+            background: #000000;
+            color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        code {
+            background: #000000;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #ffffff;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: #2a2a2a;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        th, td {
+            border: 1px solid #444;
+            padding: 12px;
+            text-align: left;
+            color: #e0e0e0;
+        }
+        th {
+            background: #3498db;
+            color: white;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background: #333;
+        }
+        tr:hover {
+            background: #404040;
+        }
+        .warning {
+            background: #3a2f1a;
+            border: 1px solid #b8860b;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #ffd700;
+        }
+        .warning::before {
+            content: "⚠️ ";
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .tip {
+            background: #1a3a2f;
+            border: 1px solid #27ae60;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #7bed9f;
+        }
+        .tip::before {
+            content: "💡 ";
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .example {
+            background: #2a2a2a;
+            border-left: 4px solid #17a2b8;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #e0e0e0;
+        }
+        .example h5 {
+            margin-top: 0;
+            color: #17a2b8;
+            font-size: 1.1em;
+        }
+        .syntax {
+            background: #2a2a2a;
+            border-left: 4px solid #6c757d;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #e0e0e0;
+        }
+        .syntax h5 {
+            margin-top: 0;
+            color: #6c757d;
+            font-size: 1.1em;
+        }
+        .benefits {
+            background: #1a3a1a;
+            border: 1px solid #3498db;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #90ee90;
+        }
+        .benefits ul {
+            margin: 10px 0;
+        }
+        .benefits li {
+            margin: 5px 0;
+        }
+        .checklist {
+            background: #2a2a3a;
+            border: 1px solid #3498db;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #e0e0f0;
+        }
+        .protocol {
+            background: #1a2a3a;
+            border: 1px solid #3498db;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #a8c8f0;
+        }
+        .comparison {
+            background: #3a1a1a;
+            border: 1px solid #e74c3c;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #ffb3b3;
+        }
+        .security {
+            background: #1a3a1a;
+            border: 1px solid #27ae60;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #90ee90;
+        }
+
+        @media (max-width: 1024px) {
+            .toc ul {
+                justify-content: center;
+                gap: 0.75rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .sidebar-toggle {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            h2 {
+                font-size: 1.5em;
+            }
+
+            table {
+                font-size: 0.9em;
+            }
+
+            .toc {
+                position: static;
+                margin: 20px 0;
+            }
+
+            .toc ul {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+    
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2><a href="../system-design.html" style="color: inherit; text-decoration: none;">🗂️ System Design</a></h2>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="../1.Fundamentals/system-design-fundamentals.html" class="sidebar-link">
+                🏗️ Fundamentals
+            </a>
+            <a href="../2.Networking & Communication/networking-communication.html" class="sidebar-link">
+                🌐 Networking & Communication
+            </a>
+            <a href="../3.Databases/databases.html" class="sidebar-link">
+                🗃️ Databases
+            </a>
+            <a href="../4.Caching/caching.html" class="sidebar-link">
+                🗄️ Caching
+            </a>
+            <a href="../5.Message Queues & Event-Driven Systems/message-queues-event-driven.html" class="sidebar-link">
+                📬 Message Queues & Events
+            </a>
+            <a href="../6.Storage Systems/storage-systems.html" class="sidebar-link">
+                💾 Storage Systems
+            </a>
+            <a href="../7.Design Patterns & Architecture/design-patterns-architecture.html" class="sidebar-link">
+                🏛️ Design Patterns
+            </a>
+            <a href="../8.Scalability & Performance/scalability-performance.html" class="sidebar-link">
+                📈 Scalability & Performance
+            </a>
+            <a href="../9.Security in System Design/security-system-design.html" class="sidebar-link current">
+                🔒 Security
+            </a>
+            <a href="../10.Monitoring & Observability/monitoring-observability.html" class="sidebar-link">
+                📊 Monitoring & Observability
+            </a>
+            <a href="../11.Deployment & DevOps/deployment-devops.html" class="sidebar-link">
+                🚀 Deployment & DevOps
+            </a>
+            <a href="../12.Popular Use Cases/popular-use-cases.html" class="sidebar-link">
+                🎯 Popular Use Cases
+            </a>
+            <a href="../13.Trade-offs & Decision Making/trade-offs-decision-making.html" class="sidebar-link">
+                ⚖️ Trade-offs & Decisions
+            </a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="container">
+        <h1>🔒 Security in System Design</h1>
+        
+        <div class="toc" id="toc">
+            <ul>
+                <li><a href="#authentication-authorization">Auth</a></li>
+                <li><a href="#encryption">Encryption</a></li>
+                <li><a href="#rate-limiting-waf">Rate Limiting & WAF</a></li>
+                <li><a href="#secure-credential-storage">Secure Credential Storage</a></li>
+            </ul>
+        </div>
+
+            <section id="authentication-authorization" class="section">
+                <h2>Authentication & Authorization</h2>
+                <p>Authentication and authorization are fundamental security mechanisms that verify user identity and control access to system resources.</p>
+
+                <div id="oauth2" class="section">
+                    <h3>OAuth2</h3>
+                    <p>OAuth2 is an authorization framework that enables applications to obtain limited access to user accounts on an HTTP service.</p>
+
+                    <h4>OAuth2 Flow Types</h4>
+                    
+                    <div class="security">
+                        <strong>Authorization Code Flow</strong>
+                        <ul>
+                            <li><strong>Use Case:</strong> Server-side web applications</li>
+                            <li><strong>Security:</strong> Most secure flow type</li>
+                            <li><strong>Process:</strong> Client redirects user to authorization server, receives authorization code, exchanges code for access token</li>
+                        </ul>
+                    </div>
+
+                    <div class="protocol">
+                        <h4>OAuth2 Authorization Code Flow</h4>
+                        <pre>
+User → Client: Access protected resource
+Client → User: Redirect to authorization server
+User → AuthServer: Login and grant permission
+AuthServer → Client: Return authorization code
+Client → AuthServer: Exchange code for access token
+AuthServer → Client: Return access token
+Client → ResourceServer: Request resource with token
+ResourceServer → Client: Return protected resource
+                        </pre>
+                    </div>
+
+                    <div class="example">
+                        <pre># OAuth2 Authorization Server Implementation
+from flask import Flask, request, jsonify, redirect
+import jwt
+import secrets
+import time
+
+class OAuth2Server:
+    def __init__(self):
+        self.clients = {
+            'client123': {
+                'secret': 'secret456',
+                'redirect_uris': ['https://app.example.com/callback'],
+                'scopes': ['read', 'write']
+            }
+        }
+        self.authorization_codes = {}
+        self.access_tokens = {}
+    
+    def generate_authorization_code(self, client_id, user_id, scopes):
+        code = secrets.token_urlsafe(32)
+        self.authorization_codes[code] = {
+            'client_id': client_id,
+            'user_id': user_id,
+            'scopes': scopes,
+            'expires_at': time.time() + 600  # 10 minutes
+        }
+        return code
+    
+    def exchange_code_for_token(self, code, client_id, client_secret):
+        if code not in self.authorization_codes:
+            return None
+        
+        auth_data = self.authorization_codes[code]
+        
+        # Validate client credentials
+        if (auth_data['client_id'] != client_id or 
+            self.clients.get(client_id, {}).get('secret') != client_secret):
+            return None
+        
+        # Check expiration
+        if time.time() > auth_data['expires_at']:
+            del self.authorization_codes[code]
+            return None
+        
+        # Generate access token
+        access_token = jwt.encode({
+            'user_id': auth_data['user_id'],
+            'client_id': client_id,
+            'scopes': auth_data['scopes'],
+            'exp': time.time() + 3600  # 1 hour
+        }, 'secret_key', algorithm='HS256')
+        
+        # Clean up authorization code
+        del self.authorization_codes[code]
+        
+        return {
+            'access_token': access_token,
+            'token_type': 'Bearer',
+            'expires_in': 3600,
+            'scope': ' '.join(auth_data['scopes'])
+        }</pre>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Flow Type</th>
+                                    <th>Use Case</th>
+                                    <th>Security Level</th>
+                                    <th>Token Exposure</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Authorization Code</td>
+                                    <td>Server-side web apps</td>
+                                    <td>High</td>
+                                    <td>Server-side only</td>
+                                </tr>
+                                <tr>
+                                    <td>Implicit</td>
+                                    <td>Single-page apps</td>
+                                    <td>Medium</td>
+                                    <td>Browser exposed</td>
+                                </tr>
+                                <tr>
+                                    <td>Client Credentials</td>
+                                    <td>Server-to-server</td>
+                                    <td>High</td>
+                                    <td>Server-side only</td>
+                                </tr>
+                                <tr>
+                                    <td>Resource Owner Password</td>
+                                    <td>Trusted applications</td>
+                                    <td>Low</td>
+                                    <td>Client exposed</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="jwt" class="section">
+                    <h3>JWT (JSON Web Tokens)</h3>
+                    <p>JWT is a compact, URL-safe means of representing claims between two parties.</p>
+
+                    <h4>JWT Structure</h4>
+                    <div class="security">
+                        <strong>Header.Payload.Signature</strong>
+                        <ul>
+                            <li><strong>Header:</strong> Token type and signing algorithm</li>
+                            <li><strong>Payload:</strong> Claims (user data, permissions, expiration)</li>
+                            <li><strong>Signature:</strong> Verification of token integrity</li>
+                        </ul>
+                    </div>
+
+                    <div class="example">
+                        <pre>import jwt
+import time
+from datetime import datetime, timedelta
+
+class JWTManager:
+    def __init__(self, secret_key, algorithm='HS256'):
+        self.secret_key = secret_key
+        self.algorithm = algorithm
+    
+    def generate_token(self, user_id, roles=None, expires_in_hours=24):
+        """Generate a JWT token for a user"""
+        now = datetime.utcnow()
+        
+        payload = {
+            'user_id': user_id,
+            'roles': roles or [],
+            'iat': now,  # Issued at
+            'exp': now + timedelta(hours=expires_in_hours),  # Expiration
+            'nbf': now,  # Not before
+            'jti': secrets.token_urlsafe(16)  # JWT ID for revocation
+        }
+        
+        return jwt.encode(payload, self.secret_key, algorithm=self.algorithm)
+    
+    def verify_token(self, token):
+        """Verify and decode a JWT token"""
+        try:
+            payload = jwt.decode(token, self.secret_key, algorithms=[self.algorithm])
+            return payload
+        except jwt.ExpiredSignatureError:
+            raise Exception("Token has expired")
+        except jwt.InvalidTokenError:
+            raise Exception("Invalid token")</pre>
+                    </div>
+
+                    <div class="warning">
+                        <strong>JWT Security Considerations:</strong>
+                        <ul>
+                            <li>Never store sensitive data in JWT payload (it's base64 encoded, not encrypted)</li>
+                            <li>Use strong secret keys and consider key rotation</li>
+                            <li>Implement proper token expiration</li>
+                            <li>Consider token revocation mechanisms</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div id="api-keys" class="section">
+                    <h3>API Keys</h3>
+                    <p>API keys are simple authentication mechanisms for API access control.</p>
+
+                    <div class="example">
+                        <pre>import hashlib
+import secrets
+import time
+
+class APIKeyManager:
+    def __init__(self):
+        self.api_keys = {}
+    
+    def generate_api_key(self, user_id, permissions=None):
+        """Generate a new API key for a user"""
+        key = secrets.token_urlsafe(32)
+        key_hash = hashlib.sha256(key.encode()).hexdigest()
+        
+        self.api_keys[key_hash] = {
+            'user_id': user_id,
+            'permissions': permissions or [],
+            'created_at': time.time(),
+            'last_used': None,
+            'active': True
+        }
+        
+        return key
+    
+    def validate_api_key(self, key):
+        """Validate an API key"""
+        key_hash = hashlib.sha256(key.encode()).hexdigest()
+        
+        if key_hash not in self.api_keys:
+            return None
+        
+        key_data = self.api_keys[key_hash]
+        
+        if not key_data['active']:
+            return None
+        
+        # Update last used timestamp
+        key_data['last_used'] = time.time()
+        
+        return key_data</pre>
+                    </div>
+
+                    <div class="tip">
+                        <strong>API Key Best Practices:</strong>
+                        <ul>
+                            <li>Use long, random keys (minimum 32 characters)</li>
+                            <li>Store hashed versions, not plaintext</li>
+                            <li>Implement key rotation policies</li>
+                            <li>Monitor key usage and detect anomalies</li>
+                            <li>Use HTTPS for all API key transmissions</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section id="encryption" class="section">
+                <h2>Encryption</h2>
+                <p>Encryption protects data both at rest and in transit, ensuring confidentiality and integrity.</p>
+
+                <div id="tls-ssl" class="section">
+                    <h3>TLS/SSL</h3>
+                    <p>Transport Layer Security (TLS) secures communication between clients and servers.</p>
+
+                    <h4>TLS Handshake Process</h4>
+                    <div class="protocol">
+                        <pre>
+Client → Server: ClientHello (supported ciphers, TLS version)
+Server → Client: ServerHello (chosen cipher, certificate)
+Client → Server: Certificate verification
+Client → Server: PreMasterSecret (encrypted with server's public key)
+Both: Generate session keys from PreMasterSecret
+Client → Server: Finished (encrypted with session key)
+Server → Client: Finished (encrypted with session key)
+                        </pre>
+                    </div>
+
+                    <div class="example">
+                        <pre># TLS Configuration Example (Python Flask)
+from flask import Flask
+import ssl
+
+app = Flask(__name__)
+
+# TLS Configuration
+context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
+context.load_cert_chain('cert.pem', 'key.pem')
+
+# Security headers
+@app.after_request
+def add_security_headers(response):
+    response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'DENY'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    return response
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=443, ssl_context=context)</pre>
+                    </div>
+                </div>
+
+                <div id="encryption-at-rest" class="section">
+                    <h3>Encryption at Rest</h3>
+                    <p>Protects stored data from unauthorized access when not in active use.</p>
+
+                    <div class="example">
+                        <pre>from cryptography.fernet import Fernet
+import base64
+import os
+
+class DataEncryption:
+    def __init__(self, key=None):
+        if key:
+            self.key = key
+        else:
+            self.key = Fernet.generate_key()
+        self.cipher = Fernet(self.key)
+    
+    def encrypt_data(self, data):
+        """Encrypt data for storage"""
+        if isinstance(data, str):
+            data = data.encode()
+        
+        encrypted_data = self.cipher.encrypt(data)
+        return base64.urlsafe_b64encode(encrypted_data).decode()
+    
+    def decrypt_data(self, encrypted_data):
+        """Decrypt stored data"""
+        encrypted_bytes = base64.urlsafe_b64decode(encrypted_data.encode())
+        decrypted_data = self.cipher.decrypt(encrypted_bytes)
+        return decrypted_data.decode()
+    
+    def save_key(self, key_path):
+        """Save encryption key to file"""
+        with open(key_path, 'wb') as key_file:
+            key_file.write(self.key)
+    
+    @classmethod
+    def load_key(cls, key_path):
+        """Load encryption key from file"""
+        with open(key_path, 'rb') as key_file:
+            key = key_file.read()
+        return cls(key)</pre>
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Encryption Method</th>
+                                <th>Use Case</th>
+                                <th>Key Size</th>
+                                <th>Performance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>AES-256</td>
+                                <td>File/Database encryption</td>
+                                <td>256 bits</td>
+                                <td>High</td>
+                            </tr>
+                            <tr>
+                                <td>RSA-2048</td>
+                                <td>Key exchange</td>
+                                <td>2048 bits</td>
+                                <td>Medium</td>
+                            </tr>
+                            <tr>
+                                <td>ChaCha20-Poly1305</td>
+                                <td>High-performance encryption</td>
+                                <td>256 bits</td>
+                                <td>Very High</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="encryption-in-transit" class="section">
+                    <h3>Encryption in Transit</h3>
+                    <p>Protects data while it travels between systems over networks.</p>
+
+                    <div class="security">
+                        <strong>Common Protocols:</strong>
+                        <ul>
+                            <li><strong>HTTPS:</strong> HTTP over TLS/SSL</li>
+                            <li><strong>SFTP:</strong> Secure File Transfer Protocol</li>
+                            <li><strong>SSH:</strong> Secure Shell for remote access</li>
+                            <li><strong>VPN:</strong> Virtual Private Networks</li>
+                        </ul>
+                    </div>
+
+                    <div class="example">
+                        <pre># Example: Secure HTTP client with certificate pinning
+import requests
+import ssl
+import hashlib
+
+class SecureHTTPClient:
+    def __init__(self, pinned_cert_hash=None):
+        self.session = requests.Session()
+        self.pinned_cert_hash = pinned_cert_hash
+        
+        # Configure SSL context
+        self.session.verify = True
+        self.session.headers.update({
+            'User-Agent': 'SecureClient/1.0',
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        })
+    
+    def make_request(self, method, url, **kwargs):
+        """Make a secure HTTP request with certificate validation"""
+        try:
+            response = self.session.request(method, url, **kwargs)
+            
+            # Verify certificate pinning if configured
+            if self.pinned_cert_hash:
+                self._verify_certificate_pinning(response)
+            
+            response.raise_for_status()
+            return response
+            
+        except requests.exceptions.SSLError:
+            raise Exception("SSL certificate verification failed")
+        except requests.exceptions.RequestException as e:
+            raise Exception(f"Request failed: {str(e)}")
+    
+    def _verify_certificate_pinning(self, response):
+        """Verify certificate hash matches pinned hash"""
+        # Implementation would verify the server's certificate
+        # against the pinned hash
+        pass</pre>
+                    </div>
+                </div>
+            </section>
+
+            <section id="rate-limiting-waf" class="section">
+                <h2>Rate Limiting & Web Application Firewalls</h2>
+                <p>Protect systems from abuse and malicious attacks through traffic control and filtering.</p>
+
+                <div id="rate-limiting" class="section">
+                    <h3>Rate Limiting</h3>
+                    <p>Controls the rate of requests to prevent abuse and ensure fair usage.</p>
+
+                    <h4>Rate Limiting Algorithms</h4>
+                    
+                    <div class="code-block">
+                        <pre>import time
+import threading
+from collections import defaultdict
+
+class TokenBucketRateLimiter:
+    def __init__(self, capacity, refill_rate):
+        self.capacity = capacity
+        self.refill_rate = refill_rate
+        self.buckets = defaultdict(lambda: {'tokens': capacity, 'last_refill': time.time()})
+        self.lock = threading.Lock()
+    
+    def is_allowed(self, key, tokens_requested=1):
+        """Check if request is allowed under rate limit"""
+        with self.lock:
+            bucket = self.buckets[key]
+            now = time.time()
+            
+            # Refill tokens based on time elapsed
+            time_elapsed = now - bucket['last_refill']
+            tokens_to_add = time_elapsed * self.refill_rate
+            bucket['tokens'] = min(self.capacity, bucket['tokens'] + tokens_to_add)
+            bucket['last_refill'] = now
+            
+            if bucket['tokens'] >= tokens_requested:
+                bucket['tokens'] -= tokens_requested
+                return True
+            
+            return False
+
+class SlidingWindowRateLimiter:
+    def __init__(self, window_size, max_requests):
+        self.window_size = window_size
+        self.max_requests = max_requests
+        self.requests = defaultdict(list)
+        self.lock = threading.Lock()
+    
+    def is_allowed(self, key):
+        """Check if request is allowed in sliding window"""
+        with self.lock:
+            now = time.time()
+            window_start = now - self.window_size
+            
+            # Remove old requests outside the window
+            self.requests[key] = [req_time for req_time in self.requests[key] 
+                                 if req_time > window_start]
+            
+            if len(self.requests[key]) < self.max_requests:
+                self.requests[key].append(now)
+                return True
+            
+            return False</pre>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Algorithm</th>
+                                    <th>Memory Usage</th>
+                                    <th>Accuracy</th>
+                                    <th>Best For</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Token Bucket</td>
+                                    <td>Low</td>
+                                    <td>Good</td>
+                                    <td>Burst tolerance</td>
+                                </tr>
+                                <tr>
+                                    <td>Sliding Window</td>
+                                    <td>High</td>
+                                    <td>Excellent</td>
+                                    <td>Precise control</td>
+                                </tr>
+                                <tr>
+                                    <td>Fixed Window</td>
+                                    <td>Low</td>
+                                    <td>Fair</td>
+                                    <td>Simple implementation</td>
+                                </tr>
+                                <tr>
+                                    <td>Leaky Bucket</td>
+                                    <td>Low</td>
+                                    <td>Good</td>
+                                    <td>Smooth traffic</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="web-application-firewalls" class="section">
+                    <h3>Web Application Firewalls (WAF)</h3>
+                    <p>Filters and monitors HTTP traffic to protect web applications from attacks.</p>
+
+                    <div class="highlight-box">
+                        <strong>WAF Protection Features:</strong>
+                        <ul>
+                            <li>SQL Injection prevention</li>
+                            <li>Cross-Site Scripting (XSS) protection</li>
+                            <li>Cross-Site Request Forgery (CSRF) protection</li>
+                            <li>Bot detection and mitigation</li>
+                            <li>Geographic IP blocking</li>
+                            <li>Request size limiting</li>
+                        </ul>
+                    </div>
+
+                    <div class="code-block">
+                        <pre># Simple WAF Implementation Example
+import re
+from flask import Flask, request, abort
+
+class SimpleWAF:
+    def __init__(self):
+        # SQL Injection patterns
+        self.sql_patterns = [
+            r"(\bunion\b.*\bselect\b)",
+            r"(\bselect\b.*\bfrom\b)",
+            r"(\binsert\b.*\binto\b)",
+            r"(\bdelete\b.*\bfrom\b)",
+            r"(\bdrop\b.*\btable\b)",
+            r"(\bor\b.*\b1\s*=\s*1\b)",
+            r"(\band\b.*\b1\s*=\s*1\b)"
+        ]
+        
+        # XSS patterns
+        self.xss_patterns = [
+            r"<script[^>]*>.*?</script>",
+            r"javascript:",
+            r"onload\s*=",
+            r"onerror\s*=",
+            r"onclick\s*="
+        ]
+        
+        # Compile patterns for performance
+        self.compiled_sql_patterns = [re.compile(pattern, re.IGNORECASE) 
+                                     for pattern in self.sql_patterns]
+        self.compiled_xss_patterns = [re.compile(pattern, re.IGNORECASE) 
+                                     for pattern in self.xss_patterns]
+    
+    def check_sql_injection(self, text):
+        """Check for SQL injection patterns"""
+        for pattern in self.compiled_sql_patterns:
+            if pattern.search(text):
+                return True
+        return False
+    
+    def check_xss(self, text):
+        """Check for XSS patterns"""
+        for pattern in self.compiled_xss_patterns:
+            if pattern.search(text):
+                return True
+        return False
+    
+    def validate_request(self, request_data):
+        """Validate incoming request"""
+        # Check all request parameters
+        for value in request_data.values():
+            if isinstance(value, str):
+                if self.check_sql_injection(value):
+                    return False, "SQL injection detected"
+                if self.check_xss(value):
+                    return False, "XSS attempt detected"
+        
+        return True, "Request validated"
+
+# Flask middleware integration
+app = Flask(__name__)
+waf = SimpleWAF()
+
+@app.before_request
+def waf_check():
+    """Check all requests through WAF"""
+    # Get all request data
+    request_data = {}
+    request_data.update(request.args.to_dict())
+    request_data.update(request.form.to_dict())
+    
+    if request.is_json:
+        request_data.update(request.get_json() or {})
+    
+    # Validate request
+    is_valid, message = waf.validate_request(request_data)
+    
+    if not is_valid:
+        abort(403, description=message)</pre>
+                    </div>
+                </div>
+            </section>
+
+            <section id="secure-credential-storage" class="section">
+                <h2>Secure Credential Storage</h2>
+                <p>Safely store and manage sensitive information like API keys, database passwords, and certificates.</p>
+
+                <div id="hashicorp-vault" class="section">
+                    <h3>HashiCorp Vault</h3>
+                    <p>A tool for securely accessing secrets with fine-grained access controls and audit logging.</p>
+
+                    <div class="code-block">
+                        <pre># HashiCorp Vault Integration Example
+import hvac
+import os
+
+class VaultManager:
+    def __init__(self, vault_url, vault_token):
+        self.client = hvac.Client(url=vault_url, token=vault_token)
+        
+        if not self.client.is_authenticated():
+            raise Exception("Vault authentication failed")
+    
+    def store_secret(self, path, secret_data):
+        """Store a secret in Vault"""
+        try:
+            response = self.client.secrets.kv.v2.create_or_update_secret(
+                path=path,
+                secret=secret_data
+            )
+            return response
+        except Exception as e:
+            raise Exception(f"Failed to store secret: {str(e)}")
+    
+    def retrieve_secret(self, path):
+        """Retrieve a secret from Vault"""
+        try:
+            response = self.client.secrets.kv.v2.read_secret_version(path=path)
+            return response['data']['data']
+        except Exception as e:
+            raise Exception(f"Failed to retrieve secret: {str(e)}")
+    
+    def delete_secret(self, path):
+        """Delete a secret from Vault"""
+        try:
+            self.client.secrets.kv.v2.delete_metadata_and_all_versions(path=path)
+            return True
+        except Exception as e:
+            raise Exception(f"Failed to delete secret: {str(e)}")
+    
+    def create_policy(self, policy_name, policy_rules):
+        """Create a Vault policy"""
+        try:
+            self.client.sys.create_or_update_policy(
+                name=policy_name,
+                policy=policy_rules
+            )
+            return True
+        except Exception as e:
+            raise Exception(f"Failed to create policy: {str(e)}")
+
+# Example usage
+vault = VaultManager(
+    vault_url="https://vault.example.com:8200",
+    vault_token=os.environ.get("VAULT_TOKEN")
+)
+
+# Store database credentials
+vault.store_secret("database/prod", {
+    "username": "db_user",
+    "password": "secure_password",
+    "host": "db.example.com",
+    "port": 5432
+})
+
+# Retrieve credentials
+db_creds = vault.retrieve_secret("database/prod")</pre>
+                    </div>
+                </div>
+
+                <div id="aws-secrets-manager" class="section">
+                    <h3>AWS Secrets Manager</h3>
+                    <p>AWS managed service for storing and retrieving secrets with automatic rotation.</p>
+
+                    <div class="code-block">
+                        <pre># AWS Secrets Manager Integration
+import boto3
+import json
+from botocore.exceptions import ClientError
+
+class AWSSecretsManager:
+    def __init__(self, region_name='us-east-1'):
+        self.client = boto3.client('secretsmanager', region_name=region_name)
+    
+    def create_secret(self, name, secret_value, description=None):
+        """Create a new secret"""
+        try:
+            response = self.client.create_secret(
+                Name=name,
+                SecretString=json.dumps(secret_value),
+                Description=description or f"Secret for {name}"
+            )
+            return response['ARN']
+        except ClientError as e:
+            raise Exception(f"Failed to create secret: {str(e)}")
+    
+    def get_secret(self, secret_name):
+        """Retrieve a secret value"""
+        try:
+            response = self.client.get_secret_value(SecretId=secret_name)
+            return json.loads(response['SecretString'])
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'ResourceNotFoundException':
+                raise Exception(f"Secret {secret_name} not found")
+            raise Exception(f"Failed to retrieve secret: {str(e)}")
+    
+    def update_secret(self, secret_name, secret_value):
+        """Update an existing secret"""
+        try:
+            response = self.client.update_secret(
+                SecretId=secret_name,
+                SecretString=json.dumps(secret_value)
+            )
+            return response['ARN']
+        except ClientError as e:
+            raise Exception(f"Failed to update secret: {str(e)}")
+    
+    def delete_secret(self, secret_name, force_delete=False):
+        """Delete a secret"""
+        try:
+            if force_delete:
+                response = self.client.delete_secret(
+                    SecretId=secret_name,
+                    ForceDeleteWithoutRecovery=True
+                )
+            else:
+                response = self.client.delete_secret(SecretId=secret_name)
+            
+            return response['ARN']
+        except ClientError as e:
+            raise Exception(f"Failed to delete secret: {str(e)}")
+    
+    def enable_rotation(self, secret_name, lambda_function_arn, rotation_days=30):
+        """Enable automatic rotation for a secret"""
+        try:
+            response = self.client.rotate_secret(
+                SecretId=secret_name,
+                RotationLambdaARN=lambda_function_arn,
+                RotationRules={
+                    'AutomaticallyAfterDays': rotation_days
+                }
+            )
+            return response['ARN']
+        except ClientError as e:
+            raise Exception(f"Failed to enable rotation: {str(e)}")
+
+# Example usage
+secrets_manager = AWSSecretsManager()
+
+# Store API key
+secrets_manager.create_secret(
+    name="api-keys/third-party-service",
+    secret_value={
+        "api_key": "sk-1234567890abcdef",
+        "api_secret": "secret_key_value"
+    }
+)
+
+# Retrieve API key
+api_creds = secrets_manager.get_secret("api-keys/third-party-service")</pre>
+                    </div>
+                </div>
+
+                <div id="best-practices" class="section">
+                    <h3>Best Practices</h3>
+                    
+                    <div class="info-box">
+                        <strong>Credential Storage Best Practices:</strong>
+                        <ul>
+                            <li><strong>Never store secrets in code:</strong> Use environment variables or secret management services</li>
+                            <li><strong>Implement least privilege:</strong> Grant minimum necessary permissions</li>
+                            <li><strong>Enable audit logging:</strong> Track all secret access and modifications</li>
+                            <li><strong>Use strong encryption:</strong> Encrypt secrets at rest and in transit</li>
+                            <li><strong>Implement rotation:</strong> Regularly rotate secrets and keys</li>
+                            <li><strong>Monitor access patterns:</strong> Detect unusual access to sensitive data</li>
+                        </ul>
+                    </div>
+
+                    <div class="warning-box">
+                        <strong>Common Security Mistakes:</strong>
+                        <ul>
+                            <li>Hardcoding secrets in source code</li>
+                            <li>Using weak or default passwords</li>
+                            <li>Not implementing proper access controls</li>
+                            <li>Storing secrets in version control</li>
+                            <li>Not rotating credentials regularly</li>
+                            <li>Sharing secrets through insecure channels</li>
+                        </ul>
+                    </div>
+
+                    <div class="code-block">
+                        <pre># Security Best Practices Implementation
+import os
+import hashlib
+import secrets
+from datetime import datetime, timedelta
+
+class SecureCredentialManager:
+    def __init__(self):
+        self.credentials = {}
+        self.access_log = []
+    
+    def generate_secure_password(self, length=16):
+        """Generate a cryptographically secure password"""
+        alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*"
+        password = ''.join(secrets.choice(alphabet) for _ in range(length))
+        return password
+    
+    def hash_password(self, password, salt=None):
+        """Hash a password with salt"""
+        if salt is None:
+            salt = secrets.token_hex(32)
+        
+        password_hash = hashlib.pbkdf2_hmac(
+            'sha256',
+            password.encode('utf-8'),
+            salt.encode('utf-8'),
+            100000  # iterations
+        )
+        
+        return salt + password_hash.hex()
+    
+    def verify_password(self, password, hashed_password):
+        """Verify a password against its hash"""
+        salt = hashed_password[:64]
+        stored_hash = hashed_password[64:]
+        
+        password_hash = hashlib.pbkdf2_hmac(
+            'sha256',
+            password.encode('utf-8'),
+            salt.encode('utf-8'),
+            100000
+        )
+        
+        return password_hash.hex() == stored_hash
+    
+    def log_access(self, user_id, action, resource):
+        """Log credential access for auditing"""
+        self.access_log.append({
+            'timestamp': datetime.utcnow().isoformat(),
+            'user_id': user_id,
+            'action': action,
+            'resource': resource,
+            'ip_address': os.environ.get('CLIENT_IP', 'unknown')
+        })
+    
+    def check_password_strength(self, password):
+        """Check password strength"""
+        if len(password) < 12:
+            return False, "Password must be at least 12 characters long"
+        
+        if not any(c.islower() for c in password):
+            return False, "Password must contain lowercase letters"
+        
+        if not any(c.isupper() for c in password):
+            return False, "Password must contain uppercase letters"
+        
+        if not any(c.isdigit() for c in password):
+            return False, "Password must contain numbers"
+        
+        if not any(c in "!@#$%^&*()_+-=[]{}|;:,.<>?" for c in password):
+            return False, "Password must contain special characters"
+        
+        return True, "Password is strong"</pre>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Summary</h2>
+                <p>Security in system design requires a multi-layered approach combining authentication, authorization, encryption, and secure credential management. Key takeaways include:</p>
+                
+                <div class="security">
+                    <ul>
+                        <li><strong>Authentication & Authorization:</strong> Use OAuth2 for third-party integrations, JWT for stateless authentication, and proper session management</li>
+                        <li><strong>Encryption:</strong> Implement TLS for data in transit and strong encryption for data at rest</li>
+                        <li><strong>Rate Limiting:</strong> Protect against abuse with appropriate algorithms and thresholds</li>
+                        <li><strong>WAF Protection:</strong> Filter malicious traffic and prevent common web attacks</li>
+                        <li><strong>Secure Storage:</strong> Use dedicated secret management services and follow security best practices</li>
+                    </ul>
+                </div>
+                
+                <p>Remember that security is an ongoing process that requires regular updates, monitoring, and adaptation to new threats.</p>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Smooth scrolling for TOC links
+        document.querySelectorAll('.toc a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    const toc = document.querySelector('.toc');
+                    const tocHeight = toc ? toc.offsetHeight : 0;
+                    const targetPosition = target.offsetTop - tocHeight - 50;
+                    
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Update active link in TOC
+                    document.querySelectorAll('.toc a').forEach(link => {
+                        link.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                }
+            });
+        });
+
+        // Highlight current section in TOC on scroll
+        window.addEventListener('scroll', function() {
+            const sections = document.querySelectorAll('h2[id]');
+            const tocLinks = document.querySelectorAll('.toc a');
+            
+            let current = '';
+            const tocElement = document.querySelector('.toc');
+            const tocHeight = tocElement ? tocElement.offsetHeight : 0;
+            const offset = tocHeight + 50; // Same offset as smooth scrolling
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (window.scrollY >= sectionTop - offset) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            tocLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🗃️ Databases in System Design Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #e8e8e8;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: #1e1e1e;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            border-right: 1px solid #333;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background: #2d2d2d;
+            border-bottom: 1px solid #444;
+        }
+
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 1.3em;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #f0f0f0;
+            border: none;
+            padding: 0;
+        }
+
+        .sidebar-nav {
+            padding: 0;
+        }
+
+        .sidebar-link {
+            display: block;
+            color: #b8b8b8;
+            text-decoration: none;
+            padding: 15px 20px;
+            border-bottom: 1px solid #444;
+            transition: background 0.2s ease;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 1.1em;
+            font-weight: 500;
+        }
+
+        .sidebar-link:hover {
+            background: #3a3a3a;
+            color: #f0f0f0;
+        }
+
+        .sidebar-link.current {
+            background: #3498db;
+            color: white;
+            font-weight: 600;
+        }
+
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(30, 30, 30, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid #444;
+        }
+
+        h1 {
+            color: #f0f0f0;
+            text-align: center;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: #e0e0e0;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+            margin-top: 30px;
+            font-size: 1.8em;
+        }
+
+        h3 {
+            color: #3498db;
+            margin-top: 25px;
+            font-size: 1.4em;
+        }
+
+        h4 {
+            color: #5dade2;
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+
+        h5 {
+            color: #85c1e9;
+            margin-top: 15px;
+            font-size: 1.1em;
+        }
+
+        .toc {
+            background: rgba(52, 152, 219, 0.15);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(52, 152, 219, 0.3);
+        }
+
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-evenly;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .toc li {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex: 0 1 calc(25% - 0.5rem);
+            min-width: 120px;
+        }
+
+        .toc a {
+            color: #e0e0e0;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 0.8em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            white-space: nowrap;
+            background: rgba(50, 50, 50, 0.7);
+            border: 1px solid rgba(52, 152, 219, 0.3);
+            min-height: 40px;
+            width: 100%;
+        }
+
+        .toc a:hover, .toc a.active {
+            background: linear-gradient(45deg, #3498db, #5dade2);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        pre {
+            background: #000000;
+            color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            margin: 15px 0;
+        }
+
+        code {
+            background: #000000;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #ffffff;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: #2a2a2a;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th, td {
+            border: 1px solid #444;
+            padding: 12px;
+            text-align: left;
+            color: #e0e0e0;
+        }
+
+        th {
+            background: #3498db;
+            color: white;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background: #333;
+        }
+
+        tr:hover {
+            background: #404040;
+        }
+
+        .overview {
+            background: #2a2a3a;
+            border: 1px solid #3498db;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #e0e0f0;
+        }
+
+        .sql-database {
+            background: #1a3a2a;
+            border: 1px solid #27ae60;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #90ee90;
+        }
+
+        .nosql-database {
+            background: #3a2a1a;
+            border: 1px solid #f39c12;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #ffc966;
+        }
+
+        .indexing {
+            background: #2a1a3a;
+            border: 1px solid #9b59b6;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #d1a3ff;
+        }
+
+        .modeling {
+            background: #1a2a3a;
+            border: 1px solid #3498db;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #a8c8f0;
+        }
+
+        .transactions {
+            background: #1a3a1a;
+            border: 1px solid #27ae60;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #90ee90;
+        }
+
+        .distributed {
+            background: #3a1a1a;
+            border: 1px solid #e74c3c;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #ffb3b3;
+        }
+
+        .optimization {
+            background: #2a3a1a;
+            border: 1px solid #f1c40f;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #f4d03f;
+        }
+
+        .example {
+            background: #2a2a2a;
+            border-left: 4px solid #17a2b8;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #e0e0e0;
+        }
+
+        .example h5 {
+            margin-top: 0;
+            color: #17a2b8;
+            font-size: 1.1em;
+        }
+
+        .benefits {
+            background: #1a3a1a;
+            border: 1px solid #3498db;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #90ee90;
+        }
+
+        .benefits ul {
+            margin: 10px 0;
+        }
+
+        .benefits li {
+            margin: 5px 0;
+        }
+
+        .warning {
+            background: #3a2f1a;
+            border: 1px solid #b8860b;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #ffd700;
+        }
+
+        .warning::before {
+            content: "⚠️ ";
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .tip {
+            background: #1a3a2f;
+            border: 1px solid #27ae60;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #7bed9f;
+        }
+
+        .tip::before {
+            content: "💡 ";
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        @media (max-width: 1024px) {
+            .toc ul {
+                justify-content: center;
+                gap: 0.75rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .sidebar-toggle {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            h2 {
+                font-size: 1.5em;
+            }
+
+            table {
+                font-size: 0.9em;
+            }
+
+            .toc {
+                position: static;
+                margin: 20px 0;
+            }
+
+            .toc ul {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.3rem;
+            }
+
+            .toc li {
+                flex: 1;
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+    
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2><a href="../system-design.html" style="color: inherit; text-decoration: none;">🗂️ System Design</a></h2>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="../1.Fundamentals/system-design-fundamentals.html" class="sidebar-link">
+                🏗️ Fundamentals
+            </a>
+            <a href="../2.Networking & Communication/networking-communication.html" class="sidebar-link">
+                🌐 Networking & Communication
+            </a>
+            <a href="../3.Databases/databases.html" class="sidebar-link current">
+                🗃️ Databases
+            </a>
+            <a href="../4.Caching/caching.html" class="sidebar-link">
+                🗄️ Caching
+            </a>
+            <a href="../5.Message Queues & Event-Driven Systems/message-queues-event-driven.html" class="sidebar-link">
+                📬 Message Queues & Events
+            </a>
+            <a href="../6.Storage Systems/storage-systems.html" class="sidebar-link">
+                💾 Storage Systems
+            </a>
+            <a href="../7.Design Patterns & Architecture/design-patterns-architecture.html" class="sidebar-link">
+                🏛️ Design Patterns
+            </a>
+            <a href="../8.Scalability & Performance/scalability-performance.html" class="sidebar-link">
+                📈 Scalability & Performance
+            </a>
+            <a href="../9.Security in System Design/security-system-design.html" class="sidebar-link">
+                🔒 Security
+            </a>
+            <a href="../10.Monitoring & Observability/monitoring-observability.html" class="sidebar-link">
+                📊 Monitoring & Observability
+            </a>
+            <a href="../11.Deployment & DevOps/deployment-devops.html" class="sidebar-link">
+                🚀 Deployment & DevOps
+            </a>
+            <a href="../12.Popular Use Cases/popular-use-cases.html" class="sidebar-link">
+                🎯 Popular Use Cases
+            </a>
+            <a href="../13.Trade-offs & Decision Making/trade-offs-decision-making.html" class="sidebar-link">
+                ⚖️ Trade-offs & Decisions
+            </a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="container">
+            <h1>🗃️ Databases in System Design</h1>
+            
+            <div class="toc" id="toc">
+                <ul>
+                    <li><a href="#overview">Overview</a></li>
+                    <li><a href="#sql-nosql">SQL vs NoSQL</a></li>
+                    <li><a href="#indexing">Indexing</a></li>
+                    <li><a href="#modeling">Data Modeling</a></li>
+                    <li><a href="#transactions">Transactions</a></li>
+                    <li><a href="#cap-base">CAP & BASE</a></li>
+                    <li><a href="#partitioning">Partitioning</a></li>
+                    <li><a href="#optimization">Optimization</a></li>
+                </ul>
+            </div>
+
+            <h2 id="overview">Overview</h2>
+            <div class="overview">
+                <p>Databases are the backbone of most modern applications, providing persistent storage, data integrity, and efficient data access patterns. Understanding database concepts is crucial for designing scalable, reliable, and performant systems.</p>
+                
+                <p>This comprehensive guide covers fundamental database concepts, different database paradigms, and the trade-offs involved in database design decisions. From traditional SQL databases to modern NoSQL solutions, we'll explore the technologies and patterns that power today's applications.</p>
+            </div>
+
+            <h2 id="sql-nosql">🗄️ SQL vs NoSQL Databases</h2>
+            <p>The choice between SQL and NoSQL databases represents one of the most fundamental decisions in system design, each offering distinct advantages based on specific use cases, data structures, and scalability requirements.</p>
+
+            <h3>SQL Databases (Relational Databases)</h3>
+            <div class="sql-database">
+                <h4>Core Characteristics:</h4>
+                <ul>
+                    <li><strong>Structured Data:</strong> Data stored in tables with predefined schemas</li>
+                    <li><strong>ACID Properties:</strong> Atomicity, Consistency, Isolation, Durability</li>
+                    <li><strong>Standardized Query Language:</strong> SQL for data manipulation and querying</li>
+                    <li><strong>Relationships:</strong> Foreign keys and joins to maintain data relationships</li>
+                    <li><strong>Schema Enforcement:</strong> Strict data validation and type checking</li>
+                </ul>
+            </div>
+
+            <h4>Popular SQL Databases</h4>
+            <table>
+                <tr>
+                    <th>Database</th>
+                    <th>Type</th>
+                    <th>Key Features</th>
+                    <th>Best Use Cases</th>
+                </tr>
+                <tr><td><strong>MySQL</strong></td><td>Open Source</td><td>High performance, replication, clustering</td><td>Web applications, e-commerce</td></tr>
+                <tr><td><strong>PostgreSQL</strong></td><td>Open Source</td><td>Advanced features, extensibility, JSON support</td><td>Complex applications, analytics</td></tr>
+                <tr><td><strong>Oracle</strong></td><td>Enterprise</td><td>Advanced features, high availability, security</td><td>Enterprise applications</td></tr>
+                <tr><td><strong>SQL Server</strong></td><td>Enterprise</td><td>Windows integration, BI tools, cloud services</td><td>Microsoft ecosystems</td></tr>
+                <tr><td><strong>SQLite</strong></td><td>Embedded</td><td>Lightweight, serverless, zero-config</td><td>Mobile apps, embedded systems</td></tr>
+            </table>
+
+            <h4>SQL Database Advantages</h4>
+            <div class="sql-database">
+                <ul>
+                    <li><strong>Data Integrity:</strong> Strong consistency and validation through constraints</li>
+                    <li><strong>Complex Queries:</strong> Advanced JOIN operations and analytical queries</li>
+                    <li><strong>Mature Ecosystem:</strong> Extensive tooling, documentation, and community support</li>
+                    <li><strong>Standardization:</strong> SQL is a widely adopted standard across platforms</li>
+                    <li><strong>Transaction Support:</strong> Full ACID compliance for critical business operations</li>
+                </ul>
+            </div>
+
+            <h3>NoSQL Databases (Non-Relational Databases)</h3>
+            <div class="nosql-database">
+                <h4>Core Characteristics:</h4>
+                <ul>
+                    <li><strong>Flexible Schema:</strong> Dynamic or schema-less data structures</li>
+                    <li><strong>Horizontal Scalability:</strong> Designed for distributed, scale-out architectures</li>
+                    <li><strong>Varied Data Models:</strong> Document, key-value, column-family, graph databases</li>
+                    <li><strong>Eventual Consistency:</strong> Often prioritizes availability over immediate consistency</li>
+                    <li><strong>High Performance:</strong> Optimized for specific access patterns and large volumes</li>
+                </ul>
+            </div>
+
+            <h4>Types of NoSQL Databases</h4>
+
+            <h5>Document Databases</h5>
+            <div class="example">
+                <h5>MongoDB Example:</h5>
+                <pre><code>// JSON-like document structure
+{
+  "_id": "507f1f77bcf86cd799439011",
+  "name": "John Doe",
+  "email": "john@example.com",
+  "address": {
+    "street": "123 Main St",
+    "city": "Boston",
+    "zipcode": "02101"
+  },
+  "orders": [
+    {"product": "laptop", "price": 999.99},
+    {"product": "mouse", "price": 29.99}
+  ]
+}</code></pre>
+            </div>
+
+            <h5>Key-Value Stores</h5>
+            <div class="example">
+                <h5>Redis Example:</h5>
+                <pre><code>// Simple key-value operations
+SET user:1001 "John Doe"
+GET user:1001
+HSET user:1001:profile name "John Doe" email "john@example.com"
+HGET user:1001:profile email
+
+// Advanced data structures
+LPUSH notifications:user:1001 "New message received"
+ZADD leaderboard 1500 "player1" 1200 "player2"</code></pre>
+            </div>
+
+            <h5>Column-Family Databases</h5>
+            <div class="example">
+                <h5>Cassandra Example:</h5>
+                <pre><code>// Column family structure
+CREATE TABLE users (
+    user_id UUID PRIMARY KEY,
+    name text,
+    email text,
+    created_at timestamp
+);
+
+// Wide column storage
+CREATE TABLE user_activity (
+    user_id UUID,
+    activity_date date,
+    activity_time timeuuid,
+    activity_type text,
+    activity_data text,
+    PRIMARY KEY (user_id, activity_date, activity_time)
+);</code></pre>
+            </div>
+
+            <h4>SQL vs NoSQL Comparison</h4>
+            <table>
+                <tr>
+                    <th>Aspect</th>
+                    <th>SQL</th>
+                    <th>NoSQL</th>
+                </tr>
+                <tr><td><strong>Schema</strong></td><td>Fixed, predefined</td><td>Flexible, dynamic</td></tr>
+                <tr><td><strong>Scalability</strong></td><td>Vertical (scale up)</td><td>Horizontal (scale out)</td></tr>
+                <tr><td><strong>Consistency</strong></td><td>ACID compliance</td><td>Eventual consistency</td></tr>
+                <tr><td><strong>Queries</strong></td><td>Complex SQL queries</td><td>Simple queries, aggregations</td></tr>
+                <tr><td><strong>Relationships</strong></td><td>Strong relationships via JOINs</td><td>Denormalized, embedded data</td></tr>
+                <tr><td><strong>Transactions</strong></td><td>Multi-table transactions</td><td>Limited transaction support</td></tr>
+                <tr><td><strong>Performance</strong></td><td>Optimized for complex queries</td><td>Optimized for simple operations</td></tr>
+            </table>
+
+            <h3>When to Choose SQL vs NoSQL</h3>
+            <div class="tip">
+                <h4>Choose SQL When:</h4>
+                <ul>
+                    <li>Data structure is well-defined and unlikely to change frequently</li>
+                    <li>Complex relationships between data entities are important</li>
+                    <li>ACID compliance is critical for business operations</li>
+                    <li>Complex analytical queries and reporting are required</li>
+                    <li>Team has strong SQL expertise and existing SQL infrastructure</li>
+                </ul>
+            </div>
+
+            <div class="tip">
+                <h4>Choose NoSQL When:</h4>
+                <ul>
+                    <li>Rapid development with evolving data requirements</li>
+                    <li>Horizontal scaling is essential for handling large volumes</li>
+                    <li>Data is primarily unstructured or semi-structured</li>
+                    <li>High availability is more important than immediate consistency</li>
+                    <li>Specific performance requirements for read/write operations</li>
+                </ul>
+            </div>
+
+            <h2 id="indexing">📊 Database Indexing</h2>
+            <p>Database indexing is a critical optimization technique that dramatically improves query performance by creating efficient data access paths, similar to an index in a book that helps locate information quickly.</p>
+
+            <h3>Index Fundamentals</h3>
+            <div class="indexing">
+                <p><strong>What is an Index:</strong> An index is a separate data structure that maintains a sorted reference to data in the main table, allowing the database engine to locate records without scanning the entire table.</p>
+                
+                <h4>Index Types:</h4>
+                <ul>
+                    <li><strong>B-Tree Index:</strong> Most common, balanced tree structure for range queries</li>
+                    <li><strong>Hash Index:</strong> Fast equality lookups but no range queries</li>
+                    <li><strong>Bitmap Index:</strong> Efficient for low-cardinality data</li>
+                    <li><strong>Composite Index:</strong> Multiple columns combined into single index</li>
+                </ul>
+            </div>
+
+            <h3>Types of Indexes</h3>
+
+            <h4>Primary vs Secondary Indexes</h4>
+            <table>
+                <tr>
+                    <th>Index Type</th>
+                    <th>Characteristics</th>
+                    <th>Use Case</th>
+                    <th>Performance</th>
+                </tr>
+                <tr><td><strong>Primary Index</strong></td><td>Unique, non-null, clustered</td><td>Direct record access</td><td>Fastest lookups</td></tr>
+                <tr><td><strong>Secondary Index</strong></td><td>May be unique/non-unique</td><td>Optimize specific queries</td><td>Good for filtering</td></tr>
+                <tr><td><strong>Clustered Index</strong></td><td>Physical data ordering</td><td>Range queries</td><td>Excellent for ranges</td></tr>
+                <tr><td><strong>Non-Clustered</strong></td><td>Logical ordering</td><td>Multiple per table</td><td>Good for equality</td></tr>
+            </table>
+
+            <h3>Index Design Strategies</h3>
+            <div class="example">
+                <h5>Single-Column Index:</h5>
+                <pre><code>-- Create index on frequently queried column
+CREATE INDEX idx_user_email ON users(email);
+
+-- Optimized query
+SELECT * FROM users WHERE email = 'user@example.com';
+-- Uses idx_user_email for fast lookup</code></pre>
+            </div>
+
+            <div class="example">
+                <h5>Composite Index:</h5>
+                <pre><code>-- Create composite index (left-most prefix rule)
+CREATE INDEX idx_user_name_age ON users(last_name, first_name, age);
+
+-- Optimized queries
+SELECT * FROM users WHERE last_name = 'Smith';
+SELECT * FROM users WHERE last_name = 'Smith' AND first_name = 'John';
+SELECT * FROM users WHERE last_name = 'Smith' AND first_name = 'John' AND age = 30;
+
+-- NOT optimized (violates left-most prefix)
+SELECT * FROM users WHERE first_name = 'John';  -- Cannot use index</code></pre>
+            </div>
+
+            <h3>Index Performance Considerations</h3>
+            <div class="indexing">
+                <h4>Benefits:</h4>
+                <ul>
+                    <li><strong>Query Speed:</strong> Dramatically faster SELECT operations</li>
+                    <li><strong>Sorting:</strong> Efficient ORDER BY operations</li>
+                    <li><strong>Grouping:</strong> Faster GROUP BY operations</li>
+                    <li><strong>Uniqueness:</strong> Enforce unique constraints efficiently</li>
+                </ul>
+                
+                <h4>Costs:</h4>
+                <ul>
+                    <li><strong>Storage Overhead:</strong> Additional disk space for index structures</li>
+                    <li><strong>Maintenance Cost:</strong> Updates needed on INSERT/UPDATE/DELETE</li>
+                    <li><strong>Memory Usage:</strong> Indexes consume memory for caching</li>
+                    <li><strong>Write Performance:</strong> Slower writes due to index maintenance</li>
+                </ul>
+            </div>
+
+            <h2 id="modeling">🔄 Data Modeling</h2>
+            <p>Data modeling is the process of creating a conceptual representation of data structures, relationships, and constraints that will be implemented in a database system.</p>
+
+            <h3>Entity-Relationship (ER) Diagrams</h3>
+            <div class="modeling">
+                <h4>ER Diagram Components:</h4>
+                <ul>
+                    <li><strong>Entities:</strong> Objects or concepts (Customer, Product, Order)</li>
+                    <li><strong>Attributes:</strong> Properties of entities (name, email, price)</li>
+                    <li><strong>Relationships:</strong> Associations between entities</li>
+                    <li><strong>Cardinality:</strong> Number of instances that can participate</li>
+                </ul>
+            </div>
+
+            <h4>Relationship Types</h4>
+            <table>
+                <tr>
+                    <th>Relationship</th>
+                    <th>Description</th>
+                    <th>Example</th>
+                    <th>Implementation</th>
+                </tr>
+                <tr><td><strong>One-to-One (1:1)</strong></td><td>Each entity relates to one other</td><td>User ↔ Profile</td><td>Foreign key in either table</td></tr>
+                <tr><td><strong>One-to-Many (1:M)</strong></td><td>One entity relates to many others</td><td>Customer → Orders</td><td>Foreign key in "many" table</td></tr>
+                <tr><td><strong>Many-to-Many (M:N)</strong></td><td>Multiple entities relate to multiple</td><td>Students ↔ Courses</td><td>Junction/bridge table</td></tr>
+            </table>
+
+            <h3>Database Normalization</h3>
+            <p>Normalization is the process of organizing data to reduce redundancy and dependency, ensuring data integrity and efficient storage.</p>
+
+            <h4>First Normal Form (1NF)</h4>
+            <div class="example">
+                <h5>1NF Requirements:</h5>
+                <pre><code>-- Violates 1NF (multi-valued attribute)
+CREATE TABLE customers_bad (
+    id INT PRIMARY KEY,
+    name VARCHAR(100),
+    phones VARCHAR(200)  -- "555-1234, 555-5678"
+);
+
+-- Normalized to 1NF
+CREATE TABLE customers (
+    id INT PRIMARY KEY,
+    name VARCHAR(100)
+);
+
+CREATE TABLE customer_phones (
+    customer_id INT,
+    phone VARCHAR(15),
+    PRIMARY KEY (customer_id, phone),
+    FOREIGN KEY (customer_id) REFERENCES customers(id)
+);</code></pre>
+            </div>
+
+            <h4>Second Normal Form (2NF)</h4>
+            <div class="example">
+                <h5>2NF Requirements:</h5>
+                <pre><code>-- Violates 2NF (partial dependency)
+CREATE TABLE order_items_bad (
+    order_id INT,
+    product_id INT,
+    product_name VARCHAR(100),  -- Depends only on product_id
+    quantity INT,
+    price DECIMAL(10,2),
+    PRIMARY KEY (order_id, product_id)
+);
+
+-- Normalized to 2NF
+CREATE TABLE order_items (
+    order_id INT,
+    product_id INT,
+    quantity INT,
+    price DECIMAL(10,2),
+    PRIMARY KEY (order_id, product_id)
+);
+
+CREATE TABLE products (
+    product_id INT PRIMARY KEY,
+    product_name VARCHAR(100)
+);</code></pre>
+            </div>
+
+            <h4>Third Normal Form (3NF)</h4>
+            <div class="example">
+                <h5>3NF Requirements:</h5>
+                <pre><code>-- Violates 3NF (transitive dependency)
+CREATE TABLE employees_bad (
+    employee_id INT PRIMARY KEY,
+    name VARCHAR(100),
+    department_id INT,
+    department_name VARCHAR(100)  -- Depends on department_id, not employee_id
+);
+
+-- Normalized to 3NF
+CREATE TABLE employees (
+    employee_id INT PRIMARY KEY,
+    name VARCHAR(100),
+    department_id INT
+);
+
+CREATE TABLE departments (
+    department_id INT PRIMARY KEY,
+    department_name VARCHAR(100)
+);</code></pre>
+            </div>
+
+            <h2 id="transactions">💳 Transactions and ACID Properties</h2>
+            <p>Transactions are fundamental units of work in database systems that ensure data integrity and consistency, especially in concurrent environments.</p>
+
+            <h3>ACID Properties</h3>
+
+            <h4>Atomicity</h4>
+            <div class="transactions">
+                <p><strong>All-or-nothing principle:</strong> All operations in a transaction succeed or fail together.</p>
+                
+                <div class="example">
+                    <h5>Bank Transfer Example:</h5>
+                    <pre><code>BEGIN TRANSACTION;
+    -- Debit from account A
+    UPDATE accounts SET balance = balance - 100 WHERE account_id = 'A';
+    
+    -- Credit to account B
+    UPDATE accounts SET balance = balance + 100 WHERE account_id = 'B';
+    
+    -- If either fails, both are rolled back
+    IF @@ERROR <> 0
+        ROLLBACK TRANSACTION;
+    ELSE
+        COMMIT TRANSACTION;</code></pre>
+                </div>
+            </div>
+
+            <h4>Consistency</h4>
+            <div class="transactions">
+                <p><strong>Data integrity:</strong> Database must remain in a valid state before and after transaction execution.</p>
+                
+                <div class="example">
+                    <h5>Constraint Enforcement:</h5>
+                    <pre><code>-- Consistency through constraints
+ALTER TABLE orders ADD CONSTRAINT fk_customer
+    FOREIGN KEY (customer_id) REFERENCES customers(id);
+
+ALTER TABLE accounts ADD CONSTRAINT chk_balance
+    CHECK (balance >= 0);
+
+-- These constraints ensure data consistency
+INSERT INTO orders (customer_id, total) VALUES (999, 100.00);
+-- Error: Customer ID 999 does not exist</code></pre>
+                </div>
+            </div>
+
+            <h4>Isolation</h4>
+            <div class="transactions">
+                <p><strong>Concurrent execution:</strong> Transactions do not interfere with each other.</p>
+                
+                <h5>Isolation Levels:</h5>
+                <table>
+                    <tr>
+                        <th>Level</th>
+                        <th>Dirty Reads</th>
+                        <th>Non-Repeatable Reads</th>
+                        <th>Phantom Reads</th>
+                        <th>Use Case</th>
+                    </tr>
+                    <tr><td><strong>Read Uncommitted</strong></td><td>Yes</td><td>Yes</td><td>Yes</td><td>Reporting, approximate data</td></tr>
+                    <tr><td><strong>Read Committed</strong></td><td>No</td><td>Yes</td><td>Yes</td><td>Most applications</td></tr>
+                    <tr><td><strong>Repeatable Read</strong></td><td>No</td><td>No</td><td>Yes</td><td>Consistent reads needed</td></tr>
+                    <tr><td><strong>Serializable</strong></td><td>No</td><td>No</td><td>No</td><td>Critical financial transactions</td></tr>
+                </table>
+            </div>
+
+            <h4>Durability</h4>
+            <div class="transactions">
+                <p><strong>Persistence:</strong> Committed transactions persist even in case of system failures.</p>
+                
+                <h5>Implementation Mechanisms:</h5>
+                <ul>
+                    <li><strong>Write-Ahead Logging:</strong> Changes logged before being written to disk</li>
+                    <li><strong>Checkpoints:</strong> Periodic synchronization of memory and disk</li>
+                    <li><strong>Backup and Recovery:</strong> Regular backups and point-in-time recovery</li>
+                    <li><strong>Replication:</strong> Data copies across multiple systems</li>
+                </ul>
+            </div>
+
+            <h2 id="cap-base">🔄 CAP Theorem and BASE in NoSQL</h2>
+            <p>The CAP theorem and BASE properties represent fundamental trade-offs in distributed database systems, particularly relevant for NoSQL databases.</p>
+
+            <h3>CAP Theorem in Database Context</h3>
+            <div class="distributed">
+                <h4>CAP Properties:</h4>
+                <ul>
+                    <li><strong>Consistency:</strong> All nodes see the same data simultaneously</li>
+                    <li><strong>Availability:</strong> System remains operational despite failures</li>
+                    <li><strong>Partition Tolerance:</strong> System continues during network failures</li>
+                </ul>
+            </div>
+
+            <h3>CAP Trade-offs in Databases</h3>
+            <table>
+                <tr>
+                    <th>System Type</th>
+                    <th>Guarantees</th>
+                    <th>Trade-offs</th>
+                    <th>Examples</th>
+                </tr>
+                <tr><td><strong>CP Systems</strong></td><td>Consistency + Partition Tolerance</td><td>May become unavailable</td><td>MongoDB, Redis Cluster</td></tr>
+                <tr><td><strong>AP Systems</strong></td><td>Availability + Partition Tolerance</td><td>Eventual consistency</td><td>Cassandra, DynamoDB</td></tr>
+                <tr><td><strong>CA Systems</strong></td><td>Consistency + Availability</td><td>No partition tolerance</td><td>Traditional RDBMS</td></tr>
+            </table>
+
+            <h3>BASE Properties</h3>
+            <div class="distributed">
+                <p><strong>BASE</strong> (Basically Available, Soft state, Eventual consistency) provides an alternative to ACID properties for distributed systems.</p>
+                
+                <h4>BASE Components:</h4>
+                <ul>
+                    <li><strong>Basically Available:</strong> System remains available during partial failures</li>
+                    <li><strong>Soft State:</strong> System state may change over time without input</li>
+                    <li><strong>Eventual Consistency:</strong> System becomes consistent over time</li>
+                </ul>
+            </div>
+
+            <div class="example">
+                <h5>Eventual Consistency Example:</h5>
+                <pre><code>// Initial state
+Replica1: user:123 = {name: "John", email: "john@old.com"}
+Replica2: user:123 = {name: "John", email: "john@old.com"}
+
+// Update on Replica1
+Replica1.update("user:123", {email: "john@new.com"})
+
+// Temporary inconsistency
+Replica1: user:123 = {name: "John", email: "john@new.com"}
+Replica2: user:123 = {name: "John", email: "john@old.com"}
+
+// Eventually consistent (after replication)
+Replica1: user:123 = {name: "John", email: "john@new.com"}
+Replica2: user:123 = {name: "John", email: "john@new.com"}</code></pre>
+            </div>
+
+            <h2 id="partitioning">🔀 Partitioning, Sharding, and Replication</h2>
+            <p>These techniques enable databases to scale beyond single-machine limitations by distributing data across multiple nodes.</p>
+
+            <h3>Database Partitioning</h3>
+            <div class="distributed">
+                <h4>Partitioning Types:</h4>
+                <ul>
+                    <li><strong>Vertical Partitioning:</strong> Split tables by columns</li>
+                    <li><strong>Horizontal Partitioning:</strong> Split tables by rows</li>
+                    <li><strong>Functional Partitioning:</strong> Split by feature or service</li>
+                </ul>
+            </div>
+
+            <h4>Horizontal Partitioning Example</h4>
+            <div class="example">
+                <h5>Date-based Partitioning:</h5>
+                <pre><code>-- Partition by date range
+CREATE TABLE orders_2023 (
+    order_id INT,
+    customer_id INT,
+    order_date DATE,
+    amount DECIMAL(10,2),
+    CONSTRAINT chk_date CHECK (order_date >= '2023-01-01' AND order_date < '2024-01-01')
+);
+
+CREATE TABLE orders_2024 (
+    order_id INT,
+    customer_id INT,
+    order_date DATE,
+    amount DECIMAL(10,2),
+    CONSTRAINT chk_date CHECK (order_date >= '2024-01-01' AND order_date < '2025-01-01')
+);</code></pre>
+            </div>
+
+            <h3>Database Sharding</h3>
+            <div class="distributed">
+                <p><strong>Sharding:</strong> Horizontal partitioning across multiple database instances on separate servers.</p>
+            </div>
+
+            <h4>Sharding Strategies</h4>
+            <table>
+                <tr>
+                    <th>Strategy</th>
+                    <th>Approach</th>
+                    <th>Benefits</th>
+                    <th>Challenges</th>
+                </tr>
+                <tr><td><strong>Range-based</strong></td><td>Partition by value ranges</td><td>Good for range queries</td><td>Hot spots possible</td></tr>
+                <tr><td><strong>Hash-based</strong></td><td>Hash function determines shard</td><td>Even distribution</td><td>Difficult range queries</td></tr>
+                <tr><td><strong>Directory-based</strong></td><td>Lookup service maps data</td><td>Flexible, easy rebalancing</td><td>Directory bottleneck</td></tr>
+                <tr><td><strong>Consistent Hashing</strong></td><td>Hash ring with virtual nodes</td><td>Minimal data movement</td><td>Complex implementation</td></tr>
+            </table>
+
+            <div class="example">
+                <h5>Hash-based Sharding:</h5>
+                <pre><code>// Simple hash-based sharding
+function getShardId(userId, numShards) {
+    return hash(userId) % numShards;
+}
+
+// Example with 4 shards
+const userId = "user123";
+const shardId = getShardId(userId, 4);
+
+// Query routing
+if (shardId === 0) {
+    database = "shard0.example.com";
+} else if (shardId === 1) {
+    database = "shard1.example.com";
+}
+// ... route to appropriate shard</code></pre>
+            </div>
+
+            <h3>Database Replication</h3>
+            <div class="distributed">
+                <p><strong>Replication:</strong> Maintaining multiple copies of data across different database servers.</p>
+            </div>
+
+            <h4>Replication Types</h4>
+            <table>
+                <tr>
+                    <th>Type</th>
+                    <th>Architecture</th>
+                    <th>Benefits</th>
+                    <th>Challenges</th>
+                </tr>
+                <tr><td><strong>Master-Slave</strong></td><td>One primary, multiple secondaries</td><td>Read scaling, failover</td><td>Write bottleneck</td></tr>
+                <tr><td><strong>Master-Master</strong></td><td>Multiple masters</td><td>High availability</td><td>Conflict resolution</td></tr>
+                <tr><td><strong>Multi-Master</strong></td><td>Multiple masters with conflicts</td><td>Geographic distribution</td><td>Complex consistency</td></tr>
+            </table>
+
+            <div class="example">
+                <h5>Master-Slave Replication:</h5>
+                <pre><code>-- Master server configuration
+[mysqld]
+server-id = 1
+log-bin = mysql-bin
+binlog-format = ROW
+
+-- Slave server configuration
+[mysqld]
+server-id = 2
+relay-log = mysql-relay-bin
+read-only = 1
+
+-- Application code
+// Write to master
+masterDB.query("INSERT INTO users (name) VALUES ('John')");
+
+// Read from slave (with potential lag)
+const users = slaveDB.query("SELECT * FROM users");</code></pre>
+            </div>
+
+            <h2 id="optimization">🚀 Query Optimization</h2>
+            <p>Query optimization is the process of improving database query performance through various techniques and strategies.</p>
+
+            <h3>Query Optimization Techniques</h3>
+            <div class="optimization">
+                <h4>Key Strategies:</h4>
+                <ul>
+                    <li><strong>Index Optimization:</strong> Create appropriate indexes for query patterns</li>
+                    <li><strong>Query Rewriting:</strong> Transform queries into more efficient forms</li>
+                    <li><strong>Predicate Pushdown:</strong> Move filtering early in execution</li>
+                    <li><strong>Join Optimization:</strong> Optimize join order and algorithms</li>
+                </ul>
+            </div>
+
+            <h3>Query Performance Analysis</h3>
+            <div class="example">
+                <h5>Execution Plan Analysis:</h5>
+                <pre><code>-- Analyze query performance
+EXPLAIN ANALYZE
+SELECT u.name, COUNT(o.id) as order_count
+FROM users u
+LEFT JOIN orders o ON u.id = o.user_id
+WHERE u.created_at > '2023-01-01'
+GROUP BY u.id, u.name
+ORDER BY order_count DESC
+LIMIT 10;
+
+-- Sample output
+/*
+Sort  (cost=1000.00..1001.00 rows=10 width=64)
+  ->  HashAggregate  (cost=950.00..960.00 rows=100 width=64)
+        ->  Hash Left Join  (cost=400.00..900.00 rows=1000 width=32)
+              ->  Seq Scan on users u  (cost=0.00..100.00 rows=500 width=32)
+                    Filter: (created_at > '2023-01-01'::date)
+              ->  Hash  (cost=300.00..300.00 rows=2000 width=8)
+                    ->  Seq Scan on orders o  (cost=0.00..300.00 rows=2000 width=8)
+*/</code></pre>
+            </div>
+
+            <h3>Query Optimization Best Practices</h3>
+            <div class="optimization">
+                <h4>Schema Design:</h4>
+                <ul>
+                    <li><strong>Appropriate Data Types:</strong> Use smallest suitable types</li>
+                    <li><strong>Normalize vs Denormalize:</strong> Balance consistency and performance</li>
+                    <li><strong>Index Strategy:</strong> Create indexes for common patterns</li>
+                    <li><strong>Partitioning:</strong> Partition large tables</li>
+                </ul>
+            </div>
+
+            <div class="example">
+                <h5>Query Writing Best Practices:</h5>
+                <pre><code>-- Avoid functions in WHERE clause
+-- Inefficient
+SELECT * FROM users WHERE UPPER(name) = 'JOHN';
+
+-- Efficient
+SELECT * FROM users WHERE name = 'John';
+
+-- Use EXISTS instead of IN
+-- Less efficient
+SELECT * FROM users WHERE id IN (
+    SELECT user_id FROM orders WHERE amount > 100
+);
+
+-- More efficient
+SELECT * FROM users WHERE EXISTS (
+    SELECT 1 FROM orders WHERE user_id = users.id AND amount > 100
+);
+
+-- Use LIMIT for large result sets
+SELECT * FROM users ORDER BY created_at DESC LIMIT 100;</code></pre>
+            </div>
+
+            <h2>Best Practices</h2>
+
+            <h3>Database Selection</h3>
+            <div class="tip">
+                <ul>
+                    <li><strong>Understand your data:</strong> Structure, relationships, and access patterns</li>
+                    <li><strong>Consider scalability needs:</strong> Current and future growth requirements</li>
+                    <li><strong>Evaluate consistency requirements:</strong> Strong vs eventual consistency needs</li>
+                    <li><strong>Assess team expertise:</strong> Available skills and learning curve</li>
+                    <li><strong>Consider operational complexity:</strong> Maintenance, monitoring, and backup needs</li>
+                </ul>
+            </div>
+
+            <h3>Performance Optimization</h3>
+            <div class="tip">
+                <ul>
+                    <li><strong>Monitor query performance:</strong> Identify slow queries and bottlenecks</li>
+                    <li><strong>Use appropriate indexes:</strong> Create indexes for common query patterns</li>
+                    <li><strong>Optimize schema design:</strong> Balance normalization and performance</li>
+                    <li><strong>Consider caching:</strong> Implement caching layers for frequently accessed data</li>
+                    <li><strong>Regular maintenance:</strong> Update statistics, rebuild indexes, analyze performance</li>
+                </ul>
+            </div>
+
+            <h3>Common Pitfalls to Avoid</h3>
+            <div class="warning">
+                <ul>
+                    <li><strong>Over-indexing:</strong> Too many indexes can slow down writes</li>
+                    <li><strong>Ignoring query plans:</strong> Not analyzing execution plans</li>
+                    <li><strong>Poor data modeling:</strong> Inadequate schema design</li>
+                    <li><strong>Neglecting monitoring:</strong> Insufficient performance monitoring</li>
+                    <li><strong>Premature optimization:</strong> Optimizing before understanding bottlenecks</li>
+                </ul>
+            </div>
+
+            <h2>Summary</h2>
+            <div class="benefits">
+                <p>Databases are fundamental to modern applications, and understanding their concepts is crucial for system design. Key takeaways include:</p>
+                
+                <ul>
+                    <li><strong>Database choice matters:</strong> SQL vs NoSQL depends on specific requirements</li>
+                    <li><strong>Indexing is crucial:</strong> Proper indexing dramatically improves performance</li>
+                    <li><strong>Data modeling affects everything:</strong> Good schema design prevents future problems</li>
+                    <li><strong>Transactions ensure integrity:</strong> ACID properties are essential for reliable systems</li>
+                    <li><strong>Distributed systems involve trade-offs:</strong> CAP theorem guides design decisions</li>
+                    <li><strong>Optimization is ongoing:</strong> Regular monitoring and tuning maintain performance</li>
+                </ul>
+            </div>
+
+            <h3>Next Steps</h3>
+            <p>After mastering database concepts, explore:</p>
+            <ul>
+                <li><strong>Advanced caching strategies</strong> in the Caching section</li>
+                <li><strong>Database security</strong> in the Security section</li>
+                <li><strong>Performance optimization</strong> in the Scalability & Performance section</li>
+                <li><strong>Monitoring and observability</strong> for database systems</li>
+            </ul>
+
+            <p style="text-align: center; font-size: 1.2em; color: #3498db; margin-top: 30px;">
+                <strong>Understanding databases is fundamental to system design. Master these concepts to build robust, scalable applications! 🚀</strong>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.querySelector('.sidebar-toggle');
+            
+            if (window.innerWidth <= 768 && 
+                !sidebar.contains(event.target) && 
+                !toggle.contains(event.target) && 
+                sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    const tocElement = document.querySelector('.toc');
+                    const tocHeight = tocElement ? tocElement.offsetHeight : 0;
+                    const offset = tocHeight + 20;
+                    
+                    const targetPosition = target.offsetTop - offset;
+                    
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                    
+                    document.querySelectorAll('.toc a').forEach(link => {
+                        link.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                }
+            });
+        });
+
+        // Highlight current section in TOC on scroll
+        window.addEventListener('scroll', function() {
+            const sections = document.querySelectorAll('h2[id]');
+            const tocLinks = document.querySelectorAll('.toc a');
+            
+            let current = '';
+            const tocElement = document.querySelector('.toc');
+            const tocHeight = tocElement ? tocElement.offsetHeight : 0;
+            const offset = tocHeight + 50;
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (window.scrollY >= sectionTop - offset) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            tocLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

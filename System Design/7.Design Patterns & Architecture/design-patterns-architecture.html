@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏛️ Design Patterns & Architecture Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #e8e8e8;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: #1e1e1e;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            border-right: 1px solid #333;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background: #2d2d2d;
+            border-bottom: 1px solid #444;
+        }
+
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 1.3em;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #f0f0f0;
+            border: none;
+            padding: 0;
+        }
+
+        .sidebar-nav {
+            padding: 0;
+        }
+
+        .sidebar-link {
+            display: block;
+            color: #b8b8b8;
+            text-decoration: none;
+            padding: 15px 20px;
+            border-bottom: 1px solid #444;
+            transition: background 0.2s ease;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 1.1em;
+            font-weight: 500;
+        }
+
+        .sidebar-link:hover {
+            background: #3a3a3a;
+            color: #f0f0f0;
+        }
+
+        .sidebar-link.current {
+            background: #3498db;
+            color: white;
+            font-weight: 600;
+        }
+
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(30, 30, 30, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid #444;
+        }
+        h1 {
+            color: #f0f0f0;
+            text-align: center;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #e0e0e0;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+            margin-top: 30px;
+            font-size: 1.8em;
+        }
+        h3 {
+            color: #3498db;
+            margin-top: 25px;
+            font-size: 1.4em;
+        }
+        h4 {
+            color: #5dade2;
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+        .toc {
+            background: rgba(52, 152, 219, 0.15);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(52, 152, 219, 0.3);
+        }
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-evenly;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .toc li {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex: 0 1 calc(20% - 0.5rem);
+            min-width: 140px;
+        }
+        .toc a {
+            color: #e0e0e0;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            white-space: nowrap;
+            background: rgba(50, 50, 50, 0.7);
+            border: 1px solid rgba(52, 152, 219, 0.3);
+            min-height: 40px;
+            width: 100%;
+        }
+        .toc a:hover, .toc a.active {
+            background: linear-gradient(45deg, #3498db, #5dade2);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+        
+        pre {
+            background: #000000;
+            color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        code {
+            background: #000000;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #ffffff;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: #2a2a2a;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        th, td {
+            border: 1px solid #444;
+            padding: 12px;
+            text-align: left;
+            color: #e0e0e0;
+        }
+        th {
+            background: #3498db;
+            color: white;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background: #333;
+        }
+        tr:hover {
+            background: #404040;
+        }
+        .warning {
+            background: #3a2f1a;
+            border: 1px solid #b8860b;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #ffd700;
+        }
+        .warning::before {
+            content: "⚠️ ";
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .tip {
+            background: #1a3a2f;
+            border: 1px solid #27ae60;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #7bed9f;
+        }
+        .tip::before {
+            content: "💡 ";
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .example {
+            background: #2a2a2a;
+            border-left: 4px solid #17a2b8;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #e0e0e0;
+        }
+        .example h5 {
+            margin-top: 0;
+            color: #17a2b8;
+            font-size: 1.1em;
+        }
+        .benefits {
+            background: #1a3a1a;
+            border: 1px solid #3498db;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #90ee90;
+        }
+        .benefits ul {
+            margin: 10px 0;
+        }
+        .benefits li {
+            margin: 5px 0;
+        }
+        .architecture {
+            background: #2a2a3a;
+            border: 1px solid #9b59b6;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #e0e0f0;
+        }
+        .pattern {
+            background: #1a2a3a;
+            border: 1px solid #f39c12;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #f8c471;
+        }
+        .comparison {
+            background: #3a1a1a;
+            border: 1px solid #e74c3c;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #ffb3b3;
+        }
+        .resilience {
+            background: #1a3a1a;
+            border: 1px solid #27ae60;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #90ee90;
+        }
+
+        @media (max-width: 1024px) {
+            .toc ul {
+                justify-content: center;
+                gap: 0.75rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .sidebar-toggle {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            h2 {
+                font-size: 1.5em;
+            }
+
+            table {
+                font-size: 0.9em;
+            }
+
+            .toc {
+                position: static;
+                margin: 20px 0;
+            }
+
+            .toc ul {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+    
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2><a href="../system-design.html" style="color: inherit; text-decoration: none;">🗂️ System Design</a></h2>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="../1.Fundamentals/system-design-fundamentals.html" class="sidebar-link">
+                🏗️ Fundamentals
+            </a>
+            <a href="../2.Networking & Communication/networking-communication.html" class="sidebar-link">
+                🌐 Networking & Communication
+            </a>
+            <a href="../3.Databases/databases.html" class="sidebar-link">
+                🗃️ Databases
+            </a>
+            <a href="../4.Caching/caching.html" class="sidebar-link">
+                🗄️ Caching
+            </a>
+            <a href="../5.Message Queues & Event-Driven Systems/message-queues-event-driven.html" class="sidebar-link">
+                📬 Message Queues & Events
+            </a>
+            <a href="../6.Storage Systems/storage-systems.html" class="sidebar-link">
+                💾 Storage Systems
+            </a>
+            <a href="../7.Design Patterns & Architecture/design-patterns-architecture.html" class="sidebar-link current">
+                🏛️ Design Patterns & Architecture
+            </a>
+            <a href="../8.Scalability & Performance/scalability-performance.html" class="sidebar-link">
+                📈 Scalability & Performance
+            </a>
+            <a href="../9.Security in System Design/security-system-design.html" class="sidebar-link">
+                🔒 Security
+            </a>
+            <a href="../10.Monitoring & Observability/monitoring-observability.html" class="sidebar-link">
+                📊 Monitoring & Observability
+            </a>
+            <a href="../11.Deployment & DevOps/deployment-devops.html" class="sidebar-link">
+                🚀 Deployment & DevOps
+            </a>
+            <a href="../12.Popular Use Cases/popular-use-cases.html" class="sidebar-link">
+                🎯 Popular Use Cases
+            </a>
+            <a href="../13.Trade-offs & Decision Making/trade-offs-decision-making.html" class="sidebar-link">
+                ⚖️ Trade-offs & Decisions
+            </a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="container">
+        <h1>🏛️ Design Patterns & Architecture Guide</h1>
+        
+        <div class="toc" id="toc">
+            <ul>
+                <li><a href="#monolith-vs-microservices">Monolith vs Microservices</a></li>
+                <li><a href="#service-oriented-architecture">SOA</a></li>
+                <li><a href="#api-gateway">API Gateway</a></li>
+                <li><a href="#resilience-patterns">Resilience Patterns</a></li>
+                <li><a href="#rate-limiting-backpressure">Rate Limiting & Backpressure</a></li>
+            </ul>
+        </div>
+
+        <h2 id="monolith-vs-microservices">Monolith vs Microservices</h2>
+        <p>Understanding the fundamental differences between monolithic and microservices architectures is crucial for making informed architectural decisions. Each approach has distinct characteristics, trade-offs, and use cases.</p>
+
+        <h3>Monolithic Architecture</h3>
+        <p>A monolithic architecture is a single, unified deployment unit where all components of an application are packaged together and deployed as one cohesive unit.</p>
+
+        <div class="architecture">
+            <h4>Monolithic Characteristics:</h4>
+            <ul>
+                <li><strong>Single Codebase:</strong> All functionality exists in one repository</li>
+                <li><strong>Shared Database:</strong> Components share the same database</li>
+                <li><strong>Single Deployment:</strong> Entire application deployed as one unit</li>
+                <li><strong>Centralized Business Logic:</strong> All business rules in one place</li>
+                <li><strong>Shared Runtime:</strong> All components run in the same process</li>
+            </ul>
+        </div>
+
+        <div class="benefits">
+            <h4>Monolithic Advantages:</h4>
+            <ul>
+                <li><strong>Simplicity:</strong> Easy to develop, test, and deploy initially</li>
+                <li><strong>Performance:</strong> No network latency between components</li>
+                <li><strong>Consistency:</strong> Easy to maintain data consistency</li>
+                <li><strong>Debugging:</strong> Easier to debug with single call stack</li>
+                <li><strong>Development Speed:</strong> Fast initial development</li>
+                <li><strong>Cost Effective:</strong> Lower infrastructure costs initially</li>
+            </ul>
+        </div>
+
+        <div class="warning">
+            <h4>Monolithic Disadvantages:</h4>
+            <ul>
+                <li><strong>Scalability:</strong> Difficult to scale individual components</li>
+                <li><strong>Technology Lock-in:</strong> Entire application uses same technology stack</li>
+                <li><strong>Deployment Risk:</strong> Changes to one component affect entire system</li>
+                <li><strong>Team Coordination:</strong> Multiple teams working on same codebase</li>
+                <li><strong>Code Complexity:</strong> Codebase becomes complex over time</li>
+                <li><strong>Fault Isolation:</strong> Failure in one component can bring down entire system</li>
+            </ul>
+        </div>
+
+        <div class="tip">
+            <h4>When to Choose Monolith:</h4>
+            <ul>
+                <li>Small teams (< 10 developers)</li>
+                <li>Simple applications with limited complexity</li>
+                <li>Rapid prototyping and MVP development</li>
+                <li>Well-defined and stable requirements</li>
+                <li>Limited scalability requirements</li>
+                <li>Cost-sensitive projects</li>
+            </ul>
+        </div>
+
+        <h3>Microservices Architecture</h3>
+        <p>Microservices architecture breaks down applications into small, independent services that communicate over well-defined APIs.</p>
+
+        <div class="architecture">
+            <h4>Microservices Characteristics:</h4>
+            <ul>
+                <li><strong>Service Independence:</strong> Each service can be developed, deployed, and scaled independently</li>
+                <li><strong>Decentralized:</strong> Services manage their own data and business logic</li>
+                <li><strong>API Communication:</strong> Services communicate via APIs (REST, gRPC, messaging)</li>
+                <li><strong>Technology Diversity:</strong> Different services can use different technologies</li>
+                <li><strong>Fault Isolation:</strong> Failure in one service doesn't affect others</li>
+            </ul>
+        </div>
+
+        <div class="benefits">
+            <h4>Microservices Advantages:</h4>
+            <ul>
+                <li><strong>Scalability:</strong> Scale individual services based on demand</li>
+                <li><strong>Technology Flexibility:</strong> Use different technologies for different services</li>
+                <li><strong>Independent Deployment:</strong> Deploy services independently</li>
+                <li><strong>Team Autonomy:</strong> Teams can work independently on different services</li>
+                <li><strong>Fault Isolation:</strong> Better fault tolerance and resilience</li>
+                <li><strong>Innovation:</strong> Easier to experiment with new technologies</li>
+            </ul>
+        </div>
+
+        <div class="warning">
+            <h4>Microservices Disadvantages:</h4>
+            <ul>
+                <li><strong>Complexity:</strong> Increased operational complexity</li>
+                <li><strong>Network Latency:</strong> Communication overhead between services</li>
+                <li><strong>Data Consistency:</strong> Challenging to maintain consistency across services</li>
+                <li><strong>Testing:</strong> More complex integration testing</li>
+                <li><strong>Monitoring:</strong> Need sophisticated monitoring and logging</li>
+                <li><strong>Infrastructure Overhead:</strong> Higher infrastructure and operational costs</li>
+            </ul>
+        </div>
+
+        <div class="tip">
+            <h4>When to Choose Microservices:</h4>
+            <ul>
+                <li>Large, complex applications</li>
+                <li>Multiple teams working on different features</li>
+                <li>High scalability requirements</li>
+                <li>Need for technology diversity</li>
+                <li>Mature DevOps practices</li>
+                <li>Tolerance for operational complexity</li>
+            </ul>
+        </div>
+
+        <h3>Migration Strategies</h3>
+
+        <div class="pattern">
+            <h4>Strangler Fig Pattern</h4>
+            <pre><code>Legacy Monolith → Gradual Service Extraction → Full Microservices</code></pre>
+            <ul>
+                <li>Gradually extract functionality from monolith</li>
+                <li>Route traffic to new services incrementally</li>
+                <li>Decommission monolith components over time</li>
+            </ul>
+        </div>
+
+        <div class="pattern">
+            <h4>Database-per-Service Pattern</h4>
+            <pre><code>Shared Database → Service-specific Databases → Data Synchronization</code></pre>
+            <ul>
+                <li>Each service owns its data</li>
+                <li>Eliminate shared database dependencies</li>
+                <li>Implement eventual consistency patterns</li>
+            </ul>
+        </div>
+
+        <h3>Architecture Comparison</h3>
+        <table>
+            <tr>
+                <th>Aspect</th>
+                <th>Monolith</th>
+                <th>Microservices</th>
+            </tr>
+            <tr>
+                <td><strong>Deployment</strong></td>
+                <td>Single unit</td>
+                <td>Independent services</td>
+            </tr>
+            <tr>
+                <td><strong>Scalability</strong></td>
+                <td>Scale entire application</td>
+                <td>Scale individual services</td>
+            </tr>
+            <tr>
+                <td><strong>Technology</strong></td>
+                <td>Single stack</td>
+                <td>Multiple technologies</td>
+            </tr>
+            <tr>
+                <td><strong>Data Management</strong></td>
+                <td>Shared database</td>
+                <td>Service-specific databases</td>
+            </tr>
+            <tr>
+                <td><strong>Team Structure</strong></td>
+                <td>Single team</td>
+                <td>Multiple autonomous teams</td>
+            </tr>
+            <tr>
+                <td><strong>Complexity</strong></td>
+                <td>Simple initially</td>
+                <td>Complex from start</td>
+            </tr>
+            <tr>
+                <td><strong>Performance</strong></td>
+                <td>No network overhead</td>
+                <td>Network latency</td>
+            </tr>
+            <tr>
+                <td><strong>Fault Tolerance</strong></td>
+                <td>Single point of failure</td>
+                <td>Isolated failures</td>
+            </tr>
+        </table>
+
+        <h2 id="service-oriented-architecture">Service-Oriented Architecture (SOA)</h2>
+        <p>Service-Oriented Architecture (SOA) is an architectural pattern where functionality is organized as a collection of services that communicate through well-defined interfaces and protocols.</p>
+
+        <h3>Core SOA Principles</h3>
+        <div class="architecture">
+            <h4>SOA Principles:</h4>
+            <ol>
+                <li><strong>Service Contracts:</strong> Services expose formal contracts defining their capabilities</li>
+                <li><strong>Service Loose Coupling:</strong> Services maintain minimal dependencies</li>
+                <li><strong>Service Abstraction:</strong> Services hide internal implementation details</li>
+                <li><strong>Service Reusability:</strong> Services are designed for reuse across applications</li>
+                <li><strong>Service Autonomy:</strong> Services control their own environment and resources</li>
+                <li><strong>Service Statelessness:</strong> Services minimize resource consumption</li>
+                <li><strong>Service Discoverability:</strong> Services are discoverable and have metadata</li>
+                <li><strong>Service Composability:</strong> Services can be composed to form larger solutions</li>
+            </ol>
+        </div>
+
+        <h3>SOA Components</h3>
+
+        <div class="example">
+            <h5>Service Provider</h5>
+            <ul>
+                <li>Implements and hosts the service</li>
+                <li>Publishes service contract to registry</li>
+                <li>Responds to service requests</li>
+            </ul>
+        </div>
+
+        <div class="example">
+            <h5>Service Consumer</h5>
+            <ul>
+                <li>Discovers and invokes services</li>
+                <li>Binds to service contract</li>
+                <li>Handles service responses</li>
+            </ul>
+        </div>
+
+        <div class="example">
+            <h5>Service Registry</h5>
+            <ul>
+                <li>Central repository of service contracts</li>
+                <li>Enables service discovery</li>
+                <li>Maintains service metadata</li>
+            </ul>
+        </div>
+
+        <div class="example">
+            <h5>Enterprise Service Bus (ESB)</h5>
+            <ul>
+                <li>Middleware infrastructure for service communication</li>
+                <li>Handles message routing, transformation, and protocol mediation</li>
+                <li>Provides quality of service features</li>
+            </ul>
+        </div>
+
+        <h3>SOA vs Microservices Comparison</h3>
+        <table>
+            <tr>
+                <th>Aspect</th>
+                <th>SOA</th>
+                <th>Microservices</th>
+            </tr>
+            <tr>
+                <td><strong>Scope</strong></td>
+                <td>Enterprise-wide</td>
+                <td>Application-specific</td>
+            </tr>
+            <tr>
+                <td><strong>Communication</strong></td>
+                <td>ESB, SOAP</td>
+                <td>REST, gRPC, messaging</td>
+            </tr>
+            <tr>
+                <td><strong>Governance</strong></td>
+                <td>Centralized</td>
+                <td>Decentralized</td>
+            </tr>
+            <tr>
+                <td><strong>Data Sharing</strong></td>
+                <td>Shared databases common</td>
+                <td>Database per service</td>
+            </tr>
+            <tr>
+                <td><strong>Service Size</strong></td>
+                <td>Larger services</td>
+                <td>Smaller, focused services</td>
+            </tr>
+            <tr>
+                <td><strong>Technology</strong></td>
+                <td>Standards-based (XML, WSDL)</td>
+                <td>Technology agnostic</td>
+            </tr>
+            <tr>
+                <td><strong>Deployment</strong></td>
+                <td>Shared infrastructure</td>
+                <td>Independent deployment</td>
+            </tr>
+        </table>
+
+        <h3>SOA Implementation Patterns</h3>
+
+        <div class="pattern">
+            <h4>Service Orchestration vs Choreography</h4>
+            <h5>Orchestration (Centralized)</h5>
+            <pre><code>Process Controller → Service A → Service B → Service C</code></pre>
+            <ul>
+                <li>Central coordinator manages service interactions</li>
+                <li>Easier to monitor and control</li>
+                <li>Single point of failure</li>
+            </ul>
+            
+            <h5>Choreography (Decentralized)</h5>
+            <pre><code>Service A → Service B → Service C (Event-driven)</code></pre>
+            <ul>
+                <li>Services coordinate through events</li>
+                <li>More resilient and flexible</li>
+                <li>Harder to monitor overall process</li>
+            </ul>
+        </div>
+
+        <h2 id="api-gateway">API Gateway</h2>
+        <p>An API Gateway is a server that acts as a single entry point for all client requests to a backend system, providing a unified interface while handling cross-cutting concerns.</p>
+
+        <h3>API Gateway Core Functions</h3>
+        <div class="architecture">
+            <h4>Primary Functions:</h4>
+            <ul>
+                <li><strong>Request Routing:</strong> Route requests to appropriate backend services</li>
+                <li><strong>Load Balancing:</strong> Distribute requests across service instances</li>
+                <li><strong>Authentication & Authorization:</strong> Verify client identity and permissions</li>
+                <li><strong>Rate Limiting:</strong> Control request frequency and prevent abuse</li>
+                <li><strong>Request/Response Transformation:</strong> Modify requests and responses</li>
+                <li><strong>Caching:</strong> Cache responses to improve performance</li>
+                <li><strong>Monitoring & Analytics:</strong> Track API usage and performance</li>
+            </ul>
+        </div>
+
+        <h3>API Gateway Architecture</h3>
+        <div class="example">
+            <h5>Gateway Flow:</h5>
+            <pre><code>Client Applications → API Gateway → Microservices
+                                 → Legacy Systems
+                                 → External APIs</code></pre>
+        </div>
+
+        <div class="architecture">
+            <h4>Gateway Components:</h4>
+            <ul>
+                <li><strong>Gateway Core:</strong> Request processing engine and routing logic</li>
+                <li><strong>Policy Engine:</strong> Security policies, rate limiting, transformation rules</li>
+                <li><strong>Service Discovery:</strong> Dynamic service registration and health checking</li>
+                <li><strong>Management Interface:</strong> API configuration and analytics dashboard</li>
+            </ul>
+        </div>
+
+        <h3>API Gateway Patterns</h3>
+
+        <div class="pattern">
+            <h4>Backend for Frontend (BFF)</h4>
+            <pre><code>Mobile App → Mobile BFF → Services
+Web App → Web BFF → Services</code></pre>
+            <ul>
+                <li>Separate API Gateway for each client type</li>
+                <li>Optimized for specific client needs</li>
+                <li>Reduces over-fetching and under-fetching</li>
+            </ul>
+        </div>
+
+        <div class="pattern">
+            <h4>API Composition Pattern</h4>
+            <pre><code>Client → API Gateway → [Service A + Service B + Service C] → Aggregated Response</code></pre>
+            <ul>
+                <li>Combines multiple service calls</li>
+                <li>Reduces client complexity</li>
+                <li>Handles partial failures</li>
+            </ul>
+        </div>
+
+        <div class="benefits">
+            <h4>API Gateway Benefits:</h4>
+            <ul>
+                <li><strong>For Clients:</strong> Simplified integration, consistent interface, reduced complexity</li>
+                <li><strong>For Services:</strong> Centralized cross-cutting concerns, service evolution independence</li>
+                <li><strong>For Operations:</strong> Centralized monitoring, security policies, performance optimization</li>
+            </ul>
+        </div>
+
+        <div class="warning">
+            <h4>API Gateway Challenges:</h4>
+            <ul>
+                <li><strong>Performance Bottleneck:</strong> Single point of failure, latency introduction</li>
+                <li><strong>Complexity:</strong> Configuration complexity, debugging difficulties</li>
+                <li><strong>Vendor Lock-in:</strong> Proprietary features, migration challenges</li>
+            </ul>
+        </div>
+
+        <h3>Popular API Gateway Solutions</h3>
+
+        <div class="example">
+            <h5>Open Source Solutions:</h5>
+            <ul>
+                <li><strong>Kong:</strong> Scalable, plugin-based gateway</li>
+                <li><strong>Zuul:</strong> Netflix's gateway solution</li>
+                <li><strong>Traefik:</strong> Modern reverse proxy and load balancer</li>
+                <li><strong>Envoy:</strong> High-performance proxy</li>
+            </ul>
+        </div>
+
+        <div class="example">
+            <h5>Cloud-based Solutions:</h5>
+            <ul>
+                <li><strong>AWS API Gateway:</strong> Fully managed service</li>
+                <li><strong>Azure API Management:</strong> Enterprise API platform</li>
+                <li><strong>Google Cloud Endpoints:</strong> API management platform</li>
+                <li><strong>Kong Enterprise:</strong> Commercial Kong offering</li>
+            </ul>
+        </div>
+
+        <h2 id="resilience-patterns">Circuit Breaker, Bulkhead, Retry Patterns</h2>
+        <p>Resilience patterns are essential for building robust distributed systems that can handle failures gracefully and maintain service availability.</p>
+
+        <h3>Circuit Breaker Pattern</h3>
+        <p>The Circuit Breaker pattern prevents cascading failures by monitoring service calls and stopping requests to failing services.</p>
+
+        <div class="resilience">
+            <h4>Circuit Breaker States:</h4>
+            <ol>
+                <li><strong>Closed:</strong> Normal operation, requests pass through</li>
+                <li><strong>Open:</strong> Service is failing, requests are blocked</li>
+                <li><strong>Half-Open:</strong> Limited requests allowed to test service recovery</li>
+            </ol>
+        </div>
+
+        <div class="example">
+            <h5>State Transitions:</h5>
+            <pre><code>Closed → (Failure threshold reached) → Open
+Open → (Timeout reached) → Half-Open
+Half-Open → (Success) → Closed
+Half-Open → (Failure) → Open</code></pre>
+        </div>
+
+        <div class="pattern">
+            <h4>Circuit Breaker Implementation:</h4>
+            <pre><code>class CircuitBreaker:
+    def __init__(self, failure_threshold=5, timeout=60):
+        self.failure_threshold = failure_threshold
+        self.timeout = timeout
+        self.failure_count = 0
+        self.last_failure_time = None
+        self.state = 'CLOSED'
+    
+    def call(self, func, *args, **kwargs):
+        if self.state == 'OPEN':
+            if time.time() - self.last_failure_time > self.timeout:
+                self.state = 'HALF_OPEN'
+            else:
+                raise CircuitBreakerOpenException()
+        
+        try:
+            result = func(*args, **kwargs)
+            self.reset()
+            return result
+        except Exception as e:
+            self.record_failure()
+            raise e
+    
+    def record_failure(self):
+        self.failure_count += 1
+        self.last_failure_time = time.time()
+        if self.failure_count >= self.failure_threshold:
+            self.state = 'OPEN'
+    
+    def reset(self):
+        self.failure_count = 0
+        self.state = 'CLOSED'</code></pre>
+        </div>
+
+        <h3>Bulkhead Pattern</h3>
+        <p>The Bulkhead pattern isolates resources to prevent total system failure when one component fails.</p>
+
+        <div class="resilience">
+            <h4>Bulkhead Types:</h4>
+            <ul>
+                <li><strong>Thread Pool Bulkhead:</strong> Separate thread pools for different services</li>
+                <li><strong>Connection Pool Bulkhead:</strong> Separate connection pools for different resources</li>
+                <li><strong>Service Instance Bulkhead:</strong> Separate service instances for different operations</li>
+            </ul>
+        </div>
+
+        <div class="example">
+            <h5>Thread Pool Bulkhead:</h5>
+            <pre><code>Service A → Thread Pool 1 (10 threads)
+Service B → Thread Pool 2 (10 threads)
+Service C → Thread Pool 3 (10 threads)</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>Connection Pool Bulkhead:</h5>
+            <pre><code>Database Service → Connection Pool 1 (50 connections)
+Cache Service → Connection Pool 2 (20 connections)
+External API → Connection Pool 3 (10 connections)</code></pre>
+        </div>
+
+        <h3>Retry Pattern</h3>
+        <p>The Retry pattern handles transient failures by automatically retrying failed operations.</p>
+
+        <div class="resilience">
+            <h4>Retry Strategies:</h4>
+            <ul>
+                <li><strong>Immediate Retry:</strong> Retry immediately after failure</li>
+                <li><strong>Fixed Interval:</strong> Consistent retry intervals</li>
+                <li><strong>Exponential Backoff:</strong> Increasing wait times between retries</li>
+                <li><strong>Exponential Backoff with Jitter:</strong> Adds randomness to prevent thundering herd</li>
+            </ul>
+        </div>
+
+        <div class="example">
+            <h5>Exponential Backoff with Jitter:</h5>
+            <pre><code>Wait Time = Base_Delay × (2^attempt) + Random_Jitter
+
+Request → Failure → Wait(1s) → Retry → Wait(2s) → Retry → Wait(4s) → Retry</code></pre>
+        </div>
+
+        <div class="tip">
+            <h4>Combining Resilience Patterns:</h4>
+            <ul>
+                <li><strong>Circuit Breaker + Retry:</strong> Retry for transient failures, circuit breaker for persistent failures</li>
+                <li><strong>Bulkhead + Circuit Breaker:</strong> Resource isolation with failure prevention</li>
+                <li><strong>Timeout + Retry + Circuit Breaker:</strong> Comprehensive resilience strategy</li>
+            </ul>
+        </div>
+
+        <h2 id="rate-limiting-backpressure">Rate Limiting and Backpressure</h2>
+        <p>Rate limiting and backpressure are crucial mechanisms for controlling system load and preventing overload situations in distributed systems.</p>
+
+        <h3>Rate Limiting</h3>
+        <p>Rate limiting controls the frequency of requests to prevent system overload and ensure fair resource usage.</p>
+
+        <div class="pattern">
+            <h4>Rate Limiting Types:</h4>
+            <ul>
+                <li><strong>Request Rate Limiting:</strong> Limits number of requests per time period</li>
+                <li><strong>Bandwidth Rate Limiting:</strong> Limits data transfer rate</li>
+                <li><strong>Connection Rate Limiting:</strong> Limits number of concurrent connections</li>
+                <li><strong>Resource Rate Limiting:</strong> Limits specific resource usage</li>
+            </ul>
+        </div>
+
+        <h3>Rate Limiting Algorithms</h3>
+
+        <div class="example">
+            <h5>Token Bucket Algorithm:</h5>
+            <pre><code>Bucket (Fixed Capacity) → Tokens added at fixed rate
+Request → Consume token → Process request
+No tokens → Reject request</code></pre>
+            <ul>
+                <li>Allows burst traffic up to bucket capacity</li>
+                <li>Smooth rate limiting over time</li>
+                <li>Configurable burst size</li>
+            </ul>
+        </div>
+
+        <div class="example">
+            <h5>Leaky Bucket Algorithm:</h5>
+            <pre><code>Requests → Bucket (FIFO Queue) → Process at fixed rate
+Bucket full → Drop requests</code></pre>
+            <ul>
+                <li>Smooths out traffic spikes</li>
+                <li>Consistent processing rate</li>
+                <li>Simple to implement</li>
+            </ul>
+        </div>
+
+        <div class="example">
+            <h5>Sliding Window Algorithm:</h5>
+            <pre><code>Window slides continuously
+Count requests in current window
+More accurate than fixed window</code></pre>
+            <ul>
+                <li>Smoother rate limiting</li>
+                <li>No boundary effects</li>
+                <li>More complex to implement</li>
+            </ul>
+        </div>
+
+        <h3>Rate Limiting Implementation</h3>
+
+        <div class="pattern">
+            <h4>Client-Side Rate Limiting:</h4>
+            <pre><code>class RateLimiter:
+    def __init__(self, max_requests, time_window):
+        self.max_requests = max_requests
+        self.time_window = time_window
+        self.requests = []
+    
+    def allow_request(self):
+        now = time.time()
+        # Remove old requests outside time window
+        self.requests = [req_time for req_time in self.requests 
+                        if now - req_time < self.time_window]
+        
+        if len(self.requests) < self.max_requests:
+            self.requests.append(now)
+            return True
+        return False</code></pre>
+        </div>
+
+        <div class="pattern">
+            <h4>Server-Side Rate Limiting:</h4>
+            <pre><code># Redis-based rate limiting
+def rate_limit_user(user_id, max_requests, time_window):
+    key = f"rate_limit:{user_id}"
+    current_requests = redis.get(key) or 0
+    
+    if int(current_requests) >= max_requests:
+        return False
+    
+    pipe = redis.pipeline()
+    pipe.incr(key)
+    pipe.expire(key, time_window)
+    pipe.execute()
+    
+    return True</code></pre>
+        </div>
+
+        <h3>Backpressure</h3>
+        <p>Backpressure is a mechanism to handle situations where data is produced faster than it can be consumed.</p>
+
+        <div class="pattern">
+            <h4>Backpressure Types:</h4>
+            <ul>
+                <li><strong>Blocking Backpressure:</strong> Producer waits when buffer is full</li>
+                <li><strong>Dropping Backpressure:</strong> Drop newest or oldest data when buffer is full</li>
+                <li><strong>Buffering Backpressure:</strong> Increase buffer size dynamically</li>
+                <li><strong>Throttling Backpressure:</strong> Reduce producer rate when buffer fills</li>
+            </ul>
+        </div>
+
+        <div class="example">
+            <h5>Flow Control Implementation:</h5>
+            <pre><code>class FlowController:
+    def __init__(self, max_queue_size=1000):
+        self.queue = asyncio.Queue(maxsize=max_queue_size)
+        self.processing = False
+    
+    async def send(self, item):
+        try:
+            await self.queue.put(item, timeout=1.0)
+        except asyncio.TimeoutError:
+            # Apply backpressure
+            raise BackpressureException("Queue full")
+    
+    async def process(self):
+        while True:
+            item = await self.queue.get()
+            await self.handle_item(item)
+            self.queue.task_done()</code></pre>
+        </div>
+
+        <h3>Monitoring and Metrics</h3>
+
+        <div class="tip">
+            <h4>Key Metrics to Monitor:</h4>
+            <ul>
+                <li><strong>Rate Limiting:</strong> Request rate, throttle rate, user distribution, error rate</li>
+                <li><strong>Backpressure:</strong> Queue size, queue growth rate, processing latency, drop rate</li>
+                <li><strong>Alerting:</strong> High throttle rates, growing queue sizes, increasing latency</li>
+            </ul>
+        </div>
+
+        <h2>Best Practices Summary</h2>
+
+        <div class="tip">
+            <h3>Architecture Decision Framework:</h3>
+            <ol>
+                <li><strong>Start Simple:</strong> Begin with monolith, evolve to microservices</li>
+                <li><strong>Business Alignment:</strong> Align services with business capabilities</li>
+                <li><strong>Team Structure:</strong> Organize teams around services (Conway's Law)</li>
+                <li><strong>Data Ownership:</strong> Each service owns its data</li>
+                <li><strong>Automation:</strong> Invest in CI/CD and monitoring</li>
+            </ol>
+        </div>
+
+        <div class="tip">
+            <h3>Resilience Patterns:</h3>
+            <ol>
+                <li><strong>Defense in Depth:</strong> Layer multiple resilience patterns</li>
+                <li><strong>Fail Fast:</strong> Detect failures quickly and fail gracefully</li>
+                <li><strong>Graceful Degradation:</strong> Provide reduced functionality during failures</li>
+                <li><strong>Monitoring:</strong> Implement comprehensive monitoring and alerting</li>
+                <li><strong>Testing:</strong> Test failure scenarios regularly</li>
+            </ol>
+        </div>
+
+        <div class="tip">
+            <h3>API Design:</h3>
+            <ol>
+                <li><strong>Consistent Interface:</strong> Maintain consistent API design</li>
+                <li><strong>Versioning Strategy:</strong> Plan for API evolution</li>
+                <li><strong>Documentation:</strong> Maintain up-to-date API documentation</li>
+                <li><strong>Security:</strong> Implement proper authentication and authorization</li>
+                <li><strong>Rate Limiting:</strong> Protect APIs from abuse</li>
+            </ol>
+        </div>
+
+        <div class="tip">
+            <h3>Operational Excellence:</h3>
+            <ol>
+                <li><strong>Observability:</strong> Implement logging, metrics, and tracing</li>
+                <li><strong>Automation:</strong> Automate deployment and operations</li>
+                <li><strong>Security:</strong> Implement security best practices</li>
+                <li><strong>Disaster Recovery:</strong> Plan for disaster recovery scenarios</li>
+                <li><strong>Continuous Improvement:</strong> Regularly review and improve architecture</li>
+            </ol>
+        </div>
+
+        <div class="warning">
+            <em>This documentation provides a comprehensive overview of design patterns and architecture in system design. For specific implementation details, consult the relevant technology documentation and best practices guides.</em>
+        </div>
+    </div>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Close sidebar when clicking on main content on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.querySelector('.sidebar-toggle');
+            const isMobile = window.innerWidth <= 768;
+            
+            if (isMobile && !sidebar.contains(event.target) && !toggle.contains(event.target)) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // Smooth scrolling for TOC links
+        document.querySelectorAll('.toc a').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    const offset = 80; // Offset to account for sticky TOC
+                    const targetPosition = target.offsetTop - offset;
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Highlight active section in TOC
+        window.addEventListener('scroll', function() {
+            const sections = document.querySelectorAll('h2[id]');
+            const tocLinks = document.querySelectorAll('.toc a');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.offsetHeight;
+                if (scrollY >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            tocLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
