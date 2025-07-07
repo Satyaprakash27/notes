@@ -9,11 +9,17 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }        body {
+        }
+
+        html {
+            scroll-padding-top: 250px;
+        }
+
+        body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
-            color: #333;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #e8e8e8;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
             min-height: 100vh;
             margin: 0;
             display: flex;
@@ -21,7 +27,7 @@
 
         .sidebar {
             width: 280px;
-            background: #2c3e50;
+            background: #1e1e1e;
             color: white;
             height: 100vh;
             position: fixed;
@@ -30,18 +36,19 @@
             overflow-y: auto;
             z-index: 1000;
             transition: transform 0.3s ease;
+            border-right: 1px solid #333;
         }
 
         .sidebar-header {
             padding: 20px;
-            background: #34495e;
-            border-bottom: 1px solid #455a75;
+            background: #2d2d2d;
+            border-bottom: 1px solid #444;
         }
 
         .sidebar-header h2 {
             margin: 0;
             font-size: 1.3em;
-            color: #ecf0f1;
+            color: #f0f0f0;
             border: none;
             padding: 0;
         }
@@ -51,12 +58,12 @@
         }
 
         .sidebar-section {
-            border-bottom: 1px solid #455a75;
+            border-bottom: 1px solid #444;
         }
 
         .sidebar-section-title {
-            background: #34495e;
-            color: #ecf0f1;
+            background: #2d2d2d;
+            color: #f0f0f0;
             padding: 15px 20px;
             margin: 0;
             font-size: 1.1em;
@@ -69,11 +76,11 @@
         }
 
         .sidebar-section-title:hover {
-            background: #455a75;
+            background: #3a3a3a;
         }
 
         .sidebar-links {
-            background: #2c3e50;
+            background: #1e1e1e;
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.3s ease;
@@ -85,20 +92,20 @@
 
         .sidebar-links a {
             display: block;
-            color: #bdc3c7;
+            color: #b8b8b8;
             text-decoration: none;
             padding: 12px 25px;
-            border-bottom: 1px solid #34495e;
+            border-bottom: 1px solid #444;
             transition: background 0.2s ease;
         }
 
         .sidebar-links a:hover {
-            background: #34495e;
-            color: #ecf0f1;
+            background: #3a3a3a;
+            color: #f0f0f0;
         }
 
         .sidebar-links a.current {
-            background: #3498db;
+            background: #27ae60;
             color: white;
             font-weight: 600;
         }
@@ -127,11 +134,12 @@
             max-width: 1000px;
             margin: 0 auto;
             padding: 20px;
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(30, 30, 30, 0.95);
             backdrop-filter: blur(10px);
             border-radius: 20px;
             margin-top: 20px;
             margin-bottom: 20px;
+            border: 1px solid #444;
         }
 
         @media (max-width: 768px) {
@@ -151,11 +159,11 @@
         }
 
         h1 {
-            color: #2c3e50;
+            color: #e8e8e8;
             text-align: center;
             margin-bottom: 30px;
             font-size: 2.5em;
-            background: linear-gradient(45deg, #667eea, #764ba2);
+            background: linear-gradient(45deg, #3498db, #e74c3c);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -166,36 +174,65 @@
         }
 
         h2 {
-            color: #34495e;
-            border-bottom: 3px solid #667eea;
+            color: #27ae60;
+            border-bottom: 3px solid #27ae60;
             padding-bottom: 10px;
             margin: 30px 0 20px 0;
             font-size: 1.8em;
         }
 
         h3 {
-            color: #555;
+            color: #74b9ff;
             margin: 25px 0 15px 0;
             font-size: 1.3em;
         }
 
         h4 {
-            color: #666;
+            color: #ddd;
             margin: 20px 0 10px 0;
             font-size: 1.1em;
         }
 
+        p {
+            color: #e0e0e0;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        ul, ol {
+            color: #e0e0e0;
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 5px;
+        }
+
+        strong {
+            color: #74b9ff;
+            font-weight: 600;
+        }
+
+        code {
+            background: #2d2d2d;
+            color: #e74c3c;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+        }
+
         .toc {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: linear-gradient(135deg, #3a4a5c, #2c3e50);
             padding: 25px;
             border-radius: 15px;
             margin-bottom: 30px;
-            border-left: 5px solid #667eea;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #27ae60;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
 
         .toc h3 {
-            color: #2c3e50;
+            color: #e8e8e8;
             margin-bottom: 20px;
             text-align: center;
         }
@@ -213,7 +250,7 @@
         }
 
         .toc a {
-            color: #2c3e50;
+            color: #e8e8e8;
             text-decoration: none;
             font-weight: 500;
             transition: all 0.3s ease;
@@ -223,23 +260,23 @@
         }
 
         .toc a:hover {
-            color: #667eea;
-            background: rgba(102, 126, 234, 0.1);
+            color: #27ae60;
+            background: rgba(39, 174, 96, 0.1);
             transform: translateX(5px);
         }
 
         .code-block {
-            background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
-            color: #e2e8f0;
+            background: #1e1e1e;
+            color: #d4d4d4;
             padding: 25px;
             border-radius: 15px;
             margin: 20px 0;
             overflow-x: auto;
-            border-left: 4px solid #667eea;
+            border-left: 4px solid #007acc;
             font-family: 'Fira Code', 'Courier New', monospace;
             line-height: 1.5;
             position: relative;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
         }
 
         .code-block pre {
@@ -268,8 +305,8 @@
             position: absolute;
             top: 10px;
             right: 15px;
-            background: rgba(102, 126, 234, 0.2);
-            color: #667eea;
+            background: rgba(0, 122, 204, 0.2);
+            color: #007acc;
             padding: 4px 8px;
             border-radius: 4px;
             font-size: 0.8em;
@@ -280,7 +317,7 @@
             position: absolute;
             top: 10px;
             right: 80px;
-            background: rgba(102, 126, 234, 0.8);
+            background: rgba(0, 122, 204, 0.8);
             color: white;
             border: none;
             padding: 5px 10px;
@@ -296,7 +333,7 @@
         }
         
         .copy-btn:hover {
-            background: rgba(102, 126, 234, 1);
+            background: rgba(0, 122, 204, 1);
         }
 
         /* Syntax highlighting for code */
@@ -313,21 +350,22 @@
         }
 
         .comparison-card {
-            background: white;
+            background: #2a2a2a;
+            color: #e8e8e8;
             padding: 20px;
             border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            border-top: 4px solid #667eea;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border-top: 4px solid #27ae60;
         }
 
         .comparison-card.sync {
-            border-top-color: #ff9a9e;
-            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border-top-color: #e74c3c;
+            background: linear-gradient(135deg, #3a2d1f, #4a3a28);
         }
 
         .comparison-card.async {
-            border-top-color: #667eea;
-            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            border-top-color: #27ae60;
+            background: linear-gradient(135deg, #2d3f2d, #3a4a3a);
         }
 
         .feature-grid {
@@ -338,12 +376,13 @@
         }
 
         .feature-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #3a4a5c, #2c3e50);
             padding: 25px;
             border-radius: 15px;
             color: white;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
             transition: transform 0.3s ease;
+            border: 1px solid #444;
         }
 
         .feature-card:hover {
@@ -364,29 +403,31 @@
         }
 
         .use-case {
-            background: white;
+            background: #2a2a2a;
+            color: #e8e8e8;
             padding: 20px;
             border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            border-top: 4px solid #667eea;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border-top: 4px solid #27ae60;
             transition: transform 0.3s ease;
         }
 
         .use-case:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
         }
 
         .use-case h4 {
-            color: #2c3e50;
+            color: #e8e8e8;
             margin-bottom: 15px;
         }
 
         .benefits-list {
-            background: #f0f8ff;
+            background: #2d3f2d;
+            color: #e8e8e8;
             padding: 20px;
             border-radius: 15px;
-            border-left: 5px solid #667eea;
+            border-left: 5px solid #27ae60;
             margin: 15px 0;
         }
 
@@ -410,24 +451,26 @@
         }
 
         .warning-box {
-            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            background: linear-gradient(135deg, #3a2d1f, #4a3a28);
+            color: #e8e8e8;
             padding: 20px;
             border-radius: 15px;
             margin: 20px 0;
-            border-left: 5px solid #ff6b6b;
+            border-left: 5px solid #e74c3c;
         }
 
         .warning-box h4 {
-            color: #c0392b;
+            color: #e74c3c;
             margin-bottom: 15px;
         }
 
         .success-box {
-            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            background: linear-gradient(135deg, #2d3f2d, #3a4a3a);
+            color: #e8e8e8;
             padding: 20px;
             border-radius: 15px;
             margin: 20px 0;
-            border-left: 5px solid #28a745;
+            border-left: 5px solid #27ae60;
         }
 
         .success-box h4 {
@@ -439,30 +482,32 @@
             width: 100%;
             border-collapse: collapse;
             margin: 20px 0;
-            background: white;
+            background: #2a2a2a;
             border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
 
         th, td {
             padding: 15px;
             text-align: left;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid #444;
+            color: #e8e8e8;
         }
 
         th {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #3a4a5c, #2c3e50);
             color: white;
             font-weight: 600;
         }
 
         tr:hover {
-            background-color: #f8f9ff;
+            background-color: #3a4a5c;
         }
 
         .highlight {
-            background: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
+            background: linear-gradient(120deg, #27ae60 0%, #74b9ff 100%);
+            color: white;
             padding: 2px 6px;
             border-radius: 4px;
             font-weight: 600;
@@ -474,12 +519,13 @@
         }
 
         .performance-stats {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #3a4a5c, #2c3e50);
             color: white;
             padding: 25px;
             border-radius: 15px;
             margin: 20px 0;
             text-align: center;
+            border: 1px solid #444;
         }
 
         .performance-stats h4 {
@@ -527,12 +573,14 @@
         .nav {
             position: sticky;
             top: 20px;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(30, 30, 30, 0.9);
             padding: 15px;
             border-radius: 10px;
             margin-bottom: 20px;
             backdrop-filter: blur(10px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border: 1px solid #444;
+            z-index: 1002;
         }
 
         .nav ul {
@@ -544,7 +592,7 @@
         }
 
         .nav a {
-            color: #2c3e50;
+            color: #74b9ff;
             text-decoration: none;
             padding: 8px 12px;
             border-radius: 6px;
@@ -553,7 +601,7 @@
         }
 
         .nav a:hover {
-            background: #667eea;
+            background: #27ae60;
             color: white;
         }
     </style>
@@ -563,15 +611,19 @@
     
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <h2>🐍 Python Guides</h2>
+            <h2><a href="../Python.html" style="color: #ecf0f1; text-decoration: none;">🐍 Python Guides</a></h2>
         </div>
         <nav class="sidebar-nav">
             <div class="sidebar-section">
                 <div class="sidebar-section-title" onclick="toggleSection(this)">
-                    🤖 Agentic AI <span>▶</span>
+                    🐍 Basic Python <span>▶</span>
                 </div>
                 <div class="sidebar-links">
-                    <a href="../Agentic AI/agentic-ai-guide.html">AI Agents Guide</a>
+                    <a href="../1.Basic Python/basic-python-guide.html">Python Fundamentals</a>
+                    <a href="../1.Basic Python/1.Python Concepts/python-concepts.html">Core Concepts</a>
+                    <a href="../1.Basic Python/2.Data Structures/python-data-structures.html">Data Structures</a>
+                    <a href="../1.Basic Python/3.Algorithms & Problem Solving/algorithms-problem-solving.html">Algorithms & Problem Solving</a>
+                    <a href="../1.Basic Python/4.Testing & Debugging/testing-debugging.html">Testing & Debugging</a>
                 </div>
             </div>
             <div class="sidebar-section active">
@@ -580,14 +632,6 @@
                 </div>
                 <div class="sidebar-links">
                     <a href="../2.Async Programming/async-programming-guide.html" class="current">Asyncio & Concurrency</a>
-                </div>
-            </div>
-            <div class="sidebar-section">
-                <div class="sidebar-section-title" onclick="toggleSection(this)">
-                    🎨 Decorators <span>▶</span>
-                </div>
-                <div class="sidebar-links">
-                    <a href="../Decorators/decorators-guide.html">Python Decorators</a>
                 </div>
             </div>
             <div class="sidebar-section">
@@ -609,7 +653,7 @@
                     🦜 LangChain <span>▶</span>
                 </div>
                 <div class="sidebar-links">
-                    <a href="../LangChain/langchain-documentation.html">LangChain Framework</a>
+                    <a href="../4.LangChain/langchain-documentation.html">LangChain Framework</a>
                 </div>
             </div>
             <div class="sidebar-section">
@@ -617,7 +661,15 @@
                     📊 LangGraph <span>▶</span>
                 </div>
                 <div class="sidebar-links">
-                    <a href="../LangGraph/langgraph-guide.html">Graph-based AI</a>
+                    <a href="../5.LangGraph/langgraph-guide.html">Graph-based AI</a>
+                </div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-section-title" onclick="toggleSection(this)">
+                    🤖 Agentic AI <span>▶</span>
+                </div>
+                <div class="sidebar-links">
+                    <a href="../7.Agentic AI/agentic-ai-guide.html">AI Agents Guide</a>
                 </div>
             </div>
         </nav>
@@ -629,25 +681,14 @@
         
         <nav class="nav">
             <ul>
-                <li><a href="#what-is-async">What is Async?</a></li>
-                <li><a href="#under-the-hood">Under the Hood</a></li>
-                <li><a href="#use-cases">Use Cases</a></li>
-                <li><a href="#fastapi">FastAPI</a></li>
-                <li><a href="#best-practices">Best Practices</a></li>
-                <li><a href="#pitfalls">Pitfalls</a></li>
-                <li><a href="#advanced">Advanced</a></li>
-                <li><a href="#performance">Performance</a></li>
-            </ul>
-        </nav>        <nav class="nav">
-            <ul>
-                <li><a href="#what-is-async" class="nav-link">🎯 What is Async?</a></li>
-                <li><a href="#under-the-hood" class="nav-link">⚙️ Under the Hood</a></li>
-                <li><a href="#use-cases" class="nav-link">🌍 Use Cases</a></li>
-                <li><a href="#fastapi" class="nav-link">🚀 FastAPI</a></li>
-                <li><a href="#best-practices" class="nav-link">🎯 Best Practices</a></li>
-                <li><a href="#pitfalls" class="nav-link">⚠️ Pitfalls</a></li>
-                <li><a href="#advanced" class="nav-link">🔬 Advanced</a></li>
-                <li><a href="#performance" class="nav-link">📊 Performance</a></li>
+                <li><a href="#what-is-async" class="nav-link">What is Async?</a></li>
+                <li><a href="#under-the-hood" class="nav-link">Under the Hood</a></li>
+                <li><a href="#use-cases" class="nav-link">Use Cases</a></li>
+                <li><a href="#fastapi" class="nav-link">FastAPI</a></li>
+                <li><a href="#best-practices" class="nav-link">Best Practices</a></li>
+                <li><a href="#pitfalls" class="nav-link">Pitfalls</a></li>
+                <li><a href="#advanced" class="nav-link">Advanced</a></li>
+                <li><a href="#performance" class="nav-link">Performance</a></li>
             </ul>
         </nav>
 
@@ -1423,9 +1464,10 @@ asyncio.run(main())</code></pre>
             });
 
             navLinks.forEach(link => {
-                link.style.background = '';                link.style.color = '#2c3e50';
+                link.style.background = '';
+                link.style.color = '#74b9ff';
                 if (link.getAttribute('href') === '#' + current) {
-                    link.style.background = '#667eea';
+                    link.style.background = '#27ae60';
                     link.style.color = 'white';
                 }
             });
@@ -1474,9 +1516,10 @@ asyncio.run(main())</code></pre>
                 const targetElement = document.getElementById(targetId);
                 
                 if (targetElement) {
-                    targetElement.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
+                    const offsetTop = targetElement.offsetTop - 80;
+                    window.scrollTo({
+                        top: offsetTop,
+                        behavior: 'smooth'
                     });
                 }
                 
@@ -1493,9 +1536,9 @@ asyncio.run(main())</code></pre>
             
             let current = '';
             sections.forEach(section => {
-                const sectionTop = section.offsetTop;
+                const sectionTop = section.offsetTop - 250;
                 const sectionHeight = section.clientHeight;
-                if (window.pageYOffset >= sectionTop - 200) {
+                if (window.pageYOffset >= sectionTop) {
                     current = section.getAttribute('id');
                 }
             });

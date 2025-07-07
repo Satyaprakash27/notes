@@ -9,11 +9,17 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }        body {
+        }
+        
+        html {
+            scroll-padding-top: 150px;
+        }
+
+        body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
-            color: #333;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #e0e0e0;
+            background: #0d1117;
             min-height: 100vh;
             margin: 0;
             display: flex;
@@ -21,8 +27,8 @@
 
         .sidebar {
             width: 280px;
-            background: #2c3e50;
-            color: white;
+            background: #161b22;
+            color: #f0f6fc;
             height: 100vh;
             position: fixed;
             left: 0;
@@ -30,18 +36,19 @@
             overflow-y: auto;
             z-index: 1000;
             transition: transform 0.3s ease;
+            border-right: 1px solid #30363d;
         }
 
         .sidebar-header {
             padding: 20px;
-            background: #34495e;
-            border-bottom: 1px solid #455a75;
+            background: #21262d;
+            border-bottom: 1px solid #30363d;
         }
 
         .sidebar-header h2 {
             margin: 0;
             font-size: 1.3em;
-            color: #ecf0f1;
+            color: #f0f6fc;
             border: none;
             padding: 0;
         }
@@ -51,12 +58,12 @@
         }
 
         .sidebar-section {
-            border-bottom: 1px solid #455a75;
+            border-bottom: 1px solid #30363d;
         }
 
         .sidebar-section-title {
-            background: #34495e;
-            color: #ecf0f1;
+            background: #21262d;
+            color: #f0f6fc;
             padding: 15px 20px;
             margin: 0;
             font-size: 1.1em;
@@ -69,11 +76,11 @@
         }
 
         .sidebar-section-title:hover {
-            background: #455a75;
+            background: #30363d;
         }
 
         .sidebar-links {
-            background: #2c3e50;
+            background: #161b22;
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.3s ease;
@@ -85,20 +92,20 @@
 
         .sidebar-links a {
             display: block;
-            color: #bdc3c7;
+            color: #8b949e;
             text-decoration: none;
             padding: 12px 25px;
-            border-bottom: 1px solid #34495e;
+            border-bottom: 1px solid #21262d;
             transition: background 0.2s ease;
         }
 
         .sidebar-links a:hover {
-            background: #34495e;
-            color: #ecf0f1;
+            background: #21262d;
+            color: #f0f6fc;
         }
 
         .sidebar-links a.current {
-            background: #3498db;
+            background: #1976d2;
             color: white;
             font-weight: 600;
         }
@@ -109,7 +116,7 @@
             top: 20px;
             left: 20px;
             z-index: 1001;
-            background: #3498db;
+            background: #1976d2;
             color: white;
             border: none;
             padding: 10px;
@@ -148,38 +155,36 @@
         }
 
         .header {
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(30, 30, 30, 0.95);
             padding: 2rem;
             border-radius: 15px;
             margin-bottom: 2rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
             text-align: center;
+            border: 1px solid #333;
         }
 
         .header h1 {
-            color: #2c3e50;
+            color: #e0e0e0;
             font-size: 2.5rem;
             margin-bottom: 0.5rem;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
         }
 
         .header p {
-            color: #666;
+            color: #b0b0b0;
             font-size: 1.2rem;
         }
 
         .nav {
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(30, 30, 30, 0.95);
             padding: 1rem;
             border-radius: 10px;
             margin-bottom: 2rem;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
             position: sticky;
             top: 20px;
-            z-index: 100;
+            z-index: 999;
+            border: 1px solid #333;
         }
 
         .nav ul {
@@ -191,7 +196,7 @@
         }
 
         .nav a {
-            color: #667eea;
+            color: #64b5f6;
             text-decoration: none;
             padding: 0.5rem 1rem;
             border-radius: 25px;
@@ -200,19 +205,32 @@
         }
 
         .nav a:hover, .nav a.active {
-            background: linear-gradient(45deg, #667eea, #764ba2);
+            background: #1976d2;
             color: white;
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 5px 15px rgba(25, 118, 210, 0.4);
         }
 
         .content {
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(30, 30, 30, 0.95);
             padding: 2rem;
             border-radius: 15px;
             margin-bottom: 2rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             backdrop-filter: blur(10px);
+            border: 1px solid #333;
+        }
+
+        .content p {
+            color: #e0e0e0;
+        }
+
+        .content li {
+            color: #e0e0e0;
+        }
+
+        .content ul {
+            color: #e0e0e0;
         }
 
         .section {
@@ -220,24 +238,24 @@
         }
 
         h2 {
-            color: #2c3e50;
+            color: #e0e0e0;
             font-size: 2rem;
             margin-bottom: 1rem;
             padding-bottom: 0.5rem;
-            border-bottom: 3px solid #667eea;
+            border-bottom: 3px solid #1976d2;
             position: relative;
         }
 
         h3 {
-            color: #34495e;
+            color: #b0b0b0;
             font-size: 1.5rem;
             margin: 2rem 0 1rem 0;
             padding-left: 1rem;
-            border-left: 4px solid #764ba2;
+            border-left: 4px solid #1976d2;
         }
 
         h4 {
-            color: #555;
+            color: #90a4ae;
             font-size: 1.2rem;
             margin: 1.5rem 0 0.5rem 0;
         }
@@ -264,7 +282,7 @@
             position: absolute;
             top: 10px;
             right: 10px;
-            background: #667eea;
+            background: #1976d2;
             color: white;
             border: none;
             padding: 0.5rem 1rem;
@@ -275,7 +293,7 @@
         }
 
         .copy-btn:hover {
-            background: #764ba2;
+            background: #1565c0;
             transform: scale(1.05);
         }
 
@@ -283,39 +301,41 @@
             width: 100%;
             border-collapse: collapse;
             margin: 1.5rem 0;
-            background: white;
+            background: #1a1a1a;
             border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border: 1px solid #333;
         }
 
         .comparison-table th,
         .comparison-table td {
             padding: 1rem;
             text-align: left;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid #333;
+            color: #e0e0e0;
         }
 
         .comparison-table th {
-            background: linear-gradient(45deg, #667eea, #764ba2);
+            background: #1976d2;
             color: white;
             font-weight: 600;
         }
 
         .comparison-table tr:hover {
-            background: #f8f9ff;
+            background: #2a2a2a;
         }
 
         .highlight-box {
-            background: linear-gradient(135deg, #667eea20, #764ba220);
-            border: 2px solid #667eea;
+            background: rgba(25, 118, 210, 0.1);
+            border: 2px solid #1976d2;
             border-radius: 10px;
             padding: 1.5rem;
             margin: 1.5rem 0;
         }
 
         .highlight-box h4 {
-            color: #667eea;
+            color: #64b5f6;
             margin-top: 0;
         }
 
@@ -327,27 +347,32 @@
         }
 
         .feature-card {
-            background: white;
+            background: rgba(30, 30, 30, 0.9);
             padding: 1.5rem;
             border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            border-left: 4px solid #667eea;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border-left: 4px solid #1976d2;
             transition: transform 0.3s ease;
+            border: 1px solid #333;
         }
 
         .feature-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
         }
 
         .feature-card h4 {
-            color: #667eea;
+            color: #64b5f6;
             margin-bottom: 1rem;
         }
 
+        .feature-card p {
+            color: #b0b0b0;
+        }
+
         .workflow-diagram {
-            background: linear-gradient(135deg, #f8f9ff, #e8ecff);
-            border: 2px solid #667eea;
+            background: rgba(30, 30, 30, 0.9);
+            border: 2px solid #1976d2;
             border-radius: 10px;
             padding: 2rem;
             margin: 2rem 0;
@@ -356,7 +381,7 @@
 
         .workflow-step {
             display: inline-block;
-            background: #667eea;
+            background: #1976d2;
             color: white;
             padding: 0.5rem 1rem;
             border-radius: 25px;
@@ -366,31 +391,33 @@
 
         .workflow-arrow {
             font-size: 1.5rem;
-            color: #764ba2;
+            color: #64b5f6;
             margin: 0 0.5rem;
         }
 
         .best-practice {
-            background: #e8f5e8;
-            border-left: 4px solid #27ae60;
+            background: rgba(46, 125, 50, 0.2);
+            border-left: 4px solid #4caf50;
             padding: 1rem 1.5rem;
             margin: 1rem 0;
             border-radius: 5px;
+            color: #e0e0e0;
         }
 
         .best-practice:before {
             content: "✓ ";
-            color: #27ae60;
+            color: #4caf50;
             font-weight: bold;
             font-size: 1.2rem;
         }
 
         .warning {
-            background: #fff3cd;
+            background: rgba(255, 193, 7, 0.2);
             border-left: 4px solid #ffc107;
             padding: 1rem 1.5rem;
             margin: 1rem 0;
             border-radius: 5px;
+            color: #e0e0e0;
         }
 
         .warning:before {
@@ -437,7 +464,7 @@
     
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <h2><a href="../Python.html" style="color: #ecf0f1; text-decoration: none;">🐍 Python Guides</a></h2>
+            <h2><a href="../Python.html" style="color: #f0f6fc; text-decoration: none;">🐍 Python Guides</a></h2>
         </div>
         <nav class="sidebar-nav">
             <div class="sidebar-section">
@@ -1331,11 +1358,10 @@ def streaming_processor(state: LargeDataState):
             const codeBlock = button.nextElementSibling.textContent;
             navigator.clipboard.writeText(codeBlock).then(() => {
                 const originalText = button.textContent;
-                button.textContent = 'Copied!';
-                button.style.background = '#27ae60';
-                setTimeout(() => {
-                    button.textContent = originalText;
-                    button.style.background = '#667eea';
+                button.textContent = 'Copied!';                    button.style.background = '#4caf50';
+                    setTimeout(() => {
+                        button.textContent = originalText;
+                        button.style.background = '#1976d2';
                 }, 2000);
             });
         }
@@ -1348,9 +1374,10 @@ def streaming_processor(state: LargeDataState):
                 const targetElement = document.getElementById(targetId);
                 
                 if (targetElement) {
-                    targetElement.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
+                    const offsetTop = targetElement.offsetTop + 200; // Account for sticky nav
+                    window.scrollTo({
+                        top: offsetTop,
+                        behavior: 'smooth'
                     });
                 }
                 
