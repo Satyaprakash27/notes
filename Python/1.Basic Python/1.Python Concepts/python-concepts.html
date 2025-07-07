@@ -11,11 +11,15 @@
             box-sizing: border-box;
         }
 
+        html {
+            scroll-padding-top: 100px;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
-            color: #333;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #e8e8e8;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
             min-height: 100vh;
             margin: 0;
             display: flex;
@@ -23,7 +27,7 @@
 
         .sidebar {
             width: 280px;
-            background: #2c3e50;
+            background: #1e1e1e;
             color: white;
             height: 100vh;
             position: fixed;
@@ -32,19 +36,20 @@
             overflow-y: auto;
             z-index: 1000;
             transition: transform 0.3s ease;
+            border-right: 1px solid #333;
         }
 
         .sidebar-header {
             padding: 20px;
-            background: #34495e;
-            border-bottom: 1px solid #455a75;
+            background: #2d2d2d;
+            border-bottom: 1px solid #444;
         }
 
         .sidebar-header h2 {
             margin: 0;
             font-size: 1.3em;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #ecf0f1;
+            color: #f0f0f0;
             border: none;
             padding: 0;
         }
@@ -54,12 +59,12 @@
         }
 
         .sidebar-section {
-            border-bottom: 1px solid #455a75;
+            border-bottom: 1px solid #444;
         }
 
         .sidebar-section-title {
-            background: #34495e;
-            color: #ecf0f1;
+            background: #2d2d2d;
+            color: #f0f0f0;
             padding: 15px 20px;
             margin: 0;
             font-size: 1.1em;
@@ -73,11 +78,11 @@
         }
 
         .sidebar-section-title:hover {
-            background: #455a75;
+            background: #3a3a3a;
         }
 
         .sidebar-links {
-            background: #2c3e50;
+            background: #1e1e1e;
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.3s ease;
@@ -89,22 +94,22 @@
 
         .sidebar-links a {
             display: block;
-            color: #bdc3c7;
+            color: #b8b8b8;
             text-decoration: none;
             padding: 12px 25px;
-            border-bottom: 1px solid #34495e;
+            border-bottom: 1px solid #444;
             transition: background 0.2s ease;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             font-size: 0.95em;
         }
 
         .sidebar-links a:hover {
-            background: #34495e;
-            color: #ecf0f1;
+            background: #3a3a3a;
+            color: #f0f0f0;
         }
 
         .sidebar-links a.current {
-            background: #3498db;
+            background: #27ae60;
             color: white;
             font-weight: 600;
         }
@@ -115,7 +120,7 @@
             top: 20px;
             left: 20px;
             z-index: 1001;
-            background: #3498db;
+            background: #27ae60;
             color: white;
             border: none;
             padding: 10px;
@@ -133,11 +138,12 @@
             max-width: 1000px;
             margin: 0 auto;
             padding: 20px;
-            background: white;
+            background: rgba(30, 30, 30, 0.95);
             margin-top: 20px;
             margin-bottom: 20px;
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid #444;
         }
 
         main {
@@ -181,11 +187,11 @@
         }
 
         h1 {
-            color: #2c3e50;
+            color: #f0f0f0;
             text-align: center;
             margin-bottom: 30px;
             font-size: 2.5em;
-            background: linear-gradient(45deg, #3498db, #e74c3c);
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -210,14 +216,14 @@
         }
 
         h3 {
-            color: #34495e;
+            color: #2ecc71;
             margin-top: 25px;
             margin-bottom: 15px;
             font-size: 1.3em;
         }
 
         h4 {
-            color: #2c3e50;
+            color: #b8b8b8;
             margin-top: 20px;
             margin-bottom: 10px;
             font-size: 1.1em;
@@ -232,7 +238,7 @@
         }
 
         .intro {
-            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
             color: white;
             padding: 30px;
             border-radius: 10px;
@@ -277,12 +283,13 @@
         .code-block.txt { border-left-color: #6c757d; }
 
         .highlight-box {
-            background: linear-gradient(135deg, #ffecd2, #fcb69f);
+            background: #2d1810;
             border: 2px solid #ff6b6b;
             border-radius: 10px;
             padding: 20px;
             margin: 20px 0;
             position: relative;
+            color: #ff9999;
         }
 
         .highlight-box::before {
@@ -304,12 +311,13 @@
         }
 
         .theory-box {
-            background: linear-gradient(135deg, #e8f5e8, #f0f8ff);
+            background: #1a3d2e;
             border: 2px solid #27ae60;
             border-radius: 10px;
             padding: 20px;
             margin: 20px 0;
             position: relative;
+            color: #e8e8e8;
         }
 
         .theory-box::before {
@@ -325,12 +333,13 @@
         }
 
         .interview-box {
-            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            background: #3d2914;
             border: 2px solid #f39c12;
             border-radius: 10px;
             padding: 20px;
             margin: 20px 0;
             position: relative;
+            color: #ffb84d;
         }
 
         .interview-box::before {
@@ -346,15 +355,15 @@
         }
 
         .toc {
-            background: #f8f9fa;
-            border: 2px solid #dee2e6;
+            background: #2a2a2a;
+            border: 2px solid #555;
             border-radius: 10px;
             padding: 20px;
             margin: 20px 0;
         }
 
         .toc h3 {
-            color: #495057;
+            color: #f0f0f0;
             margin-bottom: 15px;
             text-align: center;
         }
@@ -366,10 +375,10 @@
         }
 
         .toc-column h4 {
-            color: #2c3e50;
+            color: #27ae60;
             margin-bottom: 10px;
             padding-bottom: 5px;
-            border-bottom: 2px solid #3498db;
+            border-bottom: 2px solid #27ae60;
             font-size: 1.1em;
         }
 
@@ -383,7 +392,7 @@
         }
 
         .toc a {
-            color: #007bff;
+            color: #27ae60;
             text-decoration: none;
             padding: 5px 10px;
             border-radius: 5px;
@@ -392,7 +401,7 @@
         }
 
         .toc a:hover {
-            background: #007bff;
+            background: #27ae60;
             color: white;
         }
 
@@ -406,10 +415,10 @@
         }
 
         blockquote {
-            border-left: 4px solid #3498db;
+            border-left: 4px solid #27ae60;
             padding-left: 15px;
             margin: 20px 0;
-            color: #555;
+            color: #b8b8b8;
             font-style: italic;
         }
 
@@ -421,7 +430,7 @@
         }
 
         .feature-card {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
             color: white;
             padding: 20px;
             border-radius: 10px;
@@ -450,12 +459,13 @@
         }
 
         .interview-question {
-            background: linear-gradient(135deg, #fff9c4, #f7e98e);
+            background: #3d2914;
             border: 2px solid #f39c12;
             border-radius: 10px;
             padding: 20px;
             margin: 15px 0;
             position: relative;
+            color: #ffb84d;
         }
 
         .interview-question::before {
@@ -471,7 +481,7 @@
         }
 
         .interview-question strong {
-            color: #d35400;
+            color: #ff9966;
             display: block;
             margin-bottom: 10px;
             font-size: 1.1em;
@@ -505,7 +515,8 @@
         }
 
         .highlight {
-            background: #ffeb3b;
+            background: #ffcc00;
+            color: #333;
             padding: 2px 4px;
             border-radius: 3px;
             font-weight: bold;
@@ -526,26 +537,26 @@
 
         /* Navigation styles */
         .nav {
-            background: rgba(255, 255, 255, 0.9);
-            padding: 0.25rem;
-            border-radius: 6px;
-            margin-bottom: 1rem;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+            background: rgba(30, 30, 30, 0.95);
+            padding: 0.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
             position: sticky;
             top: 10px;
             z-index: 100;
             backdrop-filter: blur(4px);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            max-height: 120px;
+            border: 1px solid #444;
+            max-height: 150px;
             overflow-y: auto;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
         }
 
         .nav ul {
             list-style: none;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 0.15rem;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 0.3rem;
             margin: 0;
             padding: 0;
         }
@@ -555,13 +566,13 @@
         }
 
         .nav-link {
-            color: #5a67d8;
+            color: #27ae60;
             text-decoration: none;
-            padding: 0.2rem 0.4rem;
-            border-radius: 4px;
+            padding: 0.4rem 0.6rem;
+            border-radius: 5px;
             transition: all 0.15s ease;
-            font-weight: 400;
-            font-size: 0.75rem;
+            font-weight: 500;
+            font-size: 0.8rem;
             display: block;
             white-space: nowrap;
             overflow: hidden;
@@ -570,7 +581,7 @@
         }
 
         .nav-link:hover, .nav-link.active {
-            background: #5a67d8;
+            background: #27ae60;
             color: white;
             transform: none;
             box-shadow: none;
@@ -2603,9 +2614,10 @@ print(two_sum([2, 7, 11, 15], 9))  # [0, 1]</div>
                         const targetElement = document.getElementById(targetId);
                         
                         if (targetElement) {
-                            targetElement.scrollIntoView({
-                                behavior: 'smooth',
-                                block: 'start'
+                            const offsetTop = targetElement.offsetTop - 120; // Add offset for sticky nav
+                            window.scrollTo({
+                                top: offsetTop,
+                                behavior: 'smooth'
                             });
                         }
                         
@@ -2622,9 +2634,9 @@ print(two_sum([2, 7, 11, 15], 9))  # [0, 1]</div>
                     
                     let current = '';
                     sections.forEach(section => {
-                        const sectionTop = section.offsetTop;
+                        const sectionTop = section.offsetTop - 120; // Account for sticky nav offset
                         const sectionHeight = section.clientHeight;
-                        if (window.pageYOffset >= sectionTop - 200) {
+                        if (window.pageYOffset >= sectionTop) {
                             current = section.getAttribute('id');
                         }
                     });

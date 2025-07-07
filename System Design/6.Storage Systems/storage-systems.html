@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💾 Storage Systems Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #e8e8e8;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: #1e1e1e;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            border-right: 1px solid #333;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background: #2d2d2d;
+            border-bottom: 1px solid #444;
+        }
+
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 1.3em;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #f0f0f0;
+            border: none;
+            padding: 0;
+        }
+
+        .sidebar-nav {
+            padding: 0;
+        }
+
+        .sidebar-link {
+            display: block;
+            color: #b8b8b8;
+            text-decoration: none;
+            padding: 15px 20px;
+            border-bottom: 1px solid #444;
+            transition: background 0.2s ease;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 1.1em;
+            font-weight: 500;
+        }
+
+        .sidebar-link:hover {
+            background: #3a3a3a;
+            color: #f0f0f0;
+        }
+
+        .sidebar-link.current {
+            background: #3498db;
+            color: white;
+            font-weight: 600;
+        }
+
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(30, 30, 30, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid #444;
+        }
+        h1 {
+            color: #f0f0f0;
+            text-align: center;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #e0e0e0;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+            margin-top: 30px;
+            font-size: 1.8em;
+        }
+        h3 {
+            color: #3498db;
+            margin-top: 25px;
+            font-size: 1.4em;
+        }
+        h4 {
+            color: #5dade2;
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+        .toc {
+            background: rgba(52, 152, 219, 0.15);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(52, 152, 219, 0.3);
+        }
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-evenly;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .toc li {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex: 0 1 calc(23% - 0.5rem);
+            min-width: 140px;
+        }
+        .toc a {
+            color: #e0e0e0;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            white-space: nowrap;
+            background: rgba(50, 50, 50, 0.7);
+            border: 1px solid rgba(52, 152, 219, 0.3);
+            min-height: 40px;
+            width: 100%;
+        }
+        .toc a:hover, .toc a.active {
+            background: linear-gradient(45deg, #3498db, #5dade2);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+        
+        pre {
+            background: #000000;
+            color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        code {
+            background: #000000;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #ffffff;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: #2a2a2a;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        th, td {
+            border: 1px solid #444;
+            padding: 12px;
+            text-align: left;
+            color: #e0e0e0;
+        }
+        th {
+            background: #3498db;
+            color: white;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background: #333;
+        }
+        tr:hover {
+            background: #404040;
+        }
+        .warning {
+            background: #3a2f1a;
+            border: 1px solid #b8860b;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #ffd700;
+        }
+        .warning::before {
+            content: "⚠️ ";
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .tip {
+            background: #1a3a2f;
+            border: 1px solid #27ae60;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #7bed9f;
+        }
+        .tip::before {
+            content: "💡 ";
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .example {
+            background: #2a2a2a;
+            border-left: 4px solid #17a2b8;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #e0e0e0;
+        }
+        .example h5 {
+            margin-top: 0;
+            color: #17a2b8;
+            font-size: 1.1em;
+        }
+        .benefits {
+            background: #1a3a1a;
+            border: 1px solid #3498db;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #90ee90;
+        }
+        .benefits ul {
+            margin: 10px 0;
+        }
+        .benefits li {
+            margin: 5px 0;
+        }
+        .comparison {
+            background: #3a1a1a;
+            border: 1px solid #e74c3c;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #ffb3b3;
+        }
+        .reliability {
+            background: #1a3a1a;
+            border: 1px solid #27ae60;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #90ee90;
+        }
+        .storage-service {
+            background: #2a2a3a;
+            border: 1px solid #9b59b6;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #e0e0f0;
+        }
+        .raid-info {
+            background: #1a2a3a;
+            border: 1px solid #f39c12;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #f8c471;
+        }
+
+        @media (max-width: 1024px) {
+            .toc ul {
+                justify-content: center;
+                gap: 0.75rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .sidebar-toggle {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            h2 {
+                font-size: 1.5em;
+            }
+
+            table {
+                font-size: 0.9em;
+            }
+
+            .toc {
+                position: static;
+                margin: 20px 0;
+            }
+
+            .toc ul {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+    
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2><a href="../system-design.html" style="color: inherit; text-decoration: none;">🗂️ System Design</a></h2>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="../1.Fundamentals/system-design-fundamentals.html" class="sidebar-link">
+                🏗️ Fundamentals
+            </a>
+            <a href="../2.Networking & Communication/networking-communication.html" class="sidebar-link">
+                🌐 Networking & Communication
+            </a>
+            <a href="../3.Databases/databases.html" class="sidebar-link">
+                🗃️ Databases
+            </a>
+            <a href="../4.Caching/caching.html" class="sidebar-link">
+                🗄️ Caching
+            </a>
+            <a href="../5.Message Queues & Event-Driven Systems/message-queues-event-driven.html" class="sidebar-link">
+                📬 Message Queues & Events
+            </a>
+            <a href="../6.Storage Systems/storage-systems.html" class="sidebar-link current">
+                💾 Storage Systems
+            </a>
+            <a href="../7.Design Patterns & Architecture/design-patterns-architecture.html" class="sidebar-link">
+                🏛️ Design Patterns
+            </a>
+            <a href="../8.Scalability & Performance/scalability-performance.html" class="sidebar-link">
+                📈 Scalability & Performance
+            </a>
+            <a href="../9.Security in System Design/security-system-design.html" class="sidebar-link">
+                🔒 Security
+            </a>
+            <a href="../10.Monitoring & Observability/monitoring-observability.html" class="sidebar-link">
+                📊 Monitoring & Observability
+            </a>
+            <a href="../11.Deployment & DevOps/deployment-devops.html" class="sidebar-link">
+                🚀 Deployment & DevOps
+            </a>
+            <a href="../12.Popular Use Cases/popular-use-cases.html" class="sidebar-link">
+                🎯 Popular Use Cases
+            </a>
+            <a href="../13.Trade-offs & Decision Making/trade-offs-decision-making.html" class="sidebar-link">
+                ⚖️ Trade-offs & Decisions
+            </a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="container">
+        <h1>💾 Storage Systems Guide</h1>
+        
+        <div class="toc" id="toc">
+            <ul>
+                <li><a href="#file-vs-object">File vs Object Storage</a></li>
+                <li><a href="#blob-stores">Blob Stores</a></li>
+                <li><a href="#reliability-redundancy">Reliability & Redundancy</a></li>
+                <li><a href="#raid-replication-backups">RAID, Replication & Backups</a></li>
+            </ul>
+        </div>
+
+        <h2 id="file-vs-object">File Storage vs Object Storage</h2>
+        <p>Understanding the fundamental differences between file storage and object storage is crucial for designing scalable and efficient systems. Each storage type has distinct characteristics, advantages, and use cases that make them suitable for different scenarios.</p>
+
+        <h3>File Storage</h3>
+        <p>File storage is the traditional hierarchical storage system where data is organized in folders and files with a directory structure, similar to how files are organized on a personal computer.</p>
+
+        <div class="example">
+            <h5>File Storage Characteristics:</h5>
+            <ul>
+                <li><strong>Hierarchical Structure:</strong> Files are organized in a tree-like directory structure</li>
+                <li><strong>POSIX Compliance:</strong> Supports standard file operations (read, write, delete, rename)</li>
+                <li><strong>Metadata:</strong> Limited metadata capabilities</li>
+                <li><strong>Access Protocol:</strong> Accessed via file system protocols (NFS, SMB, CIFS)</li>
+                <li><strong>Scalability:</strong> Limited horizontal scalability</li>
+            </ul>
+        </div>
+
+        <div class="benefits">
+            <h4>File Storage Advantages:</h4>
+            <ul>
+                <li>Familiar interface for users and applications</li>
+                <li>Strong consistency guarantees</li>
+                <li>POSIX compliance for compatibility</li>
+                <li>Fine-grained access control</li>
+                <li>Direct file system access</li>
+            </ul>
+        </div>
+
+        <div class="warning">
+            <h4>File Storage Limitations:</h4>
+            <ul>
+                <li>Limited scalability compared to object storage</li>
+                <li>Complex metadata management</li>
+                <li>Difficult to distribute across multiple locations</li>
+                <li>Performance bottlenecks with large numbers of files</li>
+            </ul>
+        </div>
+
+        <h3>Object Storage</h3>
+        <p>Object storage stores data as objects in a flat namespace, with each object containing data, metadata, and a unique identifier. This architecture is designed for massive scale and cloud-native applications.</p>
+
+        <div class="example">
+            <h5>Object Storage Characteristics:</h5>
+            <ul>
+                <li><strong>Flat Namespace:</strong> No hierarchical directory structure</li>
+                <li><strong>Rich Metadata:</strong> Extensive metadata capabilities</li>
+                <li><strong>Unique Identifiers:</strong> Each object has a unique ID or key</li>
+                <li><strong>REST APIs:</strong> Accessed via HTTP/HTTPS REST APIs</li>
+                <li><strong>Horizontal Scalability:</strong> Designed for massive scale</li>
+            </ul>
+        </div>
+
+        <div class="benefits">
+            <h4>Object Storage Advantages:</h4>
+            <ul>
+                <li>Virtually unlimited scalability</li>
+                <li>Cost-effective for large amounts of data</li>
+                <li>Rich metadata capabilities</li>
+                <li>Built-in redundancy and durability</li>
+                <li>Geographic distribution capabilities</li>
+            </ul>
+        </div>
+
+        <div class="warning">
+            <h4>Object Storage Limitations:</h4>
+            <ul>
+                <li>No file system semantics</li>
+                <li>Eventual consistency in some systems</li>
+                <li>Learning curve for traditional file-based applications</li>
+                <li>Limited transaction support</li>
+            </ul>
+        </div>
+
+        <h3>Comparison Table</h3>
+        <table>
+            <tr>
+                <th>Aspect</th>
+                <th>File Storage</th>
+                <th>Object Storage</th>
+            </tr>
+            <tr>
+                <td><strong>Structure</strong></td>
+                <td>Hierarchical</td>
+                <td>Flat namespace</td>
+            </tr>
+            <tr>
+                <td><strong>Scalability</strong></td>
+                <td>Limited</td>
+                <td>Virtually unlimited</td>
+            </tr>
+            <tr>
+                <td><strong>Metadata</strong></td>
+                <td>Basic</td>
+                <td>Rich and extensible</td>
+            </tr>
+            <tr>
+                <td><strong>Access Method</strong></td>
+                <td>File system protocols</td>
+                <td>REST APIs</td>
+            </tr>
+            <tr>
+                <td><strong>Consistency</strong></td>
+                <td>Strong</td>
+                <td>Eventual (typically)</td>
+            </tr>
+            <tr>
+                <td><strong>Cost</strong></td>
+                <td>Higher per GB</td>
+                <td>Lower per GB</td>
+            </tr>
+            <tr>
+                <td><strong>Performance</strong></td>
+                <td>Lower latency</td>
+                <td>Higher throughput</td>
+            </tr>
+        </table>
+
+        <h2 id="blob-stores">Blob Stores</h2>
+        <p>Blob (Binary Large Object) stores are specialized storage systems designed to store unstructured data such as images, videos, documents, and other binary data. They are a type of object storage optimized for handling large amounts of unstructured data.</p>
+
+        <h3>What are Blob Stores?</h3>
+        <div class="example">
+            <h5>Key Characteristics:</h5>
+            <ul>
+                <li><strong>Unstructured Data:</strong> Store any type of binary data</li>
+                <li><strong>Scalable:</strong> Handle petabytes of data</li>
+                <li><strong>REST APIs:</strong> HTTP-based access</li>
+                <li><strong>Metadata Support:</strong> Rich metadata capabilities</li>
+                <li><strong>Durability:</strong> Built-in redundancy and error correction</li>
+            </ul>
+        </div>
+
+        <h3>Popular Blob Store Services</h3>
+
+        <div class="storage-service">
+            <h4>Amazon S3 (Simple Storage Service)</h4>
+            <ul>
+                <li><strong>Features:</strong> Versioning, lifecycle management, encryption</li>
+                <li><strong>Storage Classes:</strong> Standard, Infrequent Access, Glacier, Deep Archive</li>
+                <li><strong>Durability:</strong> 99.999999999% (11 9's)</li>
+                <li><strong>Use Cases:</strong> Static websites, data archival, content distribution</li>
+            </ul>
+        </div>
+
+        <div class="storage-service">
+            <h4>Azure Blob Storage</h4>
+            <ul>
+                <li><strong>Tiers:</strong> Hot, Cool, Archive</li>
+                <li><strong>Features:</strong> Soft delete, versioning, immutable storage</li>
+                <li><strong>Integration:</strong> Deep integration with Azure services</li>
+                <li><strong>Use Cases:</strong> Backup, media storage, data lakes</li>
+            </ul>
+        </div>
+
+        <div class="storage-service">
+            <h4>Google Cloud Storage</h4>
+            <ul>
+                <li><strong>Classes:</strong> Standard, Nearline, Coldline, Archive</li>
+                <li><strong>Features:</strong> Uniform bucket-level access, object versioning</li>
+                <li><strong>Integration:</strong> Machine learning and analytics services</li>
+                <li><strong>Use Cases:</strong> Content delivery, backup, data analytics</li>
+            </ul>
+        </div>
+
+        <h3>Blob Store Design Patterns</h3>
+
+        <div class="example">
+            <h5>1. Partitioning Strategy</h5>
+            <pre><code>/year/month/day/hour/object_id
+/tenant_id/object_type/object_id
+/hash_prefix/object_id</code></pre>
+        </div>
+
+        <div class="example">
+            <h5>2. Naming Conventions</h5>
+            <ul>
+                <li>Use meaningful prefixes for better organization</li>
+                <li>Include timestamps for time-based queries</li>
+                <li>Avoid sequential naming to prevent hotspots</li>
+            </ul>
+        </div>
+
+        <div class="example">
+            <h5>3. Metadata Management</h5>
+            <ul>
+                <li>Store searchable metadata as object tags</li>
+                <li>Use consistent metadata schemas</li>
+                <li>Index metadata for efficient queries</li>
+            </ul>
+        </div>
+
+        <div class="tip">
+            <h4>Blob Store Best Practices:</h4>
+            <ul>
+                <li><strong>Naming:</strong> Use descriptive and consistent naming conventions</li>
+                <li><strong>Versioning:</strong> Enable versioning for critical data</li>
+                <li><strong>Encryption:</strong> Encrypt sensitive data at rest and in transit</li>
+                <li><strong>Lifecycle:</strong> Implement lifecycle policies for cost optimization</li>
+                <li><strong>Access Control:</strong> Use fine-grained access controls</li>
+            </ul>
+        </div>
+
+        <h2 id="reliability-redundancy">Storage Reliability and Redundancy</h2>
+        <p>Storage reliability and redundancy are critical aspects of system design that ensure data availability, durability, and system resilience. Understanding these concepts helps in designing robust storage solutions.</p>
+
+        <h3>Reliability Metrics</h3>
+
+        <div class="reliability">
+            <h4>Availability</h4>
+            <ul>
+                <li><strong>Definition:</strong> Percentage of time the system is operational</li>
+                <li><strong>Calculation:</strong> Uptime / (Uptime + Downtime) × 100</li>
+                <li><strong>Standards:</strong>
+                    <ul>
+                        <li>99.9% (8.76 hours downtime/year)</li>
+                        <li>99.99% (52.56 minutes downtime/year)</li>
+                        <li>99.999% (5.26 minutes downtime/year)</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <div class="reliability">
+            <h4>Durability</h4>
+            <ul>
+                <li><strong>Definition:</strong> Probability that data will not be lost</li>
+                <li><strong>Measurement:</strong> Expressed as number of 9's (99.999999999%)</li>
+                <li><strong>Factors:</strong> Hardware failures, software bugs, human error</li>
+            </ul>
+        </div>
+
+        <div class="reliability">
+            <h4>Mean Time Between Failures (MTBF)</h4>
+            <ul>
+                <li><strong>Definition:</strong> Average time between system failures</li>
+                <li><strong>Importance:</strong> Helps in capacity planning and maintenance scheduling</li>
+            </ul>
+        </div>
+
+        <div class="reliability">
+            <h4>Mean Time To Recovery (MTTR)</h4>
+            <ul>
+                <li><strong>Definition:</strong> Average time to restore service after failure</li>
+                <li><strong>Components:</strong> Detection time + Response time + Repair time</li>
+            </ul>
+        </div>
+
+        <h3>Redundancy Strategies</h3>
+
+        <div class="example">
+            <h5>Geographic Redundancy</h5>
+            <ul>
+                <li><strong>Multi-Region:</strong> Data replicated across different geographic regions</li>
+                <li><strong>Benefits:</strong> Disaster recovery, regulatory compliance</li>
+                <li><strong>Challenges:</strong> Latency, consistency, cost</li>
+            </ul>
+        </div>
+
+        <div class="example">
+            <h5>Availability Zones</h5>
+            <ul>
+                <li><strong>Definition:</strong> Isolated data centers within a region</li>
+                <li><strong>Purpose:</strong> Protect against localized failures</li>
+                <li><strong>Implementation:</strong> Synchronous replication between zones</li>
+            </ul>
+        </div>
+
+        <div class="example">
+            <h5>Data Center Redundancy</h5>
+            <ul>
+                <li><strong>Power:</strong> Multiple power sources and UPS systems</li>
+                <li><strong>Cooling:</strong> Redundant cooling systems</li>
+                <li><strong>Network:</strong> Multiple network paths and ISPs</li>
+                <li><strong>Hardware:</strong> Redundant servers and storage systems</li>
+            </ul>
+        </div>
+
+        <h3>Failure Modes and Mitigation</h3>
+
+        <div class="warning">
+            <h4>Hardware Failures</h4>
+            <ul>
+                <li><strong>Disk Failures:</strong> Use RAID, regular replacement</li>
+                <li><strong>Server Failures:</strong> Clustering, load balancing</li>
+                <li><strong>Network Failures:</strong> Redundant network paths</li>
+            </ul>
+        </div>
+
+        <div class="warning">
+            <h4>Software Failures</h4>
+            <ul>
+                <li><strong>Application Bugs:</strong> Testing, monitoring, rollback capabilities</li>
+                <li><strong>OS Failures:</strong> Redundant systems, regular updates</li>
+                <li><strong>Database Corruption:</strong> Backups, replication</li>
+            </ul>
+        </div>
+
+        <div class="warning">
+            <h4>Human Error</h4>
+            <ul>
+                <li><strong>Training:</strong> Regular training programs</li>
+                <li><strong>Procedures:</strong> Well-documented procedures</li>
+                <li><strong>Access Control:</strong> Principle of least privilege</li>
+                <li><strong>Automation:</strong> Reduce manual operations</li>
+            </ul>
+        </div>
+
+        <h2 id="raid-replication-backups">RAID, Replication, and Backups</h2>
+        <p>RAID, replication, and backups are fundamental technologies for ensuring data protection, availability, and disaster recovery. Each serves different purposes and provides varying levels of protection.</p>
+
+        <h3>RAID (Redundant Array of Independent Disks)</h3>
+        <p>RAID combines multiple disk drives into a single logical unit to provide data redundancy, performance improvement, or both.</p>
+
+        <div class="raid-info">
+            <h4>RAID 0 (Striping)</h4>
+            <ul>
+                <li><strong>Configuration:</strong> Data striped across multiple disks</li>
+                <li><strong>Performance:</strong> High read/write performance</li>
+                <li><strong>Reliability:</strong> No fault tolerance (failure of one disk loses all data)</li>
+                <li><strong>Use Case:</strong> High-performance applications with external backup</li>
+            </ul>
+        </div>
+
+        <div class="raid-info">
+            <h4>RAID 1 (Mirroring)</h4>
+            <ul>
+                <li><strong>Configuration:</strong> Data mirrored on two disks</li>
+                <li><strong>Performance:</strong> Good read performance, write performance same as single disk</li>
+                <li><strong>Reliability:</strong> Can survive failure of one disk</li>
+                <li><strong>Use Case:</strong> Critical applications requiring high availability</li>
+            </ul>
+        </div>
+
+        <div class="raid-info">
+            <h4>RAID 5 (Distributed Parity)</h4>
+            <ul>
+                <li><strong>Configuration:</strong> Data striped with distributed parity</li>
+                <li><strong>Performance:</strong> Good read performance, slower write performance</li>
+                <li><strong>Reliability:</strong> Can survive failure of one disk</li>
+                <li><strong>Minimum Disks:</strong> 3 disks required</li>
+                <li><strong>Use Case:</strong> Balance of performance, capacity, and reliability</li>
+            </ul>
+        </div>
+
+        <div class="raid-info">
+            <h4>RAID 6 (Double Parity)</h4>
+            <ul>
+                <li><strong>Configuration:</strong> Data striped with double distributed parity</li>
+                <li><strong>Performance:</strong> Good read performance, slower write performance than RAID 5</li>
+                <li><strong>Reliability:</strong> Can survive failure of two disks</li>
+                <li><strong>Minimum Disks:</strong> 4 disks required</li>
+                <li><strong>Use Case:</strong> High reliability requirements</li>
+            </ul>
+        </div>
+
+        <div class="raid-info">
+            <h4>RAID 10 (1+0)</h4>
+            <ul>
+                <li><strong>Configuration:</strong> Mirrored sets in a striped array</li>
+                <li><strong>Performance:</strong> Excellent read/write performance</li>
+                <li><strong>Reliability:</strong> Can survive multiple disk failures</li>
+                <li><strong>Minimum Disks:</strong> 4 disks required</li>
+                <li><strong>Use Case:</strong> High-performance databases</li>
+            </ul>
+        </div>
+
+        <h3>Replication</h3>
+        <p>Replication involves creating and maintaining multiple copies of data across different locations or systems to ensure availability and disaster recovery.</p>
+
+        <div class="comparison">
+            <h4>Synchronous vs Asynchronous Replication</h4>
+            <table>
+                <tr>
+                    <th>Aspect</th>
+                    <th>Synchronous</th>
+                    <th>Asynchronous</th>
+                </tr>
+                <tr>
+                    <td><strong>Process</strong></td>
+                    <td>Data written to primary and replica simultaneously</td>
+                    <td>Data written to primary first, then to replica</td>
+                </tr>
+                <tr>
+                    <td><strong>Consistency</strong></td>
+                    <td>Strong consistency guaranteed</td>
+                    <td>Eventual consistency</td>
+                </tr>
+                <tr>
+                    <td><strong>Performance</strong></td>
+                    <td>Higher latency due to network round-trip</td>
+                    <td>Lower latency, higher throughput</td>
+                </tr>
+                <tr>
+                    <td><strong>Data Loss Risk</strong></td>
+                    <td>Zero data loss</td>
+                    <td>Potential data loss during failures</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="example">
+            <h5>Master-Slave Replication</h5>
+            <pre><code>Master (Read/Write) → Slave (Read Only)
+                   → Slave (Read Only)
+                   → Slave (Read Only)</code></pre>
+            <ul>
+                <li><strong>Advantages:</strong> Simple setup, read scalability</li>
+                <li><strong>Disadvantages:</strong> Single point of failure, write bottleneck</li>
+            </ul>
+        </div>
+
+        <div class="example">
+            <h5>Master-Master Replication</h5>
+            <pre><code>Master (Read/Write) ↔ Master (Read/Write)</code></pre>
+            <ul>
+                <li><strong>Advantages:</strong> High availability, write scalability</li>
+                <li><strong>Disadvantages:</strong> Conflict resolution complexity</li>
+            </ul>
+        </div>
+
+        <div class="example">
+            <h5>Multi-Master Replication</h5>
+            <pre><code>Master ↔ Master ↔ Master
+  ↕       ↕       ↕
+Master ↔ Master ↔ Master</code></pre>
+            <ul>
+                <li><strong>Advantages:</strong> No single point of failure, geographical distribution</li>
+                <li><strong>Disadvantages:</strong> Complex conflict resolution, eventual consistency</li>
+            </ul>
+        </div>
+
+        <h3>Backup Strategies</h3>
+        <p>Backups are essential for data protection and disaster recovery, providing the ability to restore data in case of corruption, deletion, or system failure.</p>
+
+        <h4>Backup Types</h4>
+
+        <div class="example">
+            <h5>Full Backup</h5>
+            <ul>
+                <li><strong>Definition:</strong> Complete copy of all data</li>
+                <li><strong>Advantages:</strong> Simple restoration, complete data copy</li>
+                <li><strong>Disadvantages:</strong> Time-consuming, storage-intensive</li>
+                <li><strong>Frequency:</strong> Weekly or monthly</li>
+            </ul>
+        </div>
+
+        <div class="example">
+            <h5>Incremental Backup</h5>
+            <ul>
+                <li><strong>Definition:</strong> Only changes since last backup</li>
+                <li><strong>Advantages:</strong> Fast backup, minimal storage</li>
+                <li><strong>Disadvantages:</strong> Complex restoration (requires full + all incrementals)</li>
+                <li><strong>Frequency:</strong> Daily</li>
+            </ul>
+        </div>
+
+        <div class="example">
+            <h5>Differential Backup</h5>
+            <ul>
+                <li><strong>Definition:</strong> All changes since last full backup</li>
+                <li><strong>Advantages:</strong> Faster restoration than incremental</li>
+                <li><strong>Disadvantages:</strong> Growing backup size over time</li>
+                <li><strong>Frequency:</strong> Daily</li>
+            </ul>
+        </div>
+
+        <h4>Backup Strategies</h4>
+
+        <div class="tip">
+            <h5>3-2-1 Rule</h5>
+            <ul>
+                <li><strong>3 copies:</strong> Original + 2 backups</li>
+                <li><strong>2 different media:</strong> Different storage types</li>
+                <li><strong>1 offsite:</strong> Geographic separation</li>
+            </ul>
+        </div>
+
+        <div class="example">
+            <h5>Grandfather-Father-Son (GFS)</h5>
+            <ul>
+                <li><strong>Son:</strong> Daily backups (kept for a week)</li>
+                <li><strong>Father:</strong> Weekly backups (kept for a month)</li>
+                <li><strong>Grandfather:</strong> Monthly backups (kept for a year)</li>
+            </ul>
+        </div>
+
+        <h3>Recovery Strategies</h3>
+
+        <div class="reliability">
+            <h4>Recovery Time Objective (RTO)</h4>
+            <ul>
+                <li><strong>Definition:</strong> Maximum acceptable downtime</li>
+                <li><strong>Factors:</strong> Business requirements, cost considerations</li>
+                <li><strong>Strategies:</strong> Hot standby, warm standby, cold standby</li>
+            </ul>
+        </div>
+
+        <div class="reliability">
+            <h4>Recovery Point Objective (RPO)</h4>
+            <ul>
+                <li><strong>Definition:</strong> Maximum acceptable data loss</li>
+                <li><strong>Factors:</strong> Data criticality, business impact</li>
+                <li><strong>Strategies:</strong> Synchronous replication, frequent backups</li>
+            </ul>
+        </div>
+
+        <div class="example">
+            <h5>Disaster Recovery Planning</h5>
+            <ol>
+                <li><strong>Risk Assessment:</strong> Identify potential disasters</li>
+                <li><strong>Business Impact Analysis:</strong> Assess impact of different scenarios</li>
+                <li><strong>Recovery Strategies:</strong> Define recovery procedures</li>
+                <li><strong>Testing:</strong> Regular disaster recovery drills</li>
+                <li><strong>Documentation:</strong> Maintain updated recovery plans</li>
+            </ol>
+        </div>
+
+        <h2>Best Practices Summary</h2>
+
+        <div class="tip">
+            <h3>Storage Selection</h3>
+            <ul>
+                <li>Choose storage type based on access patterns and requirements</li>
+                <li>Consider cost, performance, and scalability needs</li>
+                <li>Evaluate compliance and regulatory requirements</li>
+            </ul>
+        </div>
+
+        <div class="tip">
+            <h3>Reliability Design</h3>
+            <ul>
+                <li>Implement multiple layers of redundancy</li>
+                <li>Plan for various failure scenarios</li>
+                <li>Monitor system health continuously</li>
+                <li>Automate failure detection and recovery</li>
+            </ul>
+        </div>
+
+        <div class="tip">
+            <h3>Backup Strategy</h3>
+            <ul>
+                <li>Follow the 3-2-1 backup rule</li>
+                <li>Test backups regularly</li>
+                <li>Maintain offsite backups</li>
+                <li>Document recovery procedures</li>
+            </ul>
+        </div>
+
+        <div class="tip">
+            <h3>Performance Optimization</h3>
+            <ul>
+                <li>Use appropriate storage tiers</li>
+                <li>Implement caching strategies</li>
+                <li>Monitor and optimize access patterns</li>
+                <li>Consider data lifecycle management</li>
+            </ul>
+        </div>
+
+        <div class="warning">
+            <em>This documentation provides a comprehensive overview of storage systems in system design. For specific implementation details, consult the relevant technology documentation and best practices guides.</em>
+        </div>
+    </div>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Close sidebar when clicking on main content on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.querySelector('.sidebar-toggle');
+            const isMobile = window.innerWidth <= 768;
+            
+            if (isMobile && !sidebar.contains(event.target) && !toggle.contains(event.target)) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // Smooth scrolling for TOC links
+        document.querySelectorAll('.toc a').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    const offset = 80; // Offset to account for sticky TOC
+                    const targetPosition = target.offsetTop - offset;
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Highlight active section in TOC
+        window.addEventListener('scroll', function() {
+            const sections = document.querySelectorAll('h2[id]');
+            const tocLinks = document.querySelectorAll('.toc a');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.offsetHeight;
+                if (scrollY >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            tocLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

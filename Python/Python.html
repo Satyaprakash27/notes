@@ -14,8 +14,8 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
-            color: #333;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #e8e8e8;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
             min-height: 100vh;
             margin: 0;
             display: flex;
@@ -23,7 +23,7 @@
 
         .sidebar {
             width: 280px;
-            background: #2c3e50;
+            background: #1e1e1e;
             color: white;
             height: 100vh;
             position: fixed;
@@ -32,19 +32,20 @@
             overflow-y: auto;
             z-index: 1000;
             transition: transform 0.3s ease;
+            border-right: 1px solid #333;
         }
 
         .sidebar-header {
             padding: 20px;
-            background: #34495e;
-            border-bottom: 1px solid #455a75;
+            background: #2d2d2d;
+            border-bottom: 1px solid #444;
         }
 
         .sidebar-header h2 {
             margin: 0;
             font-size: 1.3em;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #ecf0f1;
+            color: #f0f0f0;
             border: none;
             padding: 0;
         }
@@ -54,12 +55,12 @@
         }
 
         .sidebar-section {
-            border-bottom: 1px solid #455a75;
+            border-bottom: 1px solid #444;
         }
 
         .sidebar-section-title {
-            background: #34495e;
-            color: #ecf0f1;
+            background: #2d2d2d;
+            color: #f0f0f0;
             padding: 15px 20px;
             margin: 0;
             font-size: 1.1em;
@@ -73,11 +74,11 @@
         }
 
         .sidebar-section-title:hover {
-            background: #455a75;
+            background: #3a3a3a;
         }
 
         .sidebar-links {
-            background: #2c3e50;
+            background: #1e1e1e;
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.3s ease;
@@ -89,22 +90,22 @@
 
         .sidebar-links a {
             display: block;
-            color: #bdc3c7;
+            color: #b8b8b8;
             text-decoration: none;
             padding: 12px 25px;
-            border-bottom: 1px solid #34495e;
+            border-bottom: 1px solid #444;
             transition: background 0.2s ease;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             font-size: 0.95em;
         }
 
         .sidebar-links a:hover {
-            background: #34495e;
-            color: #ecf0f1;
+            background: #3a3a3a;
+            color: #f0f0f0;
         }
 
         .sidebar-links a.current {
-            background: #3498db;
+            background: #27ae60;
             color: white;
             font-weight: 600;
         }
@@ -115,7 +116,7 @@
             top: 20px;
             left: 20px;
             z-index: 1001;
-            background: #3498db;
+            background: #27ae60;
             color: white;
             border: none;
             padding: 10px;
@@ -132,18 +133,19 @@
 
         .hero-section {
             text-align: center;
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(30, 30, 30, 0.95);
             backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 60px 40px;
             margin-bottom: 40px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid #444;
         }
 
         .hero-title {
             font-size: 3.5em;
             margin-bottom: 20px;
-            background: linear-gradient(45deg, #667eea, #764ba2);
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -152,13 +154,13 @@
 
         .hero-subtitle {
             font-size: 1.3em;
-            color: #666;
+            color: #b8b8b8;
             margin-bottom: 30px;
         }
 
         .hero-description {
             font-size: 1.1em;
-            color: #555;
+            color: #a0a0a0;
             max-width: 600px;
             margin: 0 auto;
         }
@@ -172,22 +174,23 @@
         }
 
         .topic-card {
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(30, 30, 30, 0.95);
             backdrop-filter: blur(10px);
             border-radius: 15px;
             padding: 30px;
             text-decoration: none;
-            color: inherit;
+            color: #e8e8e8;
             transition: all 0.3s ease;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid #444;
         }
 
         .topic-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
             text-decoration: none;
-            color: inherit;
+            color: #e8e8e8;
+            border-color: #27ae60;
         }
 
         .topic-icon {
@@ -200,11 +203,11 @@
             font-size: 1.4em;
             font-weight: bold;
             margin-bottom: 10px;
-            color: #2c3e50;
+            color: #f0f0f0;
         }
 
         .topic-description {
-            color: #666;
+            color: #b8b8b8;
             margin-bottom: 15px;
             line-height: 1.5;
         }
@@ -216,7 +219,7 @@
         }
 
         .guide-tag {
-            background: #667eea;
+            background: #27ae60;
             color: white;
             padding: 4px 10px;
             border-radius: 12px;
@@ -225,13 +228,14 @@
         }
 
         .stats-section {
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(30, 30, 30, 0.95);
             backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 40px;
             margin: 40px auto;
             max-width: 800px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid #444;
         }
 
         .stats-grid {
@@ -248,13 +252,13 @@
         .stat-number {
             font-size: 2.5em;
             font-weight: bold;
-            color: #667eea;
+            color: #27ae60;
             display: block;
         }
 
         .stat-label {
             font-size: 1em;
-            color: #666;
+            color: #b8b8b8;
             margin-top: 5px;
         }
 
@@ -451,7 +455,7 @@
             </a>
 
             <a href="5.LangGraph/langgraph-guide.html" class="topic-card">
-                <span class="topic-icon">�</span>
+                <span class="topic-icon">📊</span>
                 <h3 class="topic-title">LangGraph</h3>
                 <p class="topic-description">
                     Build sophisticated graph-based AI applications with LangGraph for 
@@ -465,7 +469,7 @@
             </a>
 
             <a href="7.Agentic AI/agentic-ai-guide.html" class="topic-card">
-                <span class="topic-icon">�</span>
+                <span class="topic-icon">🤖</span>
                 <h3 class="topic-title">Agentic AI</h3>
                 <p class="topic-description">
                     Build intelligent AI agents with comprehensive guides on agent architecture, 

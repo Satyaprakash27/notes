@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>� Message Queues & Event-Driven Systems Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #e8e8e8;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: #1e1e1e;
+            color: white;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            border-right: 1px solid #333;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            background: #2d2d2d;
+            border-bottom: 1px solid #444;
+        }
+
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 1.3em;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #f0f0f0;
+            border: none;
+            padding: 0;
+        }
+
+        .sidebar-nav {
+            padding: 0;
+        }
+
+        .sidebar-link {
+            display: block;
+            color: #b8b8b8;
+            text-decoration: none;
+            padding: 15px 20px;
+            border-bottom: 1px solid #444;
+            transition: background 0.2s ease;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 1.1em;
+            font-weight: 500;
+        }
+
+        .sidebar-link:hover {
+            background: #3a3a3a;
+            color: #f0f0f0;
+        }
+
+        .sidebar-link.current {
+            background: #3498db;
+            color: white;
+            font-weight: 600;
+        }
+
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(30, 30, 30, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid #444;
+        }
+
+        h1 {
+            color: #f0f0f0;
+            text-align: center;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: #e0e0e0;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+            margin-top: 30px;
+            font-size: 1.8em;
+        }
+
+        h3 {
+            color: #3498db;
+            margin-top: 25px;
+            font-size: 1.4em;
+        }
+
+        h4 {
+            color: #5dade2;
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+
+        h5 {
+            color: #85c1e9;
+            margin-top: 15px;
+            font-size: 1.1em;
+        }
+
+        .toc {
+            background: rgba(52, 152, 219, 0.15);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(52, 152, 219, 0.3);
+        }
+
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-evenly;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .toc li {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex: 0 1 calc(20% - 0.5rem);
+            min-width: 120px;
+        }
+
+        .toc a {
+            color: #e0e0e0;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 0.8em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            white-space: nowrap;
+            background: rgba(50, 50, 50, 0.7);
+            border: 1px solid rgba(52, 152, 219, 0.3);
+            min-height: 40px;
+            width: 100%;
+        }
+
+        .toc a:hover, .toc a.active {
+            background: linear-gradient(45deg, #3498db, #5dade2);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        pre {
+            background: #000000;
+            color: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            margin: 15px 0;
+        }
+
+        code {
+            background: #000000;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #ffffff;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: #2a2a2a;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th, td {
+            border: 1px solid #444;
+            padding: 12px;
+            text-align: left;
+            color: #e0e0e0;
+        }
+
+        th {
+            background: #3498db;
+            color: white;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background: #333;
+        }
+
+        tr:hover {
+            background: #404040;
+        }
+
+        .overview {
+            background: #2a2a3a;
+            border: 1px solid #3498db;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #e0e0f0;
+        }
+
+        .kafka-section {
+            background: #1a3a2a;
+            border: 1px solid #27ae60;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #90ee90;
+        }
+
+        .rabbitmq-section {
+            background: #3a2a1a;
+            border: 1px solid #f39c12;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #ffc966;
+        }
+
+        .sqs-section {
+            background: #2a1a3a;
+            border: 1px solid #9b59b6;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #d1a3ff;
+        }
+
+        .pubsub-section {
+            background: #1a2a3a;
+            border: 1px solid #3498db;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #a8c8f0;
+        }
+
+        .delivery-section {
+            background: #3a1a1a;
+            border: 1px solid #e74c3c;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #ffb3b3;
+        }
+
+        .event-sourcing-section {
+            background: #2a3a1a;
+            border: 1px solid #f1c40f;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #f4d03f;
+        }
+
+        .example {
+            background: #2a2a2a;
+            border-left: 4px solid #17a2b8;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #e0e0e0;
+        }
+
+        .example h5 {
+            margin-top: 0;
+            color: #17a2b8;
+            font-size: 1.1em;
+        }
+
+        .benefits {
+            background: #1a3a1a;
+            border: 1px solid #3498db;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #90ee90;
+        }
+
+        .benefits ul {
+            margin: 10px 0;
+        }
+
+        .benefits li {
+            margin: 5px 0;
+        }
+
+        .warning {
+            background: #3a2f1a;
+            border: 1px solid #b8860b;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #ffd700;
+        }
+
+        .warning::before {
+            content: "⚠️ ";
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .tip {
+            background: #1a3a2f;
+            border: 1px solid #27ae60;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            color: #7bed9f;
+        }
+
+        .tip::before {
+            content: "💡 ";
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        @media (max-width: 1024px) {
+            .toc ul {
+                justify-content: center;
+                gap: 0.75rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .sidebar-toggle {
+                display: block;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            h2 {
+                font-size: 1.5em;
+            }
+
+            table {
+                font-size: 0.9em;
+            }
+
+            .toc {
+                position: static;
+                margin: 20px 0;
+            }
+
+            .toc ul {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.3rem;
+            }
+
+            .toc li {
+                flex: 1;
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+    
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2><a href="../" style="color: inherit; text-decoration: none;">🗂️ System Design</a></h2>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="../1.Fundamentals/system-design-fundamentals.html" class="sidebar-link">
+                🏗️ Fundamentals
+            </a>
+            <a href="../2.Networking & Communication/networking-communication.html" class="sidebar-link">
+                🌐 Networking & Communication
+            </a>
+            <a href="../3.Databases/databases.html" class="sidebar-link">
+                🗃️ Databases
+            </a>
+            <a href="../4.Caching/caching.html" class="sidebar-link">
+                🗄️ Caching
+            </a>
+            <a href="../5.Message Queues & Event-Driven Systems/message-queues-event-driven.html" class="sidebar-link current">
+                📬 Message Queues & Events
+            </a>
+            <a href="../6.Storage Systems/storage-systems.html" class="sidebar-link">
+                💾 Storage Systems
+            </a>
+            <a href="../7.Design Patterns & Architecture/design-patterns-architecture.html" class="sidebar-link">
+                🏛️ Design Patterns
+            </a>
+            <a href="../8.Scalability & Performance/scalability-performance.html" class="sidebar-link">
+                📈 Scalability & Performance
+            </a>
+            <a href="../9.Security in System Design/security-system-design.html" class="sidebar-link">
+                🔒 Security
+            </a>
+            <a href="../10.Monitoring & Observability/monitoring-observability.html" class="sidebar-link">
+                📊 Monitoring & Observability
+            </a>
+            <a href="../11.Deployment & DevOps/deployment-devops.html" class="sidebar-link">
+                🚀 Deployment & DevOps
+            </a>
+            <a href="../12.Popular Use Cases/popular-use-cases.html" class="sidebar-link">
+                🎯 Popular Use Cases
+            </a>
+            <a href="../13.Trade-offs & Decision Making/trade-offs-decision-making.html" class="sidebar-link">
+                ⚖️ Trade-offs & Decisions
+            </a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="container">
+            <h1>📬 Message Queues & Event-Driven Systems</h1>
+            
+            <div class="toc" id="toc">
+                <ul>
+                    <li><a href="#overview">Overview</a></li>
+                    <li><a href="#message-brokers">Message Brokers</a></li>
+                    <li><a href="#pubsub">Pub/Sub Pattern</a></li>
+                    <li><a href="#delivery-guarantees">Delivery Guarantees</a></li>
+                    <li><a href="#event-sourcing">Event Sourcing & CQRS</a></li>
+                </ul>
+            </div>
+
+            <h2 id="overview">Overview</h2>
+            <div class="overview">
+                <p>Message queues and event-driven systems form the backbone of modern distributed architectures, enabling asynchronous communication, loose coupling, and scalable processing. These systems allow applications to communicate through messages without requiring direct connections, improving system reliability, scalability, and maintainability.</p>
+                
+                <p>Event-driven architectures (EDA) process business logic through events, where services publish events when something significant happens and other services react to those events. This paradigm is fundamental to building resilient, scalable, and maintainable distributed systems.</p>
+            </div>
+
+            <h2 id="message-brokers">🔧 Message Brokers</h2>
+            <p>Message brokers are middleware systems that facilitate communication between different applications or services by routing messages from producers to consumers. They act as intermediaries that handle message storage, routing, and delivery.</p>
+
+            <h3>Apache Kafka</h3>
+            <div class="kafka-section">
+                <p><strong>Apache Kafka</strong> is a distributed event streaming platform designed for high-throughput, fault-tolerant, and scalable messaging.</p>
+                
+                <h4>Core Concepts:</h4>
+                <ul>
+                    <li><strong>Topics:</strong> Categories or feed names to which messages are published</li>
+                    <li><strong>Partitions:</strong> Subdivisions of topics for parallel processing</li>
+                    <li><strong>Producers:</strong> Applications that publish messages to topics</li>
+                    <li><strong>Consumers:</strong> Applications that subscribe to topics and process messages</li>
+                    <li><strong>Brokers:</strong> Kafka servers that store and serve messages</li>
+                    <li><strong>Clusters:</strong> Groups of brokers working together</li>
+                </ul>
+            </div>
+
+            <h4>Architecture</h4>
+            <div class="example">
+                <h5>Kafka Architecture:</h5>
+                <pre><code>Producer → Topic (Partitioned) → Consumer Groups
+    ↓
+Broker 1: Partition 0, 2, 4
+Broker 2: Partition 1, 3, 5
+Broker 3: Partition 2, 4, 6 (replicas)</code></pre>
+            </div>
+
+            <div class="benefits">
+                <h4>Key Features:</h4>
+                <ul>
+                    <li><strong>High Throughput:</strong> Handles millions of messages per second</li>
+                    <li><strong>Durability:</strong> Messages are persisted to disk and replicated</li>
+                    <li><strong>Scalability:</strong> Horizontal scaling through partitioning</li>
+                    <li><strong>Fault Tolerance:</strong> Built-in replication and failover mechanisms</li>
+                    <li><strong>Stream Processing:</strong> Real-time data processing capabilities</li>
+                </ul>
+            </div>
+
+            <div class="example">
+                <h5>Kafka Python Implementation:</h5>
+                <pre><code>from kafka import KafkaProducer, KafkaConsumer
+import json
+
+# Producer
+class KafkaMessageProducer:
+    def __init__(self, bootstrap_servers=['localhost:9092']):
+        self.producer = KafkaProducer(
+            bootstrap_servers=bootstrap_servers,
+            value_serializer=lambda x: json.dumps(x).encode('utf-8'),
+            key_serializer=lambda x: x.encode('utf-8') if x else None
+        )
+    
+    def send_message(self, topic, message, key=None):
+        try:
+            future = self.producer.send(topic, value=message, key=key)
+            record_metadata = future.get(timeout=10)
+            return {
+                'topic': record_metadata.topic,
+                'partition': record_metadata.partition,
+                'offset': record_metadata.offset
+            }
+        except Exception as e:
+            print(f"Error sending message: {e}")
+            return None
+
+# Consumer
+class KafkaMessageConsumer:
+    def __init__(self, topics, group_id, bootstrap_servers=['localhost:9092']):
+        self.consumer = KafkaConsumer(
+            *topics,
+            group_id=group_id,
+            bootstrap_servers=bootstrap_servers,
+            value_deserializer=lambda m: json.loads(m.decode('utf-8')),
+            enable_auto_commit=False,
+            auto_offset_reset='earliest'
+        )
+    
+    def consume_messages(self, callback):
+        try:
+            for message in self.consumer:
+                try:
+                    callback(message.value, message.key, message.offset)
+                    self.consumer.commit()
+                except Exception as e:
+                    print(f"Error processing message: {e}")
+        finally:
+            self.consumer.close()
+
+# Usage
+producer = KafkaMessageProducer()
+producer.send_message('orders', {'order_id': 123, 'amount': 99.99})</code></pre>
+            </div>
+
+            <h3>RabbitMQ</h3>
+            <div class="rabbitmq-section">
+                <p><strong>RabbitMQ</strong> is a message broker that implements the Advanced Message Queuing Protocol (AMQP) and supports multiple messaging patterns.</p>
+                
+                <h4>Core Concepts:</h4>
+                <ul>
+                    <li><strong>Exchanges:</strong> Route messages to queues based on routing rules</li>
+                    <li><strong>Queues:</strong> Store messages until they are consumed</li>
+                    <li><strong>Bindings:</strong> Rules that tell exchanges how to route messages to queues</li>
+                    <li><strong>Routing Keys:</strong> Used by exchanges to determine message routing</li>
+                    <li><strong>Consumers:</strong> Applications that receive and process messages</li>
+                </ul>
+            </div>
+
+            <h4>Exchange Types</h4>
+            <table>
+                <tr>
+                    <th>Exchange Type</th>
+                    <th>Routing Behavior</th>
+                    <th>Use Case</th>
+                    <th>Example</th>
+                </tr>
+                <tr><td><strong>Direct</strong></td><td>Routes messages with specific routing keys</td><td>Point-to-point messaging</td><td>Order processing by type</td></tr>
+                <tr><td><strong>Topic</strong></td><td>Routes messages based on wildcard patterns</td><td>Complex routing scenarios</td><td>Log routing by severity</td></tr>
+                <tr><td><strong>Fanout</strong></td><td>Broadcasts messages to all bound queues</td><td>Broadcasting</td><td>Notifications to all services</td></tr>
+                <tr><td><strong>Headers</strong></td><td>Routes based on message headers</td><td>Header-based routing</td><td>Multi-criteria routing</td></tr>
+            </table>
+
+            <div class="example">
+                <h5>RabbitMQ Python Implementation:</h5>
+                <pre><code>import pika
+import json
+
+class RabbitMQProducer:
+    def __init__(self, host='localhost'):
+        self.connection = pika.BlockingConnection(
+            pika.ConnectionParameters(host=host)
+        )
+        self.channel = self.connection.channel()
+    
+    def declare_exchange(self, exchange_name, exchange_type='direct'):
+        self.channel.exchange_declare(
+            exchange=exchange_name,
+            exchange_type=exchange_type,
+            durable=True
+        )
+    
+    def publish_message(self, exchange, routing_key, message):
+        self.channel.basic_publish(
+            exchange=exchange,
+            routing_key=routing_key,
+            body=json.dumps(message),
+            properties=pika.BasicProperties(
+                delivery_mode=2,  # Make message persistent
+                content_type='application/json'
+            )
+        )
+
+class RabbitMQConsumer:
+    def __init__(self, host='localhost'):
+        self.connection = pika.BlockingConnection(
+            pika.ConnectionParameters(host=host)
+        )
+        self.channel = self.connection.channel()
+    
+    def consume_messages(self, queue_name, callback):
+        def wrapper(ch, method, properties, body):
+            try:
+                message = json.loads(body.decode('utf-8'))
+                callback(message)
+                ch.basic_ack(delivery_tag=method.delivery_tag)
+            except Exception as e:
+                print(f"Error processing message: {e}")
+                ch.basic_nack(delivery_tag=method.delivery_tag, requeue=False)
+        
+        self.channel.basic_qos(prefetch_count=1)
+        self.channel.basic_consume(queue=queue_name, on_message_callback=wrapper)
+        self.channel.start_consuming()</code></pre>
+            </div>
+
+            <h3>Amazon SQS</h3>
+            <div class="sqs-section">
+                <p><strong>Amazon Simple Queue Service (SQS)</strong> is a fully managed message queuing service that enables decoupling of distributed systems.</p>
+                
+                <h4>Queue Types:</h4>
+                <ul>
+                    <li><strong>Standard Queues:</strong> High throughput, at-least-once delivery, best-effort ordering</li>
+                    <li><strong>FIFO Queues:</strong> Exactly-once processing, first-in-first-out delivery</li>
+                </ul>
+            </div>
+
+            <div class="benefits">
+                <h4>Key Features:</h4>
+                <ul>
+                    <li><strong>Fully Managed:</strong> No infrastructure management required</li>
+                    <li><strong>Scalability:</strong> Automatically scales to handle load</li>
+                    <li><strong>Security:</strong> Integration with AWS IAM and encryption</li>
+                    <li><strong>Dead Letter Queues:</strong> Handle failed message processing</li>
+                    <li><strong>Message Attributes:</strong> Additional metadata for messages</li>
+                </ul>
+            </div>
+
+            <div class="example">
+                <h5>SQS Python Implementation:</h5>
+                <pre><code>import boto3
+import json
+
+class SQSMessageHandler:
+    def __init__(self, region_name='us-east-1'):
+        self.sqs = boto3.client('sqs', region_name=region_name)
+    
+    def send_message(self, queue_url, message, delay_seconds=0):
+        response = self.sqs.send_message(
+            QueueUrl=queue_url,
+            MessageBody=json.dumps(message),
+            DelaySeconds=delay_seconds
+        )
+        return response['MessageId']
+    
+    def receive_messages(self, queue_url, max_messages=10):
+        response = self.sqs.receive_message(
+            QueueUrl=queue_url,
+            MaxNumberOfMessages=max_messages,
+            WaitTimeSeconds=20,  # Long polling
+            MessageAttributeNames=['All']
+        )
+        
+        messages = response.get('Messages', [])
+        processed_messages = []
+        
+        for message in messages:
+            try:
+                body = json.loads(message['Body'])
+                processed_messages.append({
+                    'id': message['MessageId'],
+                    'body': body,
+                    'receipt_handle': message['ReceiptHandle']
+                })
+            except json.JSONDecodeError:
+                print(f"Invalid JSON in message: {message['Body']}")
+        
+        return processed_messages
+    
+    def delete_message(self, queue_url, receipt_handle):
+        self.sqs.delete_message(
+            QueueUrl=queue_url,
+            ReceiptHandle=receipt_handle
+        )</code></pre>
+            </div>
+
+            <h3>Message Broker Comparison</h3>
+            <table>
+                <tr>
+                    <th>Feature</th>
+                    <th>Kafka</th>
+                    <th>RabbitMQ</th>
+                    <th>SQS</th>
+                </tr>
+                <tr><td><strong>Throughput</strong></td><td>Very High</td><td>High</td><td>High</td></tr>
+                <tr><td><strong>Latency</strong></td><td>Low</td><td>Very Low</td><td>Medium</td></tr>
+                <tr><td><strong>Durability</strong></td><td>Excellent</td><td>Good</td><td>Excellent</td></tr>
+                <tr><td><strong>Ordering</strong></td><td>Per-partition</td><td>Per-queue</td><td>FIFO queues</td></tr>
+                <tr><td><strong>Scalability</strong></td><td>Horizontal</td><td>Vertical/Horizontal</td><td>Automatic</td></tr>
+                <tr><td><strong>Complexity</strong></td><td>High</td><td>Medium</td><td>Low</td></tr>
+                <tr><td><strong>Cost</strong></td><td>Self-managed</td><td>Self-managed</td><td>Pay-per-use</td></tr>
+            </table>
+
+            <h2 id="pubsub">📡 Pub/Sub Pattern</h2>
+            <p>The Publish/Subscribe (Pub/Sub) pattern is a messaging pattern where publishers send messages to topics without knowing who will receive them, and subscribers receive messages from topics they're interested in.</p>
+
+            <h3>Core Concepts</h3>
+            <div class="pubsub-section">
+                <h4>Key Components:</h4>
+                <ul>
+                    <li><strong>Publishers:</strong> Decoupled from subscribers, send messages asynchronously</li>
+                    <li><strong>Subscribers:</strong> Interest-based, process messages independently</li>
+                    <li><strong>Message Broker:</strong> Routes messages, stores temporarily, filters based on interests</li>
+                </ul>
+            </div>
+
+            <div class="example">
+                <h5>Topic-based Pub/Sub Implementation:</h5>
+                <pre><code>class PubSubBroker:
+    def __init__(self):
+        self.topics = {}
+        self.subscribers = {}
+    
+    def subscribe(self, topic, subscriber_id, callback):
+        if topic not in self.topics:
+            self.topics[topic] = []
+        
+        self.topics[topic].append({
+            'id': subscriber_id,
+            'callback': callback
+        })
+    
+    def publish(self, topic, message):
+        if topic in self.topics:
+            for subscriber in self.topics[topic]:
+                try:
+                    subscriber['callback'](message)
+                except Exception as e:
+                    print(f"Error delivering message to {subscriber['id']}: {e}")
+
+# Usage example
+broker = PubSubBroker()
+
+# Define subscriber callbacks
+def handle_order_created(message):
+    print(f"Email service: Sending confirmation for order {message['order_id']}")
+
+def handle_order_inventory(message):
+    print(f"Inventory service: Updating stock for order {message['order_id']}")
+
+# Subscribe to topics
+broker.subscribe('order.created', 'email-service', handle_order_created)
+broker.subscribe('order.created', 'inventory-service', handle_order_inventory)
+
+# Publish message
+broker.publish('order.created', {
+    'order_id': 123,
+    'customer_id': 456,
+    'total_amount': 99.99
+})</code></pre>
+            </div>
+
+            <div class="example">
+                <h5>Content-based Pub/Sub:</h5>
+                <pre><code>class ContentBasedPubSub:
+    def __init__(self):
+        self.subscriptions = []
+    
+    def subscribe(self, subscriber_id, filter_func, callback):
+        self.subscriptions.append({
+            'id': subscriber_id,
+            'filter': filter_func,
+            'callback': callback
+        })
+    
+    def publish(self, message):
+        for subscription in self.subscriptions:
+            try:
+                if subscription['filter'](message):
+                    subscription['callback'](message)
+            except Exception as e:
+                print(f"Error in subscription {subscription['id']}: {e}")
+
+# Usage with filters
+content_broker = ContentBasedPubSub()
+
+# Subscribe with filters
+content_broker.subscribe(
+    'high-value-orders',
+    lambda msg: msg.get('amount', 0) > 100,
+    lambda msg: print(f"High-value order alert: {msg}")
+)
+
+content_broker.subscribe(
+    'urgent-orders',
+    lambda msg: msg.get('priority') == 'urgent',
+    lambda msg: print(f"Urgent order processing: {msg}")
+)</code></pre>
+            </div>
+
+            <div class="benefits">
+                <h4>Pub/Sub Benefits:</h4>
+                <ul>
+                    <li><strong>Decoupling:</strong> Publishers and subscribers are independent</li>
+                    <li><strong>Scalability:</strong> Easy to add new subscribers</li>
+                    <li><strong>Flexibility:</strong> Dynamic subscription management</li>
+                    <li><strong>Reliability:</strong> Messages can be persisted and replayed</li>
+                    <li><strong>Fan-out:</strong> One message can reach multiple subscribers</li>
+                </ul>
+            </div>
+
+            <div class="warning">
+                <h4>Challenges:</h4>
+                <ul>
+                    <li><strong>Message Ordering:</strong> Difficult to maintain order across subscribers</li>
+                    <li><strong>Delivery Guarantees:</strong> Ensuring all subscribers receive messages</li>
+                    <li><strong>Error Handling:</strong> Managing failed message deliveries</li>
+                    <li><strong>Complexity:</strong> Managing subscriptions and routing logic</li>
+                </ul>
+            </div>
+
+            <h2 id="delivery-guarantees">📋 Delivery Guarantees</h2>
+            <p>Delivery guarantees define the reliability semantics of message delivery in distributed systems. Understanding these guarantees is crucial for designing reliable messaging systems.</p>
+
+            <h3>At-Most-Once Delivery</h3>
+            <div class="delivery-section">
+                <p><strong>At-Most-Once</strong> guarantees that messages are delivered zero or one time, but never more than once.</p>
+                
+                <h4>Characteristics:</h4>
+                <ul>
+                    <li><strong>No Duplicates:</strong> Messages are never delivered more than once</li>
+                    <li><strong>Possible Loss:</strong> Messages may be lost during failures</li>
+                    <li><strong>High Performance:</strong> Minimal overhead for delivery tracking</li>
+                    <li><strong>Fire-and-Forget:</strong> Publisher doesn't wait for acknowledgment</li>
+                </ul>
+            </div>
+
+            <div class="example">
+                <h5>At-Most-Once Implementation:</h5>
+                <pre><code>class AtMostOnceDelivery:
+    def __init__(self, broker):
+        self.broker = broker
+        self.sent_messages = set()
+    
+    def send_message(self, topic, message):
+        message_id = self.generate_message_id(message)
+        
+        if message_id in self.sent_messages:
+            print(f"Message {message_id} already sent, skipping")
+            return False
+        
+        try:
+            self.broker.send(topic, message)
+            self.sent_messages.add(message_id)
+            return True
+        except Exception as e:
+            print(f"Failed to send message {message_id}: {e}")
+            return False
+    
+    def generate_message_id(self, message):
+        import hashlib
+        return hashlib.md5(str(message).encode()).hexdigest()
+
+# Consumer side
+class AtMostOnceConsumer:
+    def __init__(self, broker):
+        self.broker = broker
+        self.processed_messages = set()
+    
+    def consume_messages(self, topic, callback):
+        for message in self.broker.consume(topic):
+            message_id = self.extract_message_id(message)
+            
+            if message_id in self.processed_messages:
+                continue  # Skip duplicate
+            
+            try:
+                callback(message)
+                self.processed_messages.add(message_id)
+            except Exception as e:
+                print(f"Error processing message {message_id}: {e}")
+                # Message is lost on failure</code></pre>
+            </div>
+
+            <h3>At-Least-Once Delivery</h3>
+            <div class="delivery-section">
+                <p><strong>At-Least-Once</strong> guarantees that messages are delivered one or more times, ensuring no message loss but allowing duplicates.</p>
+                
+                <h4>Characteristics:</h4>
+                <ul>
+                    <li><strong>No Loss:</strong> Messages are guaranteed to be delivered</li>
+                    <li><strong>Possible Duplicates:</strong> Messages may be delivered multiple times</li>
+                    <li><strong>Acknowledgments:</strong> Consumers must acknowledge receipt</li>
+                    <li><strong>Retry Logic:</strong> Failed deliveries are retried</li>
+                </ul>
+            </div>
+
+            <div class="example">
+                <h5>At-Least-Once Implementation:</h5>
+                <pre><code>import time
+import threading
+
+class AtLeastOnceDelivery:
+    def __init__(self, broker, max_retries=3, retry_delay=1):
+        self.broker = broker
+        self.max_retries = max_retries
+        self.retry_delay = retry_delay
+        self.pending_messages = {}
+        self.lock = threading.Lock()
+    
+    def send_message(self, topic, message):
+        message_id = self.generate_message_id()
+        
+        with self.lock:
+            self.pending_messages[message_id] = {
+                'topic': topic,
+                'message': message,
+                'retries': 0,
+                'timestamp': time.time()
+            }
+        
+        self._attempt_delivery(message_id)
+        return message_id
+    
+    def _attempt_delivery(self, message_id):
+        with self.lock:
+            if message_id not in self.pending_messages:
+                return
+            
+            msg_info = self.pending_messages[message_id]
+        
+        try:
+            self.broker.send(msg_info['topic'], msg_info['message'])
+            # Start acknowledgment timeout
+            threading.Timer(5.0, self._check_acknowledgment, [message_id]).start()
+        except Exception as e:
+            print(f"Failed to send message {message_id}: {e}")
+            self._retry_message(message_id)
+    
+    def acknowledge_message(self, message_id):
+        with self.lock:
+            if message_id in self.pending_messages:
+                del self.pending_messages[message_id]
+                print(f"Message {message_id} acknowledged")</code></pre>
+            </div>
+
+            <h3>Exactly-Once Delivery</h3>
+            <div class="delivery-section">
+                <p><strong>Exactly-Once</strong> guarantees that messages are delivered exactly one time, combining the benefits of both previous approaches.</p>
+                
+                <h4>Characteristics:</h4>
+                <ul>
+                    <li><strong>No Loss:</strong> Messages are guaranteed to be delivered</li>
+                    <li><strong>No Duplicates:</strong> Messages are delivered exactly once</li>
+                    <li><strong>Complex Implementation:</strong> Requires careful coordination</li>
+                    <li><strong>Performance Overhead:</strong> Higher latency and resource usage</li>
+                </ul>
+            </div>
+
+            <h3>Delivery Guarantees Comparison</h3>
+            <table>
+                <tr>
+                    <th>Guarantee</th>
+                    <th>Duplicates</th>
+                    <th>Message Loss</th>
+                    <th>Complexity</th>
+                    <th>Performance</th>
+                    <th>Use Cases</th>
+                </tr>
+                <tr><td><strong>At-Most-Once</strong></td><td>No</td><td>Possible</td><td>Low</td><td>High</td><td>Metrics, Caching</td></tr>
+                <tr><td><strong>At-Least-Once</strong></td><td>Possible</td><td>No</td><td>Medium</td><td>Medium</td><td>Orders, Transactions</td></tr>
+                <tr><td><strong>Exactly-Once</strong></td><td>No</td><td>No</td><td>High</td><td>Low</td><td>Financial, Critical</td></tr>
+            </table>
+
+            <h2 id="event-sourcing">📚 Event Sourcing and CQRS</h2>
+            <p>Event Sourcing and Command Query Responsibility Segregation (CQRS) are architectural patterns that complement each other in building scalable, maintainable event-driven systems.</p>
+
+            <h3>Event Sourcing</h3>
+            <div class="event-sourcing-section">
+                <p><strong>Event Sourcing</strong> is a pattern where all changes to application state are stored as a sequence of events, rather than storing just the current state.</p>
+                
+                <h4>Core Concepts:</h4>
+                <ul>
+                    <li><strong>Events:</strong> Immutable records of what happened</li>
+                    <li><strong>Event Store:</strong> Persistent storage for events</li>
+                    <li><strong>Event Stream:</strong> Ordered sequence of events</li>
+                    <li><strong>Aggregate:</strong> Business entity that generates events</li>
+                    <li><strong>Projection:</strong> Current state derived from events</li>
+                </ul>
+            </div>
+
+            <div class="benefits">
+                <h4>Event Sourcing Benefits:</h4>
+                <ul>
+                    <li><strong>Complete Audit Trail:</strong> Every change is recorded</li>
+                    <li><strong>Temporal Queries:</strong> Query state at any point in time</li>
+                    <li><strong>Replay Capability:</strong> Rebuild state from events</li>
+                    <li><strong>Debugging:</strong> Easy to understand what happened</li>
+                    <li><strong>Scalability:</strong> Append-only writes are highly scalable</li>
+                </ul>
+            </div>
+
+            <div class="example">
+                <h5>Event Sourcing Implementation:</h5>
+                <pre><code>from abc import ABC, abstractmethod
+from typing import List, Dict, Any
+import uuid
+from datetime import datetime
+
+class Event(ABC):
+    def __init__(self, aggregate_id: str, event_id: str = None, timestamp: datetime = None):
+        self.aggregate_id = aggregate_id
+        self.event_id = event_id or str(uuid.uuid4())
+        self.timestamp = timestamp or datetime.utcnow()
+        self.event_type = self.__class__.__name__
+    
+    @abstractmethod
+    def to_dict(self) -> Dict[str, Any]:
+        pass
+
+# Domain Events
+class OrderCreated(Event):
+    def __init__(self, aggregate_id: str, customer_id: str, total_amount: float, items: List[Dict]):
+        super().__init__(aggregate_id)
+        self.customer_id = customer_id
+        self.total_amount = total_amount
+        self.items = items
+    
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            'aggregate_id': self.aggregate_id,
+            'event_id': self.event_id,
+            'timestamp': self.timestamp.isoformat(),
+            'event_type': self.event_type,
+            'customer_id': self.customer_id,
+            'total_amount': self.total_amount,
+            'items': self.items
+        }
+
+class OrderShipped(Event):
+    def __init__(self, aggregate_id: str, tracking_number: str, carrier: str):
+        super().__init__(aggregate_id)
+        self.tracking_number = tracking_number
+        self.carrier = carrier
+    
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            'aggregate_id': self.aggregate_id,
+            'event_id': self.event_id,
+            'timestamp': self.timestamp.isoformat(),
+            'event_type': self.event_type,
+            'tracking_number': self.tracking_number,
+            'carrier': self.carrier
+        }
+
+# Event Store
+class EventStore:
+    def __init__(self):
+        self.events = {}  # In production, use a database
+    
+    def save_events(self, aggregate_id: str, events: List[Event], expected_version: int = -1):
+        if aggregate_id not in self.events:
+            self.events[aggregate_id] = []
+        
+        # Optimistic concurrency control
+        current_version = len(self.events[aggregate_id])
+        if expected_version != -1 and expected_version != current_version:
+            raise ConcurrencyException(f"Expected version {expected_version}, got {current_version}")
+        
+        # Append events
+        for event in events:
+            self.events[aggregate_id].append(event)
+    
+    def get_events(self, aggregate_id: str, from_version: int = 0) -> List[Event]:
+        if aggregate_id not in self.events:
+            return []
+        
+        return self.events[aggregate_id][from_version:]</code></pre>
+            </div>
+
+            <h3>CQRS (Command Query Responsibility Segregation)</h3>
+            <div class="event-sourcing-section">
+                <p><strong>CQRS</strong> separates read and write operations, allowing them to be optimized independently.</p>
+                
+                <h4>Core Concepts:</h4>
+                <ul>
+                    <li><strong>Commands:</strong> Operations that change state</li>
+                    <li><strong>Queries:</strong> Operations that read state</li>
+                    <li><strong>Command Side:</strong> Handles business logic and writes</li>
+                    <li><strong>Query Side:</strong> Handles reads and projections</li>
+                    <li><strong>Separate Models:</strong> Different models for reads and writes</li>
+                </ul>
+            </div>
+
+            <div class="benefits">
+                <h4>CQRS Benefits:</h4>
+                <ul>
+                    <li><strong>Scalability:</strong> Scale reads and writes independently</li>
+                    <li><strong>Optimization:</strong> Optimize each side for its specific needs</li>
+                    <li><strong>Flexibility:</strong> Use different storage technologies</li>
+                    <li><strong>Complexity Management:</strong> Separate concerns clearly</li>
+                </ul>
+            </div>
+
+            <div class="example">
+                <h5>CQRS Implementation:</h5>
+                <pre><code># Command Side
+class Command(ABC):
+    pass
+
+class CreateOrderCommand(Command):
+    def __init__(self, order_id: str, customer_id: str, total_amount: float, items: List[Dict]):
+        self.order_id = order_id
+        self.customer_id = customer_id
+        self.total_amount = total_amount
+        self.items = items
+
+# Command Handlers
+class CommandHandler(ABC):
+    @abstractmethod
+    def handle(self, command: Command):
+        pass
+
+class CreateOrderCommandHandler(CommandHandler):
+    def __init__(self, repository):
+        self.repository = repository
+    
+    def handle(self, command: CreateOrderCommand):
+        order = OrderAggregate(command.order_id)
+        order.create_order(
+            command.customer_id,
+            command.total_amount,
+            command.items
+        )
+        self.repository.save(order)
+
+# Query Side
+class Query(ABC):
+    pass
+
+class GetOrderByIdQuery(Query):
+    def __init__(self, order_id: str):
+        self.order_id = order_id
+
+# Read Models (Projections)
+class OrderReadModel:
+    def __init__(self, order_id: str, customer_id: str, total_amount: float, 
+                 status: str, created_at: datetime, items: List[Dict]):
+        self.order_id = order_id
+        self.customer_id = customer_id
+        self.total_amount = total_amount
+        self.status = status
+        self.created_at = created_at
+        self.items = items
+
+# Command/Query Bus
+class CommandBus:
+    def __init__(self):
+        self.handlers = {}
+    
+    def register_handler(self, command_type: type, handler: CommandHandler):
+        self.handlers[command_type] = handler
+    
+    def send(self, command: Command):
+        handler = self.handlers.get(type(command))
+        if handler:
+            handler.handle(command)
+        else:
+            raise ValueError(f"No handler registered for {type(command)}")</code></pre>
+            </div>
+
+            <h3>Event Sourcing + CQRS Use Cases</h3>
+            <table>
+                <tr>
+                    <th>Industry</th>
+                    <th>Use Case</th>
+                    <th>Benefits</th>
+                    <th>Example</th>
+                </tr>
+                <tr><td><strong>Financial</strong></td><td>Trading platforms, banking</td><td>Complete audit trail</td><td>Transaction history</td></tr>
+                <tr><td><strong>E-commerce</strong></td><td>Order processing</td><td>Order state tracking</td><td>Order lifecycle</td></tr>
+                <tr><td><strong>Gaming</strong></td><td>Player actions</td><td>Replay capability</td><td>Game state management</td></tr>
+                <tr><td><strong>IoT</strong></td><td>Sensor data</td><td>Time-series analysis</td><td>Device management</td></tr>
+            </table>
+
+            <h2>Best Practices</h2>
+
+            <h3>Message Design</h3>
+            <div class="tip">
+                <h4>Standard Message Structure:</h4>
+                <ul>
+                    <li><strong>Consistent Format:</strong> Use standardized message envelope</li>
+                    <li><strong>Schema Evolution:</strong> Plan for message format changes</li>
+                    <li><strong>Metadata:</strong> Include routing and processing metadata</li>
+                    <li><strong>Validation:</strong> Implement message validation logic</li>
+                </ul>
+            </div>
+
+            <h3>Error Handling</h3>
+            <div class="tip">
+                <h4>Robust Error Handling:</h4>
+                <ul>
+                    <li><strong>Dead Letter Queues:</strong> Handle permanently failed messages</li>
+                    <li><strong>Retry Logic:</strong> Implement exponential backoff</li>
+                    <li><strong>Circuit Breakers:</strong> Prevent cascade failures</li>
+                    <li><strong>Monitoring:</strong> Track error rates and patterns</li>
+                </ul>
+            </div>
+
+            <h3>Common Pitfalls</h3>
+            <div class="warning">
+                <h4>Avoid These Issues:</h4>
+                <ul>
+                    <li><strong>Message Ordering:</strong> Don't assume global ordering</li>
+                    <li><strong>Poison Messages:</strong> Implement retry limits</li>
+                    <li><strong>Tight Coupling:</strong> Avoid shared data structures</li>
+                    <li><strong>Missing Monitoring:</strong> Always track message flows</li>
+                </ul>
+            </div>
+
+            <h2>Summary</h2>
+            <div class="benefits">
+                <p>Message queues and event-driven systems are fundamental to building scalable, resilient distributed applications. Key takeaways include:</p>
+                
+                <h3>Key Concepts:</h3>
+                <ul>
+                    <li><strong>Message Brokers:</strong> Choose between Kafka, RabbitMQ, and SQS based on requirements</li>
+                    <li><strong>Pub/Sub Pattern:</strong> Enables loose coupling and scalable communication</li>
+                    <li><strong>Delivery Guarantees:</strong> Understand trade-offs between different delivery semantics</li>
+                    <li><strong>Event Sourcing:</strong> Store all changes as events for complete auditability</li>
+                    <li><strong>CQRS:</strong> Separate read and write models for optimal performance</li>
+                </ul>
+                
+                <h3>Best Practices:</h3>
+                <ul>
+                    <li><strong>Message Design:</strong> Use consistent structure and handle schema evolution</li>
+                    <li><strong>Error Handling:</strong> Implement robust error handling and retry mechanisms</li>
+                    <li><strong>Monitoring:</strong> Track message flows and processing metrics</li>
+                    <li><strong>Idempotency:</strong> Design processors to handle duplicate messages safely</li>
+                </ul>
+            </div>
+
+            <h3>Next Steps</h3>
+            <p>After mastering message queues and event-driven systems, explore:</p>
+            <ul>
+                <li><strong>Storage Systems</strong> for persistent data management</li>
+                <li><strong>Design Patterns</strong> for system architecture</li>
+                <li><strong>Scalability strategies</strong> for high-load systems</li>
+                <li><strong>Monitoring and observability</strong> for distributed systems</li>
+            </ul>
+
+            <p style="text-align: center; font-size: 1.2em; color: #3498db; margin-top: 30px;">
+                <strong>Understanding message queues and event-driven systems is essential for building modern distributed applications! 🚀</strong>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('active');
+        }
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.querySelector('.sidebar-toggle');
+            
+            if (window.innerWidth <= 768 && 
+                !sidebar.contains(event.target) && 
+                !toggle.contains(event.target) && 
+                sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+            }
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    const tocElement = document.querySelector('.toc');
+                    const tocHeight = tocElement ? tocElement.offsetHeight : 0;
+                    const offset = tocHeight + 40;
+                    
+                    const targetPosition = target.offsetTop - offset;
+                    
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                    
+                    document.querySelectorAll('.toc a').forEach(link => {
+                        link.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                }
+            });
+        });
+
+        // Highlight current section in TOC on scroll
+        window.addEventListener('scroll', function() {
+            const sections = document.querySelectorAll('h2[id]');
+            const tocLinks = document.querySelectorAll('.toc a');
+            
+            let current = '';
+            const tocElement = document.querySelector('.toc');
+            const tocHeight = tocElement ? tocElement.offsetHeight : 0;
+            const offset = tocHeight + 50;
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (window.scrollY >= sectionTop - offset) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            tocLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
