@@ -82,22 +82,59 @@ a:hover {
 }
 
 .nav-section {
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .nav-section-title {
-  padding: 0 1.5rem;
+  padding: 0.5rem 1.5rem;
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--text-secondary);
   font-weight: 600;
-  margin-bottom: 0.5rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: color 0.2s;
+}
+
+.nav-section-title:hover {
+  color: var(--text-primary);
+}
+
+.nav-section-title::after {
+  content: "›";
+  display: inline-block;
+  font-size: 1.2em;
+  line-height: 1;
+  transition: transform 0.2s ease;
+  transform: rotate(90deg); /* Default open state pointer */
+}
+
+/* When the section is collapsed, reset rotation to 0 (pointing right) */
+.nav-section-title.collapsed::after {
+  transform: rotate(0deg);
+}
+
+.nav-items {
+  overflow: hidden;
+  transition:
+    max-height 0.3s ease,
+    opacity 0.3s ease;
+  max-height: 500px; /* Arbitrary large height */
+  opacity: 1;
+}
+
+.nav-items.collapsed {
+  max-height: 0;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .nav-link {
   display: block;
-  padding: 0.5rem 1.5rem;
+  padding: 0.5rem 1.5rem 0.5rem 2rem; /* Indent slightly more */
   color: var(--text-secondary);
   font-size: 0.9rem;
   border-left: 2px solid transparent;

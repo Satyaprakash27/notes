@@ -48,8 +48,16 @@ const navData = [
   {
     title: "V. Deep Agents",
     items: [
-      { label: "Long-Horizon Reasoning", path: "deep-agents/reasoning.html" },
-      { label: "Sandboxing & Resources", path: "deep-agents/sandboxing.html" },
+      { label: "Overview", path: "deep-agents/index.html" },
+      { label: "Quickstart", path: "deep-agents/quickstart.html" },
+      { label: "Customization", path: "deep-agents/customization.html" },
+      { label: "Agent Harness", path: "deep-agents/harness.html" },
+      { label: "Backends", path: "deep-agents/backends.html" },
+      { label: "Subagents", path: "deep-agents/subagents.html" },
+      { label: "Human-in-the-Loop", path: "deep-agents/human-in-the-loop.html" },
+      { label: "Long-term Memory", path: "deep-agents/memory.html" },
+      { label: "Middleware", path: "deep-agents/middleware.html" },
+      { label: "Skills", path: "deep-agents/skills.html" },
     ],
   },
   {
@@ -90,10 +98,25 @@ function initSidebar() {
         <div class="nav-container">
     `;
 
-  navData.forEach((section) => {
+  navData.forEach((section, index) => {
+    // Check if any item in this section is active
+    let isSectionActive = false;
+    section.items.forEach((item) => {
+        if (currentPath.includes(item.path)) {
+            isSectionActive = true;
+        }
+    });
+
+    // Default state: collapsed unless active
+    const collapsedClass = isSectionActive ? "" : "collapsed";
+    const titleCollapsedClass = isSectionActive ? "" : "collapsed";
+
     html += `
             <div class="nav-section">
-                <div class="nav-section-title">${section.title}</div>
+                <div class="nav-section-title ${titleCollapsedClass}" data-target="section-${index}">
+                    ${section.title}
+                </div>
+                <div id="section-${index}" class="nav-items ${collapsedClass}">
         `;
 
     section.items.forEach((item) => {
@@ -111,11 +134,25 @@ function initSidebar() {
             `;
     });
 
-    html += `</div>`;
+    html += `   </div>
+            </div>`;
   });
 
   html += `</div>`;
   sidebar.innerHTML = html;
+
+  // Add click handlers for toggling
+  const titles = sidebar.querySelectorAll(".nav-section-title");
+  titles.forEach((title) => {
+      title.addEventListener("click", () => {
+          const targetId = title.getAttribute("data-target");
+          const target = document.getElementById(targetId);
+          
+          // Toggle classes
+          title.classList.toggle("collapsed");
+          target.classList.toggle("collapsed");
+      });
+  });
 }
 
 // Initialize Mermaid
