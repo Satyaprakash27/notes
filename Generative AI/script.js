@@ -25,7 +25,32 @@ const navData = [
     ],
   },
   {
-    title: "III. LangGraph State Machines",
+    title: "III. LangChain Framework",
+    items: [
+      { label: "Overview", path: "langchain/index.html" },
+      { label: "Agents", path: "langchain/agents.html" },
+      { label: "Models", path: "langchain/models.html" },
+      { label: "Messages", path: "langchain/messages.html" },
+      { label: "Tools", path: "langchain/tools.html" },
+      { label: "Short-term Memory", path: "langchain/memory-short-term.html" },
+      { label: "Streaming", path: "langchain/streaming.html" },
+      { label: "Structured Output", path: "langchain/structured-output.html" },
+      { label: "Middleware Overview", path: "langchain/middleware-overview.html" },
+      { label: "Built-in Middleware", path: "langchain/middleware-builtin.html" },
+      { label: "Custom Middleware", path: "langchain/middleware-custom.html" },
+      { label: "Guardrails", path: "langchain/guardrails.html" },
+      { label: "Runtime", path: "langchain/runtime.html" },
+      { label: "Context Engineering", path: "langchain/context-engineering.html" },
+      { label: "Model Context Protocol (MCP)", path: "langchain/mcp.html" },
+      { label: "Human-in-the-Loop", path: "langchain/hitl.html" },
+      { label: "Multi-agent", path: "langchain/multi-agent.html" },
+      { label: "Retrieval", path: "langchain/retrieval.html" },
+      { label: "Long-term Memory", path: "langchain/memory-long-term.html" },
+      { label: "LangSmith Studio", path: "langchain/langsmith.html" },
+    ],
+  },
+  {
+    title: "IV. LangGraph State Machines",
     items: [
       { label: "State Machines & Nodes", path: "langgraph/state-machine.html" },
       { label: "Persistence & Memory", path: "langgraph/persistence.html" },
@@ -33,7 +58,7 @@ const navData = [
     ],
   },
   {
-    title: "IV. Multi-Agent Orchestration",
+    title: "V. Multi-Agent Orchestration",
     items: [
       {
         label: "Network Architectures",
@@ -46,7 +71,7 @@ const navData = [
     ],
   },
   {
-    title: "V. Deep Agents",
+    title: "VI. Deep Agents",
     items: [
       { label: "Overview", path: "deep-agents/index.html" },
       { label: "Quickstart", path: "deep-agents/quickstart.html" },
@@ -54,14 +79,17 @@ const navData = [
       { label: "Agent Harness", path: "deep-agents/harness.html" },
       { label: "Backends", path: "deep-agents/backends.html" },
       { label: "Subagents", path: "deep-agents/subagents.html" },
-      { label: "Human-in-the-Loop", path: "deep-agents/human-in-the-loop.html" },
+      {
+        label: "Human-in-the-Loop",
+        path: "deep-agents/human-in-the-loop.html",
+      },
       { label: "Long-term Memory", path: "deep-agents/memory.html" },
       { label: "Middleware", path: "deep-agents/middleware.html" },
       { label: "Skills", path: "deep-agents/skills.html" },
     ],
   },
   {
-    title: "VI. Evaluation & Security",
+    title: "VII. Evaluation & Security",
     items: [
       { label: "Agentic Evals", path: "evals/metrics.html" },
       { label: "Security & Red Teaming", path: "evals/security.html" },
@@ -79,14 +107,25 @@ function initSidebar() {
   // Simple heuristic: if 'core/', 'patterns/' etc in path -> '../'
 
   // Better approach: We know where we are based on the script inclusion.
-  // We'll trust the paths in navData are relative to the root 'study-bible/'.
+  // We'll trust the paths in navData are relative to the root.
   // We need to adjust them based on CURRENT page location.
 
+  // Normalize path to handle spaces (%20)
+  const normalizedPath = decodeURIComponent(currentPath);
+  
+  // Check if we are at the root (index.html or folder root)
+  // we assume the root folder is named "Generative AI" now
   const isRoot =
-    currentPath.endsWith("study-bible/index.html") ||
-    currentPath.endsWith("study-bible/");
-  const depth =
-    currentPath.split("study-bible/")[1]?.split("/").length - 1 || 0;
+    normalizedPath.endsWith("Generative AI/index.html") ||
+    normalizedPath.endsWith("Generative AI/") ||
+    normalizedPath.split("/").pop() === "index.html" && !navData.some(section => section.items.some(item => normalizedPath.endsWith(item.path))); 
+    
+  // Calculate depth based on known subdirectories in navData if possible, 
+  // or simple heuristic based on "Generative AI/" split.
+  // Since we moved everything up, we split by "Generative AI/"
+  const parts = normalizedPath.split("Generative AI/");
+  const relativePart = parts.length > 1 ? parts[1] : "";
+  const depth = relativePart.split("/").length - 1;
   const prefix = depth > 0 ? "../".repeat(depth) : "";
 
   let html = `
@@ -102,9 +141,9 @@ function initSidebar() {
     // Check if any item in this section is active
     let isSectionActive = false;
     section.items.forEach((item) => {
-        if (currentPath.includes(item.path)) {
-            isSectionActive = true;
-        }
+      if (currentPath.includes(item.path)) {
+        isSectionActive = true;
+      }
     });
 
     // Default state: collapsed unless active
@@ -144,14 +183,14 @@ function initSidebar() {
   // Add click handlers for toggling
   const titles = sidebar.querySelectorAll(".nav-section-title");
   titles.forEach((title) => {
-      title.addEventListener("click", () => {
-          const targetId = title.getAttribute("data-target");
-          const target = document.getElementById(targetId);
-          
-          // Toggle classes
-          title.classList.toggle("collapsed");
-          target.classList.toggle("collapsed");
-      });
+    title.addEventListener("click", () => {
+      const targetId = title.getAttribute("data-target");
+      const target = document.getElementById(targetId);
+
+      // Toggle classes
+      title.classList.toggle("collapsed");
+      target.classList.toggle("collapsed");
+    });
   });
 }
 
